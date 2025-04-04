@@ -27,6 +27,7 @@ export default function ProductImages({ images }: { images: string[] }) {
             )}
           >
             <Image src={image} alt="Product Image" width={100} height={100} />
+            
           </div>
         ))}
       </div>
