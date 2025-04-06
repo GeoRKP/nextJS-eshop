@@ -40,7 +40,7 @@ export default function SignUpForm() {
           <Input
             type="text"
             id="name"
-            name="text"
+            name="name"
             required
             autoComplete="name"
             defaultValue={signUpDefaultValues.name}
@@ -64,7 +64,7 @@ export default function SignUpForm() {
             id="password"
             name="password"
             required
-            autoComplete="current-password"
+            autoComplete="password"
             defaultValue={signUpDefaultValues.password}
           />
         </div>
@@ -75,7 +75,7 @@ export default function SignUpForm() {
             id="confirmPassword"
             name="confirmPassword"
             required
-            autoComplete="current-password"
+            autoComplete="confirmPassword"
             defaultValue={signUpDefaultValues.password}
           />
         </div>

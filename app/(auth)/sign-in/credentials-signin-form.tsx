@@ -53,7 +53,7 @@ export default function CredentialsSignInForm() {
             id="password"
             name="password"
             required
-            autoComplete="current-password"
+            autoComplete="password"
             defaultValue={signInDefaultValues.password}
           />
         </div>
