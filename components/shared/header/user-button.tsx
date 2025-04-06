@@ -50,7 +50,7 @@ export default async function UserButton() {
           <form action={signOutUser} className="w-full">
             <Button type="submit" variant="ghost" className="w-full py-4 px-2 h-4 justify-start">
               <LogOutIcon className="w-4 h-4 mr-2" />
-              Sign out
+              Sign Out
             </Button>
           </form>
         </DropdownMenuItem>
