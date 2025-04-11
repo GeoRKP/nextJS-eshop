@@ -1,5 +1,6 @@
+import { Product } from "@prisma/client";
 import ProductCard from "./product-card";
-import { Product } from "@/types";
+
 
 export default function ProductList({
   data,

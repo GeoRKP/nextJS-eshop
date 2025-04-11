@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import ProductPrice from "./product-price";
-import { Product } from "@/types";
+import { Product } from "@prisma/client";
 
  export default function ProductCard({product}: {product: Product}) {
     return (
