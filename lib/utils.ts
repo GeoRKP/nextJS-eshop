@@ -38,3 +38,26 @@ export async function formatError(error: any) {
       : JSON.stringify(error.message);
   }
 }
+
+export function round2(value: number | string) {
+  if (typeof value === 'string') {
+    return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+  } else if (typeof value === 'number') {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+  } else {
+    throw new Error('Value is not a number or string');
+  }
+}
+
+const CURRENCY_FORMAT = new Intl.NumberFormat("el-GR", {
+  style: "currency",
+  currency: "EUR",
+  minimumFractionDigits: 2,
+});
+
+export function formatCurrency(amount: number | string | null) {
+  if (amount === null) return "NaN";
+  if (typeof amount === "string") amount = Number(amount);
+  return CURRENCY_FORMAT.format(amount);
+
+}

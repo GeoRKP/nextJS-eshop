@@ -1,7 +1,13 @@
 import { z } from "zod";
 import { formatNumberWithDecimal } from "./utils";
+import { PAYMENT_METHODS } from "./constants";
 
-const currency = z.string().refine((value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(Number(value))),"Price must have exact two decimal places");
+const currency = z
+  .string()
+  .refine(
+    (value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(Number(value))),
+    "Price must have exact two decimal places"
+  );
 
 //Schema for creating a product
 
@@ -34,22 +40,102 @@ export const insertProductSchema = z.object({
 
 export const signInFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long" }),
 });
 
 // Schema for signing user up
-export const signUpFormSchema = z.object({
-  name: z.string().min(3, { message: "Name must be at least 3 characters" }),
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
-  confirmPassword: z.string().min(8, { message: "Confirm password must be at least 8 characters long" }),
-
-}).refine(
-  (data) => data.password === data.confirmPassword,
-  {
+export const signUpFormSchema = z
+  .object({
+    name: z.string().min(3, { message: "Name must be at least 3 characters" }),
+    email: z.string().email({ message: "Invalid email address" }),
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters long" }),
+    confirmPassword: z.string().min(8, {
+      message: "Confirm password must be at least 8 characters long",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
     message: "Passwords don't match",
-  }
-);
+  });
 
+// Cart Schemas
 
+export const cartItemSchema = z.object({
+  productId: z.string().min(1, { message: "Product is required" }),
+  name: z.string().min(1, { message: "Name is required" }),
+  slug: z.string().min(1, { message: "Slug is required" }),
+  qty: z
+    .number()
+    .int()
+    .nonnegative({ message: "Quantity must be a positive number" }),
+  image: z.string().min(1, { message: "Image is required" }),
+  price: currency,
+});
+
+export const insertCartSchema = z.object({
+  items: z.array(cartItemSchema),
+  itemsPrice: currency,
+  totalPrice: currency,
+  shippingPrice: currency,
+  taxPrice: currency,
+  sessionCartId: z.string().min(1, { message: "Session cart id is required" }),
+  userId: z.string().optional().nullable(),
+});
+
+export const shippingAddressSchema = z.object({
+  fullName: z
+    .string()
+    .min(3, { message: "Full name must be at least 3 characters long" }),
+  address: z
+    .string()
+    .min(3, { message: "Address must be at least 3 characters long" }),
+  city: z
+    .string()
+    .min(3, { message: "City must be at least 3 characters long" }),
+  postalCode: z
+    .string()
+    .min(3, { message: "Postal code must be at least 3 characters long" }),
+  country: z
+    .string()
+    .min(3, { message: "Country must be at least 3 characters long" }),
+  lat: z.number().optional().nullable(),
+  lng: z.number().optional().nullable(),
+});
+
+export const paymentMethodSchema = z
+  .object({
+    type: z.string().min(1, "Payment method is required"),
+  })
+  .refine((data) => PAYMENT_METHODS.includes(data.type), {
+    path: ["type"],
+    message: "Invalid payment method",
+  });
+
+// Schema for inserting an order
+
+export const insertOrderSchema = z.object({
+  userId: z.string().min(1, { message: "User is required" }),
+  itemsPrice: currency,
+  shippingPrice: currency,
+  taxPrice: currency,
+  totalPrice: currency,
+  paymentMethod: z.string().refine((data) => PAYMENT_METHODS.includes(data), {
+    message: "Invalid payment method",
+  }),
+  shippingAddress: shippingAddressSchema,
+});
+
+// Schema for inserting an order item
+
+export const insertOrderItemSchema = z.object({
+  productId: z.string(),
+  slug: z.string(),
+  image: z.string(),
+  name: z.string(),
+  price: currency,
+  qty: z.number(),
+});
