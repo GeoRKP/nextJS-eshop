@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import qs from 'query-string';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -19,7 +20,7 @@ export function formatNumberWithDecimal(num: number) {
 
 // Format errors
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function formatError(error: any) {
+export function formatError(error: any) {
   if (error.name === "ZodError") {
     // handle zod error
     const fieldErrors = Object.keys(error.errors).map(
@@ -61,6 +62,13 @@ export function formatCurrency(amount: number | string | null) {
   return CURRENCY_FORMAT.format(amount);
 
 }
+
+const NUMBER_FORMATTER = new Intl.NumberFormat("el-GR");
+
+export function formatNumber(number: number) {
+  return NUMBER_FORMATTER.format(number);
+}
+
 // Shorten UUID
 export function formatId(id: string) {
   return `..${id.substring(id.length - 6)}`
@@ -77,7 +85,7 @@ export const formatDateTime = (dateString: Date) => {
     minute: "numeric",
     hour12: true,
   };
-  
+
 
   const dateOptions: Intl.DateTimeFormatOptions = {
     weekday: "short",
@@ -85,13 +93,13 @@ export const formatDateTime = (dateString: Date) => {
     year: "numeric",
     day: "numeric",
   };
-  
+
   const timeOptions: Intl.DateTimeFormatOptions = {
     hour: "numeric",
     minute: "numeric",
     hour12: true,
   };
-  
+
   const formattedDateTime: string = new Date(dateString).toLocaleString("el-GR", dateTimeOptions);
   const formattedDate: string = new Date(dateString).toLocaleDateString("el-GR", dateOptions);
   const formattedTime: string = new Date(dateString).toLocaleTimeString("el-GR", timeOptions);
@@ -104,5 +112,19 @@ export const formatDateTime = (dateString: Date) => {
 }
 
 
+// Form the pagination links
+export function formUrlQuery({
+  params,
+  key,
+  value,
+}: {
+  params: string;
+  key: string;
+  value: string | null;
+}) {
 
+  const query = qs.parse(params);
+  query[key] = value;
+  return qs.stringifyUrl({ url: window.location.pathname, query }, { skipNull: true });
+}
 

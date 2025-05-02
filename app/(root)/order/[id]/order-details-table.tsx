@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -22,15 +23,20 @@ import {
 import {
   createPaypalOrder,
   approvePaypalOrder,
+  updateOrderToPaidCOD,
+  deliverOrder,
 } from "@/lib/actions/order.actions";
 import { useToast } from "@/hooks/use-toast";
+import { useTransition } from "react";
 
 export default function OrderDetailsTable({
   order,
   paypalClientId,
+  isAdmin,
 }: {
   order: Order;
   paypalClientId: string;
+  isAdmin: boolean;
 }) {
   const {
     id,
@@ -83,6 +89,50 @@ export default function OrderDetailsTable({
       variant: res.success ? "default" : "destructive",
       description: res.message,
     });
+  };
+
+  // Button to mark order as paid
+  const MarkAsPaidButton = () => {
+    const [isPending, startTransition] = useTransition();
+    const { toast } = useToast();
+
+    return (
+      <Button
+        type="button"
+        disabled={isPending}
+        onClick={() => startTransition(async () => {
+          const res = await updateOrderToPaidCOD(order.id);
+          toast({
+            variant: res.success ? "default" : "destructive",
+            description: res.message,
+          });
+        })}
+      > 
+        {isPending ? "Processing..." : "Mark as paid"}
+      </Button>
+    );
+  };
+
+  // Button to mark order as delivered
+  const MarkAsDeliveredButton = () => {
+    const [isPending, startTransition] = useTransition();
+    const { toast } = useToast();
+
+    return (
+      <Button
+        type="button"
+        disabled={isPending}
+        onClick={() => startTransition(async () => {
+          const res = await deliverOrder(order.id);
+          toast({
+            variant: res.success ? "default" : "destructive",
+            description: res.message,
+          });
+        })}
+      >
+        {isPending ? "Processing..." : "Mark as delivered"}
+      </Button>
+    );
   };
 
   return (
@@ -194,6 +244,13 @@ export default function OrderDetailsTable({
                     />
                   </PayPalScriptProvider>
                 </div>
+              )}
+              {/* COD */}
+              {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
+                <MarkAsPaidButton />
+              )}
+              {isAdmin && isPaid && !isDelivered && (
+                <MarkAsDeliveredButton />
               )}
             </CardContent>
           </Card>
