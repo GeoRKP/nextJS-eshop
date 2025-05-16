@@ -26,6 +26,7 @@ export default function StripePayment({
   );
 
   const { theme, systemTheme } = useTheme();
+  
 
   const StripeForm = () => {
     const stripe = useStripe();
