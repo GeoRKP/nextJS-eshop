@@ -1,4 +1,4 @@
-# 🛍️ E-Shop Kapatsinas Eleutheros
+# 🛍️ E-Shop Kapatsinas George
 
 A modern, full-featured e-commerce platform built with Next.js 15, offering a seamless shopping experience with beautiful UI, secure authentication, and integrated payment processing.
 
@@ -208,4 +208,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-Made with ❤️ by George Kapatsinas | [GitHub](https://github.com/gkapatsinas) | [LinkedIn](https://linkedin.com/in/georgekapatsinas)
+Made with ❤️ by George Kapatsinas | [GitHub](https://github.com/GeoRKP)
