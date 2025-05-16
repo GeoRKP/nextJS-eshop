@@ -9,21 +9,22 @@ datasource db {
 }
 
 model Product {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
-  slug        String   @unique(map: "product_slug_idx")
+  slug        String      @unique(map: "product_slug_idx")
   category    String
   images      String[]
   brand       String
   description String
   stock       Int
-  price       Decimal  @default(0) @db.Decimal(12, 2)
-  rating      Decimal  @default(0) @db.Decimal(10, 2)
-  numReviews  Int      @default(0)
-  isFeatured  Boolean  @default(false)
+  price       Decimal     @default(0) @db.Decimal(12, 2)
+  rating      Decimal     @default(0) @db.Decimal(10, 2)
+  numReviews  Int         @default(0)
+  isFeatured  Boolean     @default(false)
   banner      String?
-  createdAt   DateTime @default(now()) @db.Timestamp(6)
-  orderitems   OrderItem[]
+  createdAt   DateTime    @default(now()) @db.Timestamp(6)
+  orderitems  OrderItem[]
+  Review      Review[]
 }
 
 model User {
@@ -42,6 +43,7 @@ model User {
   Session       Session[]
   Cart          Cart[]
   Order         Order[]
+  Review        Review[]
 }
 
 model Account {
@@ -111,7 +113,7 @@ model Order {
   deliveredAt     DateTime?   @db.Timestamp(6)
   createdAt       DateTime    @default(now()) @db.Timestamp(6)
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  orderitems       OrderItem[] 
+  orderitems      OrderItem[]
 }
 
 model OrderItem {
@@ -124,5 +126,19 @@ model OrderItem {
   image     String
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
   @@id([orderId, productId], map: "orderitems_orderId_productId_pk")
+}
+
+model Review {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String   @db.Uuid
+  productId          String   @db.Uuid
+  rating             Int
+  title              String
+  description        String?
+  isVerifiedPurchase Boolean  @default(true)
+  createdAt          DateTime @default(now()) @db.Timestamp(6)
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
