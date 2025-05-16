@@ -19,7 +19,7 @@ export default function StripePayment({
 }: {
   priceInCents: number;
   orderId: string;
-  clientSecret: string;
+  clientSecret: string | null;
 }) {
   const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY! as string
@@ -97,7 +97,7 @@ export default function StripePayment({
   return (
     <Elements
       options={{
-        clientSecret,
+        clientSecret: clientSecret ?? undefined,
         appearance: {
           theme:
             theme === "dark"
