@@ -13,7 +13,7 @@ import { StarIcon } from "lucide-react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
-import { createUpdateReview } from "@/lib/actions/review-actions";
+import { createUpdateReview, getReviewByProductId } from "@/lib/actions/review-actions";
 import { reviewFormDefaultValues } from "@/lib/constants";
 
 export default function ReviewForm({
@@ -52,9 +52,18 @@ export default function ReviewForm({
     });
   }
 
-  const handleOpenForm = () => {
+  const handleOpenForm = async () => {
     form.setValue("userId", userId);
     form.setValue("productId", productId);
+
+    const review = await getReviewByProductId({productId});
+
+    if (review) {
+      form.setValue("title", review.title);
+      form.setValue("description", review.description ? review.description : "");
+      form.setValue("rating", review.rating);
+    }
+
     setOpen(true);
   };
 
