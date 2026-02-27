@@ -15,7 +15,7 @@ export type DashboardFilters = {
   period?: string;
   from?: string;
   to?: string;
-  status?: string; // comma-separated or "all"
+  paidStatus?: string; // "all" | "paid" | "unpaid"
   paymentMethod?: string; // "Stripe" | "Paypal" | "CashOnDelivery" | "all"
   category?: string; // category name or "all"
 };
@@ -36,17 +36,11 @@ export type DashboardData = {
   revenueByPaymentMethod: { method: string; revenue: number }[];
   topProducts: { name: string; unitsSold: number; revenue: number }[];
   salesByCategory: { category: string; revenue: number }[];
-  couponStats: {
-    totalDiscountGiven: number;
-    ordersWithCoupons: number;
-    topCoupons: { code: string; usageCount: number; totalDiscount: number }[];
-  };
   lowStockProducts: {
     id: string;
     name: string;
     slug: string;
     stock: number;
-    lowStockThreshold: number;
     price: string;
   }[];
   latestOrders: {
@@ -61,6 +55,14 @@ export type DashboardData = {
   categories: string[];
 };
 
+// ── Derive order status from isPaid/isDelivered ──
+
+function deriveOrderStatus(isPaid: boolean, isDelivered: boolean): string {
+  if (isDelivered) return "Delivered";
+  if (isPaid) return "Paid";
+  return "Pending";
+}
+
 // ── Main function ──
 
 export async function getDashboardData(
@@ -69,11 +71,6 @@ export async function getDashboardData(
   const range = resolveDateRange(filters);
   const prevRange = range ? previousDateRange(range) : null;
 
-  // Build Prisma where filters for orders
-  const statusList =
-    filters.status && filters.status !== "all"
-      ? filters.status.split(",")
-      : undefined;
   const paymentMethod =
     filters.paymentMethod && filters.paymentMethod !== "all"
       ? filters.paymentMethod
@@ -81,6 +78,10 @@ export async function getDashboardData(
   const category =
     filters.category && filters.category !== "all"
       ? filters.category
+      : undefined;
+  const paidStatus =
+    filters.paidStatus && filters.paidStatus !== "all"
+      ? filters.paidStatus
       : undefined;
 
   const dateFilter = range
@@ -90,16 +91,23 @@ export async function getDashboardData(
     ? { gte: prevRange.from, lte: prevRange.to }
     : undefined;
 
+  const paidFilter: Prisma.OrderWhereInput =
+    paidStatus === "paid"
+      ? { isPaid: true }
+      : paidStatus === "unpaid"
+        ? { isPaid: false }
+        : {};
+
   const orderWhere: Prisma.OrderWhereInput = {
     ...(dateFilter && { createdAt: dateFilter }),
-    ...(statusList && { status: { in: statusList } }),
     ...(paymentMethod && { paymentMethod }),
+    ...paidFilter,
   };
 
   const prevOrderWhere: Prisma.OrderWhereInput = {
     ...(prevDateFilter && { createdAt: prevDateFilter }),
-    ...(statusList && { status: { in: statusList } }),
     ...(paymentMethod && { paymentMethod }),
+    ...paidFilter,
   };
 
   const [
@@ -113,9 +121,6 @@ export async function getDashboardData(
     revenueByPaymentMethod,
     topProducts,
     salesByCategory,
-    couponDiscountAgg,
-    couponOrderCount,
-    topCouponsRaw,
     lowStockProducts,
     latestOrders,
     categoriesRaw,
@@ -143,30 +148,24 @@ export async function getDashboardData(
     // 5. Total products
     prisma.product.count(),
     // 6. Sales time series
-    getSalesTimeSeries(range, statusList, paymentMethod, category),
-    // 7. Orders by status
+    getSalesTimeSeries(range, paymentMethod, category, paidStatus),
+    // 7. Orders by status (derived from isPaid/isDelivered)
     getOrdersByStatus(range),
     // 8. Revenue by payment method
-    getRevenueByPaymentMethod(range, statusList),
+    getRevenueByPaymentMethod(range, paidStatus),
     // 9. Top products
-    getTopProducts(range, statusList, paymentMethod, category, 10),
+    getTopProducts(range, paymentMethod, category, paidStatus, 10),
     // 10. Sales by category
-    getSalesByCategory(range, statusList, paymentMethod),
-    // 11. Coupon discount aggregate (use raw to avoid Prisma $extends type issues)
-    getCouponDiscountAgg(range, statusList, paymentMethod),
-    // 12. Coupon order count
-    getCouponOrderCount(range, statusList, paymentMethod),
-    // 13. Top coupons
-    getTopCoupons(range),
-    // 14. Low stock products
+    getSalesByCategory(range, paymentMethod, paidStatus),
+    // 11. Low stock products (stock <= 5)
     getLowStockProducts(),
-    // 15. Latest orders
+    // 12. Latest orders
     prisma.order.findMany({
       orderBy: { createdAt: "desc" },
       include: { user: { select: { name: true } } },
       take: 8,
     }),
-    // 16. Categories for filter dropdown
+    // 13. Categories for filter dropdown
     prisma.product.findMany({
       distinct: ["category"],
       select: { category: true },
@@ -196,24 +195,15 @@ export async function getDashboardData(
     revenueByPaymentMethod,
     topProducts,
     salesByCategory,
-    couponStats: {
-      totalDiscountGiven: couponDiscountAgg.totalDiscount,
-      ordersWithCoupons: couponOrderCount,
-      topCoupons: topCouponsRaw,
-    },
     lowStockProducts,
-    latestOrders: latestOrders.map((o) => {
-      // Prisma $extends result transformers can omit some fields from type
-      const order = o as typeof o & { status: string };
-      return {
-        id: order.id,
-        userName: order.user?.name ?? "Deleted User",
-        createdAt: order.createdAt,
-        totalPrice: order.totalPrice,
-        status: order.status,
-        paymentMethod: order.paymentMethod,
-      };
-    }),
+    latestOrders: latestOrders.map((o) => ({
+      id: o.id,
+      userName: o.user?.name ?? "Deleted User",
+      createdAt: o.createdAt,
+      totalPrice: o.totalPrice,
+      status: deriveOrderStatus(o.isPaid, o.isDelivered),
+      paymentMethod: o.paymentMethod,
+    })),
     productsCount,
     categories: categoriesRaw.map((c) => c.category),
   };
@@ -223,36 +213,31 @@ export async function getDashboardData(
 
 async function getSalesTimeSeries(
   range: DateRange | null,
-  statusList?: string[],
   paymentMethod?: string,
-  category?: string
+  category?: string,
+  paidStatus?: string
 ): Promise<{ date: string; revenue: number; orders: number }[]> {
   const useDays = range ? rangeSpanDays(range) < 90 : false;
   const format = useDays ? "YYYY-MM-DD" : "YYYY-MM";
 
-  // Build dynamic WHERE clauses
   const conditions: string[] = [];
   const params: unknown[] = [];
   let paramIdx = 1;
 
   if (range) {
-    conditions.push(`o."createdAt" >= $${paramIdx}`);
+    conditions.push(`o."createdAt" >= $${paramIdx++}`);
     params.push(range.from);
-    paramIdx++;
-    conditions.push(`o."createdAt" <= $${paramIdx}`);
+    conditions.push(`o."createdAt" <= $${paramIdx++}`);
     params.push(range.to);
-    paramIdx++;
-  }
-  if (statusList && statusList.length > 0) {
-    conditions.push(
-      `o."status" IN (${statusList.map(() => `$${paramIdx++}`).join(",")})`
-    );
-    params.push(...statusList);
   }
   if (paymentMethod) {
-    conditions.push(`o."paymentMethod" = $${paramIdx}`);
+    conditions.push(`o."paymentMethod" = $${paramIdx++}`);
     params.push(paymentMethod);
-    paramIdx++;
+  }
+  if (paidStatus === "paid") {
+    conditions.push(`o."isPaid" = true`);
+  } else if (paidStatus === "unpaid") {
+    conditions.push(`o."isPaid" = false`);
   }
 
   let joinClause = "";
@@ -261,15 +246,13 @@ async function getSalesTimeSeries(
       JOIN "OrderItem" oi2 ON oi2."orderId" = o."id"
       JOIN "Product" p2 ON oi2."productId" = p2."id"
     `;
-    conditions.push(`p2."category" = $${paramIdx}`);
+    conditions.push(`p2."category" = $${paramIdx++}`);
     params.push(category);
-    paramIdx++;
   }
 
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-  // Using Prisma.$queryRawUnsafe for dynamic queries
   const sql = `
     SELECT to_char(o."createdAt", '${format}') as "date",
            SUM(o."totalPrice")::float as "revenue",
@@ -310,9 +293,19 @@ async function getOrdersByStatus(
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const raw = await prisma.$queryRawUnsafe<
-    Array<{ status: string; count: bigint }>
+    Array<{ status: string; count: number }>
   >(
-    `SELECT "status", COUNT(*)::int as "count" FROM "Order" ${whereClause} GROUP BY "status" ORDER BY "count" DESC`,
+    `SELECT
+       CASE
+         WHEN "isDelivered" = true THEN 'Delivered'
+         WHEN "isPaid" = true THEN 'Paid'
+         ELSE 'Pending'
+       END as "status",
+       COUNT(*)::int as "count"
+     FROM "Order"
+     ${whereClause}
+     GROUP BY "status"
+     ORDER BY "count" DESC`,
     ...params
   );
 
@@ -321,7 +314,7 @@ async function getOrdersByStatus(
 
 async function getRevenueByPaymentMethod(
   range: DateRange | null,
-  statusList?: string[]
+  paidStatus?: string
 ): Promise<{ method: string; revenue: number }[]> {
   const conditions: string[] = [`"isPaid" = true`];
   const params: unknown[] = [];
@@ -333,11 +326,9 @@ async function getRevenueByPaymentMethod(
     conditions.push(`"createdAt" <= $${paramIdx++}`);
     params.push(range.to);
   }
-  if (statusList && statusList.length > 0) {
-    conditions.push(
-      `"status" IN (${statusList.map(() => `$${paramIdx++}`).join(",")})`
-    );
-    params.push(...statusList);
+  if (paidStatus === "unpaid") {
+    // No revenue for unpaid orders
+    return [];
   }
 
   const whereClause = `WHERE ${conditions.join(" AND ")}`;
@@ -354,9 +345,9 @@ async function getRevenueByPaymentMethod(
 
 async function getTopProducts(
   range: DateRange | null,
-  statusList?: string[],
   paymentMethod?: string,
   category?: string,
+  paidStatus?: string,
   limit: number = 10
 ): Promise<{ name: string; unitsSold: number; revenue: number }[]> {
   const conditions: string[] = [];
@@ -369,15 +360,14 @@ async function getTopProducts(
     conditions.push(`o."createdAt" <= $${paramIdx++}`);
     params.push(range.to);
   }
-  if (statusList && statusList.length > 0) {
-    conditions.push(
-      `o."status" IN (${statusList.map(() => `$${paramIdx++}`).join(",")})`
-    );
-    params.push(...statusList);
-  }
   if (paymentMethod) {
     conditions.push(`o."paymentMethod" = $${paramIdx++}`);
     params.push(paymentMethod);
+  }
+  if (paidStatus === "paid") {
+    conditions.push(`o."isPaid" = true`);
+  } else if (paidStatus === "unpaid") {
+    conditions.push(`o."isPaid" = false`);
   }
 
   let joinProduct = "";
@@ -418,8 +408,8 @@ async function getTopProducts(
 
 async function getSalesByCategory(
   range: DateRange | null,
-  statusList?: string[],
-  paymentMethod?: string
+  paymentMethod?: string,
+  paidStatus?: string
 ): Promise<{ category: string; revenue: number }[]> {
   const conditions: string[] = [];
   const params: unknown[] = [];
@@ -431,15 +421,14 @@ async function getSalesByCategory(
     conditions.push(`o."createdAt" <= $${paramIdx++}`);
     params.push(range.to);
   }
-  if (statusList && statusList.length > 0) {
-    conditions.push(
-      `o."status" IN (${statusList.map(() => `$${paramIdx++}`).join(",")})`
-    );
-    params.push(...statusList);
-  }
   if (paymentMethod) {
     conditions.push(`o."paymentMethod" = $${paramIdx++}`);
     params.push(paymentMethod);
+  }
+  if (paidStatus === "paid") {
+    conditions.push(`o."isPaid" = true`);
+  } else if (paidStatus === "unpaid") {
+    conditions.push(`o."isPaid" = false`);
   }
 
   const whereClause =
@@ -465,150 +454,27 @@ async function getSalesByCategory(
   }));
 }
 
-async function getTopCoupons(
-  range: DateRange | null
-): Promise<{ code: string; usageCount: number; totalDiscount: number }[]> {
-  const conditions: string[] = [`"couponCode" IS NOT NULL`];
-  const params: unknown[] = [];
-  let paramIdx = 1;
-
-  if (range) {
-    conditions.push(`"createdAt" >= $${paramIdx++}`);
-    params.push(range.from);
-    conditions.push(`"createdAt" <= $${paramIdx++}`);
-    params.push(range.to);
-  }
-
-  const whereClause = `WHERE ${conditions.join(" AND ")}`;
-
-  const raw = await prisma.$queryRawUnsafe<
-    Array<{ code: string; usageCount: bigint; totalDiscount: number }>
-  >(
-    `SELECT "couponCode" as "code",
-            COUNT(*)::int as "usageCount",
-            SUM("discountAmount")::float as "totalDiscount"
-     FROM "Order"
-     ${whereClause}
-     GROUP BY "couponCode"
-     ORDER BY "usageCount" DESC
-     LIMIT 5`,
-    ...params
-  );
-
-  return raw.map((r) => ({
-    code: r.code,
-    usageCount: Number(r.usageCount),
-    totalDiscount: Number(r.totalDiscount),
-  }));
-}
-
-async function getCouponDiscountAgg(
-  range: DateRange | null,
-  statusList?: string[],
-  paymentMethod?: string
-): Promise<{ totalDiscount: number }> {
-  const conditions: string[] = [`"discountAmount" > 0`];
-  const params: unknown[] = [];
-  let paramIdx = 1;
-
-  if (range) {
-    conditions.push(`"createdAt" >= $${paramIdx++}`);
-    params.push(range.from);
-    conditions.push(`"createdAt" <= $${paramIdx++}`);
-    params.push(range.to);
-  }
-  if (statusList && statusList.length > 0) {
-    conditions.push(
-      `"status" IN (${statusList.map(() => `$${paramIdx++}`).join(",")})`
-    );
-    params.push(...statusList);
-  }
-  if (paymentMethod) {
-    conditions.push(`"paymentMethod" = $${paramIdx++}`);
-    params.push(paymentMethod);
-  }
-
-  const whereClause = `WHERE ${conditions.join(" AND ")}`;
-
-  const raw = await prisma.$queryRawUnsafe<
-    Array<{ totalDiscount: number }>
-  >(
-    `SELECT COALESCE(SUM("discountAmount"), 0)::float as "totalDiscount" FROM "Order" ${whereClause}`,
-    ...params
-  );
-
-  return { totalDiscount: Number(raw[0]?.totalDiscount ?? 0) };
-}
-
-async function getCouponOrderCount(
-  range: DateRange | null,
-  statusList?: string[],
-  paymentMethod?: string
-): Promise<number> {
-  const conditions: string[] = [`"couponCode" IS NOT NULL`];
-  const params: unknown[] = [];
-  let paramIdx = 1;
-
-  if (range) {
-    conditions.push(`"createdAt" >= $${paramIdx++}`);
-    params.push(range.from);
-    conditions.push(`"createdAt" <= $${paramIdx++}`);
-    params.push(range.to);
-  }
-  if (statusList && statusList.length > 0) {
-    conditions.push(
-      `"status" IN (${statusList.map(() => `$${paramIdx++}`).join(",")})`
-    );
-    params.push(...statusList);
-  }
-  if (paymentMethod) {
-    conditions.push(`"paymentMethod" = $${paramIdx++}`);
-    params.push(paymentMethod);
-  }
-
-  const whereClause = `WHERE ${conditions.join(" AND ")}`;
-
-  const raw = await prisma.$queryRawUnsafe<Array<{ count: number }>>(
-    `SELECT COUNT(*)::int as "count" FROM "Order" ${whereClause}`,
-    ...params
-  );
-
-  return Number(raw[0]?.count ?? 0);
-}
-
 async function getLowStockProducts(): Promise<
   {
     id: string;
     name: string;
     slug: string;
     stock: number;
-    lowStockThreshold: number;
     price: string;
   }[]
 > {
-  const raw = await prisma.$queryRawUnsafe<
-    Array<{
-      id: string;
-      name: string;
-      slug: string;
-      stock: number;
-      lowStockThreshold: number;
-      price: Prisma.Decimal;
-    }>
-  >(
-    `SELECT "id", "name", "slug", "stock", "lowStockThreshold", "price"
-     FROM "Product"
-     WHERE "stock" <= "lowStockThreshold"
-     ORDER BY "stock" ASC
-     LIMIT 10`
-  );
+  const products = await prisma.product.findMany({
+    where: { stock: { lte: 5 } },
+    select: { id: true, name: true, slug: true, stock: true, price: true },
+    orderBy: { stock: "asc" },
+    take: 10,
+  });
 
-  return raw.map((r) => ({
-    id: r.id,
-    name: r.name,
-    slug: r.slug,
-    stock: Number(r.stock),
-    lowStockThreshold: Number(r.lowStockThreshold),
-    price: r.price.toString(),
+  return products.map((p) => ({
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    stock: p.stock,
+    price: p.price.toString(),
   }));
 }

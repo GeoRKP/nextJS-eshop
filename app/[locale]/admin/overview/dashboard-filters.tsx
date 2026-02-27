@@ -37,7 +37,7 @@ export default function DashboardFilters({
   const currentPeriod = searchParams.get("period") || "30d";
   const currentFrom = searchParams.get("from") || "";
   const currentTo = searchParams.get("to") || "";
-  const currentStatus = searchParams.get("status") || "all";
+  const currentPaidStatus = searchParams.get("paidStatus") || "all";
   const currentPayment = searchParams.get("paymentMethod") || "all";
   const currentCategory = searchParams.get("category") || "all";
   const hasCustomRange = !!currentFrom || !!currentTo;
@@ -70,7 +70,7 @@ export default function DashboardFilters({
   const hasFilters =
     currentPeriod !== "30d" ||
     hasCustomRange ||
-    currentStatus !== "all" ||
+    currentPaidStatus !== "all" ||
     currentPayment !== "all" ||
     currentCategory !== "all";
 
@@ -127,28 +127,22 @@ export default function DashboardFilters({
         />
       </div>
 
-      {/* Status filter */}
+      {/* Paid status filter */}
       <div className="space-y-1">
         <label className="text-xs text-muted-foreground font-medium">
           {t("status")}
         </label>
         <Select
-          value={currentStatus}
-          onValueChange={(v) => updateParams({ status: v })}
+          value={currentPaidStatus}
+          onValueChange={(v) => updateParams({ paidStatus: v })}
         >
           <SelectTrigger className="w-[160px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("allStatuses")}</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="confirmed">Confirmed</SelectItem>
-            <SelectItem value="processing">Processing</SelectItem>
-            <SelectItem value="shipped">Shipped</SelectItem>
-            <SelectItem value="delivered">Delivered</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-            <SelectItem value="refund_requested">Refund Requested</SelectItem>
-            <SelectItem value="refunded">Refunded</SelectItem>
+            <SelectItem value="paid">{t("paid")}</SelectItem>
+            <SelectItem value="unpaid">{t("unpaid")}</SelectItem>
           </SelectContent>
         </Select>
       </div>

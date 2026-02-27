@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
-import { Eye, AlertTriangle, Ticket } from "lucide-react";
+import { Eye, AlertTriangle } from "lucide-react";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 
 export async function generateMetadata() {
@@ -34,7 +34,7 @@ export default async function AdminOverviewPage(props: {
     period: searchParams.period,
     from: searchParams.from,
     to: searchParams.to,
-    status: searchParams.status,
+    paidStatus: searchParams.paidStatus,
     paymentMethod: searchParams.paymentMethod,
     category: searchParams.category,
   };
@@ -65,118 +65,48 @@ export default async function AdminOverviewPage(props: {
         noDataLabel={t("noData")}
       />
 
-      {/* Bottom row: Coupon Stats + Recent Orders */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        {/* Coupon Performance */}
-        <Card className="col-span-4">
-          <CardHeader className="flex flex-row items-center gap-2">
-            <Ticket className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="text-base">{t("couponPerformance")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {t("totalDiscountGiven")}
-                </p>
-                <p className="text-xl font-bold">
-                  {formatCurrency(data.couponStats.totalDiscountGiven)}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {t("ordersWithCoupons")}
-                </p>
-                <p className="text-xl font-bold">
-                  {data.couponStats.ordersWithCoupons}
-                  {data.kpi.ordersCount > 0 && (
-                    <span className="text-sm font-normal text-muted-foreground ml-1">
-                      (
-                      {(
-                        (data.couponStats.ordersWithCoupons /
-                          data.kpi.ordersCount) *
-                        100
-                      ).toFixed(1)}
-                      % {t("ofTotal")})
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-
-            {data.couponStats.topCoupons.length > 0 && (
-              <>
-                <p className="text-sm font-medium">{t("topCoupons")}</p>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t("couponCode")}</TableHead>
-                      <TableHead>{t("uses")}</TableHead>
-                      <TableHead>{t("discount")}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.couponStats.topCoupons.map((c) => (
-                      <TableRow key={c.code}>
-                        <TableCell className="font-mono text-sm">
-                          {c.code}
-                        </TableCell>
-                        <TableCell>{c.usageCount}</TableCell>
-                        <TableCell>
-                          {formatCurrency(c.totalDiscount)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Orders */}
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle className="text-base">{t("recentSales")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("buyer")}</TableHead>
-                  <TableHead>{t("date")}</TableHead>
-                  <TableHead>{t("total")}</TableHead>
-                  <TableHead>{t("status")}</TableHead>
-                  <TableHead>{t("actions")}</TableHead>
+      {/* Recent Orders */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("recentSales")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("buyer")}</TableHead>
+                <TableHead>{t("date")}</TableHead>
+                <TableHead>{t("total")}</TableHead>
+                <TableHead>{t("status")}</TableHead>
+                <TableHead>{t("actions")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.latestOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell className="text-sm">
+                    {order.userName}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {formatDateTime(order.createdAt).dateOnly}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {formatCurrency(order.totalPrice)}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={order.status} />
+                  </TableCell>
+                  <TableCell>
+                    <Link href={`/order/${order.id}`}>
+                      <Eye className="h-4 w-4" />
+                    </Link>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.latestOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="text-sm">
-                      {order.userName}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {formatDateTime(order.createdAt).dateOnly}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {formatCurrency(order.totalPrice)}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={order.status} />
-                    </TableCell>
-                    <TableCell>
-                      <Link href={`/order/${order.id}`}>
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </div>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {/* Low Stock Alerts */}
       {data.lowStockProducts.length > 0 && (
@@ -191,7 +121,6 @@ export default async function AdminOverviewPage(props: {
                 <TableRow>
                   <TableHead>{t("productName")}</TableHead>
                   <TableHead>{t("stock")}</TableHead>
-                  <TableHead>{t("threshold")}</TableHead>
                   <TableHead>{t("status")}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -207,9 +136,6 @@ export default async function AdminOverviewPage(props: {
                       </Link>
                     </TableCell>
                     <TableCell className="font-mono">{p.stock}</TableCell>
-                    <TableCell className="font-mono">
-                      {p.lowStockThreshold}
-                    </TableCell>
                     <TableCell>
                       {p.stock === 0 ? (
                         <Badge variant="destructive">{t("outOfStock")}</Badge>
@@ -238,14 +164,9 @@ function StatusBadge({ status }: { status: string }) {
     string,
     "default" | "secondary" | "destructive" | "outline"
   > = {
-    pending: "outline",
-    confirmed: "secondary",
-    processing: "secondary",
-    shipped: "default",
-    delivered: "default",
-    cancelled: "destructive",
-    refund_requested: "destructive",
-    refunded: "destructive",
+    Pending: "outline",
+    Paid: "secondary",
+    Delivered: "default",
   };
 
   return (

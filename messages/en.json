@@ -251,6 +251,8 @@
     "status": "Status",
     "paymentMethod": "Payment",
     "allStatuses": "All Statuses",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
     "allPayments": "All Payments",
     "allCategories": "All Categories",
     "noData": "No data for this period",
