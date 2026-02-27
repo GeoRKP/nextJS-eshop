@@ -1,12 +1,14 @@
 "use client";
 import { CartItem, Cart } from "@/types";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { Plus, Minus, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart.actions";
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
+import AnimatedButton from "@/components/shared/animated-button";
 
 export default function AddToCart({
   item,
@@ -17,6 +19,7 @@ export default function AddToCart({
 }) {
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslations("Product");
 
   const [isPending, startTransition] = useTransition();
 
@@ -26,7 +29,7 @@ export default function AddToCart({
       if (!res.success) {
         toast({
           variant: "destructive",
-          description: res?.message || "Failed to add item to cart",
+          description: res?.message || "",
         });
         return;
       }
@@ -35,11 +38,11 @@ export default function AddToCart({
         description: res.message,
         action: (
           <ToastAction
-            altText="Go to cart"
+            altText={t("goToCart")}
             className="bg-primary text-white hover:bg-gray-800"
             onClick={() => router.push("/cart")}
           >
-            Go to cart
+            {t("goToCart")}
           </ToastAction>
         ),
       });
@@ -55,11 +58,11 @@ export default function AddToCart({
         variant: res.success ? "default" : "destructive",
         action: (
           <ToastAction
-            altText="Go to cart"
+            altText={t("goToCart")}
             className="bg-primary text-white hover:bg-gray-800"
             onClick={() => router.push("/cart")}
           >
-            Go to cart
+            {t("goToCart")}
           </ToastAction>
         ),
       });
@@ -91,13 +94,15 @@ export default function AddToCart({
       </Button>
     </div>
   ) : (
-    <Button className="w-full" type="button" onClick={handleAddToCart}>
-      {isPending ? (
-        <Loader className="h-4 w-4 animate-spin" />
-      ) : (
-        <Plus className="h-4 w-4" />
-      )}
-      Add to Cart
-    </Button>
+    <AnimatedButton>
+      <Button className="w-full" type="button" onClick={handleAddToCart}>
+        {isPending ? (
+          <Loader className="h-4 w-4 animate-spin" />
+        ) : (
+          <Plus className="h-4 w-4" />
+        )}
+        {t("addToCart")}
+      </Button>
+    </AnimatedButton>
   );
 }

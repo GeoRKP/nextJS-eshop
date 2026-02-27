@@ -1,8 +1,10 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 import { formUrlQuery } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 type PaginationProps = {
   page: number | string;
@@ -17,12 +19,7 @@ export default function Pagination({
 }: PaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  // const handleClick = (btnType: string) => {
-  //   const params = new URLSearchParams(searchParams);
-  //   params.set(urlParamName || "page", (Number(page) + (btnType === "prev" ? -1 : 1)).toString());
-  //   router.push(`?${params.toString()}`);
-  // };
+  const t = useTranslations("Common");
 
   const handleClick = (btnType: string) => {
     const pageValue = btnType === "prev" ? Number(page) - 1 : Number(page) + 1;
@@ -43,7 +40,7 @@ export default function Pagination({
         disabled={Number(page) === 1}
         onClick={() => handleClick('prev')}
       >
-        Previous
+        {t("previous")}
       </Button>
       <Button
         size="lg"
@@ -52,7 +49,7 @@ export default function Pagination({
         disabled={Number(page) >= totalPages}
         onClick={() => handleClick("next")}
       >
-        Next
+        {t("next")}
       </Button>
     </div>
   );

@@ -1,11 +1,12 @@
 "use server";
 
 import {
-  shippingAddressSchema,
-  signInFormSchema,
   paymentMethodSchema,
-  signUpFormSchema,
   updateUserSchema,
+  createSignInFormSchema,
+  createSignUpFormSchema,
+  createShippingAddressSchema,
+  createPaymentMethodSchema,
 } from "../validators";
 import { auth, signIn, signOut } from "@/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
@@ -16,26 +17,30 @@ import { ShippingAddress } from "@/types";
 import { z } from "zod";
 import { PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 export async function signInWithCredentials(
   prevState: unknown,
   formData: FormData
 ) {
   try {
-    const user = signInFormSchema.parse({
+    const t = await getTranslations("Actions");
+    const tV = await getTranslations("Validation");
+    const user = createSignInFormSchema(tV).parse({
       email: formData.get("email"),
       password: formData.get("password"),
     });
 
     await signIn("credentials", user);
 
-    return { success: true, message: "Signed in successfully" };
+    return { success: true, message: t("signedInSuccessfully") };
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
     }
 
-    return { success: false, message: "Invalid email or password" };
+    const t = await getTranslations("Actions");
+    return { success: false, message: t("invalidEmailOrPassword") };
   }
 }
 
@@ -45,7 +50,9 @@ export async function signOutUser() {
 
 export async function signUpUser(prevState: unknown, formData: FormData) {
   try {
-    const user = signUpFormSchema.parse({
+    const t = await getTranslations("Actions");
+    const tV = await getTranslations("Validation");
+    const user = createSignUpFormSchema(tV).parse({
       name: formData.get("name"),
       email: formData.get("email"),
       password: formData.get("password"),
@@ -69,7 +76,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       password: plainPassword,
     });
 
-    return { success: true, message: "User registered successfully" };
+    return { success: true, message: t("userRegisteredSuccessfully") };
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
@@ -86,7 +93,8 @@ export async function getUserById(id: string) {
   });
 
   if (!user) {
-    throw new Error("User not found");
+    const t = await getTranslations("Actions");
+    throw new Error(t("userNotFound"));
   }
 
   return user;
@@ -95,6 +103,7 @@ export async function getUserById(id: string) {
 // Update the user's address
 export async function updateUserAddress(data: ShippingAddress) {
   try {
+    const t = await getTranslations("Actions");
     const session = await auth();
 
     const currentUser = await prisma.user.findFirst({
@@ -104,17 +113,18 @@ export async function updateUserAddress(data: ShippingAddress) {
     });
 
     if (!currentUser) {
-      throw new Error("User not found");
+      throw new Error(t("userNotFound"));
     }
 
-    const address = shippingAddressSchema.parse(data);
+    const tV = await getTranslations("Validation");
+    const address = createShippingAddressSchema(tV).parse(data);
 
     await prisma.user.update({
       where: { id: currentUser.id },
       data: { address: address },
     });
 
-    return { success: true, message: "Address updated successfully" };
+    return { success: true, message: t("addressUpdatedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
@@ -126,6 +136,7 @@ export async function updateUserPaymentMethod(
   data: z.infer<typeof paymentMethodSchema>
 ) {
   try {
+    const t = await getTranslations("Actions");
     const session = await auth();
 
     const currentUser = await prisma.user.findFirst({
@@ -135,17 +146,18 @@ export async function updateUserPaymentMethod(
     });
 
     if (!currentUser) {
-      throw new Error("User not found");
+      throw new Error(t("userNotFound"));
     }
 
-    const paymentMethod = paymentMethodSchema.parse(data);
+    const tV = await getTranslations("Validation");
+    const paymentMethod = createPaymentMethodSchema(tV).parse(data);
 
     await prisma.user.update({
       where: { id: currentUser.id },
       data: { paymentMethod: paymentMethod.type },
     });
 
-    return { success: true, message: "Payment method updated successfully" };
+    return { success: true, message: t("paymentMethodUpdatedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
@@ -154,6 +166,7 @@ export async function updateUserPaymentMethod(
 // Update user's profile
 export async function updateProfile(user: { name: string; email: string }) {
   try {
+    const t = await getTranslations("Actions");
     const session = await auth();
 
     const currentUser = await prisma.user.findFirst({
@@ -163,7 +176,7 @@ export async function updateProfile(user: { name: string; email: string }) {
     });
 
     if (!currentUser) {
-      throw new Error("User not found");
+      throw new Error(t("userNotFound"));
     }
 
     await prisma.user.update({
@@ -171,7 +184,7 @@ export async function updateProfile(user: { name: string; email: string }) {
       data: { name: user.name },
     });
 
-    return { success: true, message: "User updated successfully" };
+    return { success: true, message: t("userUpdatedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
@@ -218,13 +231,14 @@ export async function getAllUsers({
 // Delete a user
 export async function deleteUser(id: string) {
   try {
+    const t = await getTranslations("Actions");
     await prisma.user.delete({
       where: { id },
     });
 
     revalidatePath("/admin/users");
 
-    return { success: true, message: "User deleted successfully" };
+    return { success: true, message: t("userDeletedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
@@ -233,6 +247,7 @@ export async function deleteUser(id: string) {
 // Update a user
 export async function updateUser(user: z.infer<typeof updateUserSchema>) {
   try {
+    const t = await getTranslations("Actions");
     await prisma.user.update({
       where: { id: user.id },
       data: {
@@ -243,7 +258,7 @@ export async function updateUser(user: z.infer<typeof updateUserSchema>) {
 
     revalidatePath("/admin/users");
 
-    return { success: true, message: "User updated successfully" };
+    return { success: true, message: t("userUpdatedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }

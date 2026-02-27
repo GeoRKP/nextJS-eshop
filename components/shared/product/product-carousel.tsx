@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/carousel";
 import { Product } from "@/types";
 import Autoplay from "embla-carousel-autoplay";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 
 export default function ProductCarousel({ data }: { data: Product[] }) {
@@ -28,7 +28,7 @@ export default function ProductCarousel({ data }: { data: Product[] }) {
       ]}
     >
       <CarouselContent>
-        {data.map((product: Product) => (
+        {data.filter((p) => p.banner).map((product: Product) => (
           <CarouselItem key={product.id}>
             <Link href={`/product/${product.slug}`}>
               <div className="relative mx-auto">

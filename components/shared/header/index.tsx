@@ -1,9 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { APP_NAME } from "@/lib/constants";
 import Menu from "./menu";
 import CategoryDraw from "./category-draw";
-import Search from "./search";
+import SearchWrapper from "./search-wrapper";
 
 const Header = () => {
   return (
@@ -25,7 +25,7 @@ const Header = () => {
           </Link>
         </div>
         <div className="hidden md:block" >
-          <Search />
+          <SearchWrapper />
         </div>
         <Menu />
       </div>

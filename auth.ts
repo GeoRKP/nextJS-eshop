@@ -84,13 +84,13 @@ export const config: NextAuthConfig = {
     authorized({ request, auth }: any) {
       // Array of regex patterns of paths we want to protect
       const protectedPaths = [
-        /\/shipping-address/,
-        /\/payment-method/,
-        /\/place-order/,
-        /\/profile/,
-        /\/user\/(.*)/,
-        /\/order\/(.*)/,
-        /\/admin/,
+        /^(?:\/en)?\/shipping-address/,
+        /^(?:\/en)?\/payment-method/,
+        /^(?:\/en)?\/place-order/,
+        /^(?:\/en)?\/profile/,
+        /^(?:\/en)?\/user\/(.*)/,
+        /^(?:\/en)?\/order\/(.*)/,
+        /^(?:\/en)?\/admin/,
       ];
 
       // Get the pathname of the req url object

@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
+import { useTranslations } from "next-intl";
 
 export default function DeleteDialog({
   id,
@@ -24,6 +25,8 @@ export default function DeleteDialog({
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+  const t = useTranslations("DeleteDialog");
+  const tc = useTranslations("Common");
 
   const handleDeleteClick = () => {
     startTransition(async () => {
@@ -35,7 +38,7 @@ export default function DeleteDialog({
         });
       } else {
         setIsOpen(false);
-        
+
         toast({
           description: res.message,
         });
@@ -47,20 +50,20 @@ export default function DeleteDialog({
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <Button size="sm" variant="destructive" className="ml-2">
-          Delete
+          {tc("delete")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>{t("areYouSure")}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone.
+            {t("cannotBeUndone")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{tc("cancel")}</AlertDialogCancel>
           <Button variant="destructive" size="sm" disabled={isPending} onClick={handleDeleteClick}>
-            {isPending ? "Deleting..." : "Delete"}
+            {isPending ? tc("deleting") : tc("delete")}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

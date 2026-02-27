@@ -3,12 +3,14 @@ import { prisma } from "@/db/prisma";
 import { formatError, toPlainObject } from "../utils";
 import { LATEST_PRODUCTS_LIMIT, PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
-import { insertProductSchema, updateProductSchema } from "../validators";
+import { insertProductSchema, updateProductSchema, createInsertProductSchema, createUpdateProductSchema } from "../validators";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 
 export async function getLatestProducts() {
   const data = await prisma.product.findMany({
+    where: { deletedAt: null },
     take: LATEST_PRODUCTS_LIMIT,
     orderBy: {
       createdAt: "desc",
@@ -22,6 +24,7 @@ export async function getProductBySlug(slug: string) {
   return await prisma.product.findFirst({
     where: {
       slug: slug,
+      deletedAt: null,
     },
   });
 }
@@ -54,65 +57,142 @@ export async function getAllProducts({
   sort?: string;
   category?: string;
 }) {
-  // Query Filter
-  const queryFilter: Prisma.ProductWhereInput =
-    query && query !== "all" ? {
-      name: {
-        contains: query,
-        mode: "insensitive",
-      } as Prisma.StringFilter
-    } : {};
+  const hasTextQuery = query && query !== "all" && query.trim() !== "";
 
-  //Category Filter
+  // ─── Full-text search path (raw SQL with tsvector) ───
+  if (hasTextQuery) {
+    const conditions: Prisma.Sql[] = [
+      Prisma.sql`search_vector @@ plainto_tsquery('english', ${query})`,
+      Prisma.sql`"deletedAt" IS NULL`,
+    ];
+
+    if (category && category !== "all") {
+      conditions.push(Prisma.sql`category = ${category}`);
+    }
+    if (price && price !== "all") {
+      const [min, max] = price.split("-").map(Number);
+      conditions.push(Prisma.sql`price >= ${min} AND price <= ${max}`);
+    }
+    if (rating && rating !== "all") {
+      conditions.push(Prisma.sql`rating >= ${Number(rating)}`);
+    }
+
+    const whereClause = Prisma.join(conditions, " AND ");
+
+    const orderClause =
+      sort === "lowest"
+        ? Prisma.sql`price ASC`
+        : sort === "highest"
+          ? Prisma.sql`price DESC`
+          : sort === "rating"
+            ? Prisma.sql`rating DESC`
+            : Prisma.sql`ts_rank(search_vector, plainto_tsquery('english', ${query})) DESC`;
+
+    const offset = (page - 1) * limit;
+
+    type RawProduct = {
+      id: string;
+      name: string;
+      slug: string;
+      category: string;
+      images: string[];
+      brand: string;
+      description: string;
+      stock: number;
+      price: string;
+      rating: string;
+      numreviews: number;
+      isfeatured: boolean;
+      banner: string | null;
+      createdat: Date;
+    };
+
+    const [rows, countResult] = await Promise.all([
+      prisma.$queryRaw<RawProduct[]>`
+        SELECT
+          id::text, name, slug, category, images, brand, description, stock,
+          price::text, rating::text, "numReviews" AS numreviews,
+          "isFeatured" AS isfeatured, banner, "createdAt" AS createdat
+        FROM "Product"
+        WHERE ${whereClause}
+        ORDER BY ${orderClause}
+        LIMIT ${limit} OFFSET ${offset}
+      `,
+      prisma.$queryRaw<[{ count: bigint }]>`
+        SELECT COUNT(*) AS count FROM "Product" WHERE ${whereClause}
+      `,
+    ]);
+
+    // Map raw rows to match Prisma model shape
+    const data = rows.map((r) => ({
+      id: r.id,
+      name: r.name,
+      slug: r.slug,
+      category: r.category,
+      images: r.images,
+      brand: r.brand,
+      description: r.description,
+      stock: r.stock,
+      price: r.price,
+      rating: r.rating,
+      numReviews: r.numreviews,
+      isFeatured: r.isfeatured,
+      banner: r.banner,
+      createdAt: r.createdat,
+    }));
+
+    const total = Number(countResult[0].count);
+
+    return {
+      data,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  // ─── Prisma path (filters only, no text query) ───
   const categoryFilter: Prisma.ProductWhereInput =
-    category && category !== "all" ? {
-      category: {
-        equals: category,
-      } as Prisma.StringFilter
-    } : {};
+    category && category !== "all"
+      ? { category: { equals: category } as Prisma.StringFilter }
+      : {};
 
-  //Price Filter
   const priceFilter: Prisma.ProductWhereInput =
-    price && price !== "all" ? {
-      price: {
-        gte: Number(price.split("-")[0]),
-        lte: Number(price.split("-")[1]),
-      }
-    } : {};
+    price && price !== "all"
+      ? {
+          price: {
+            gte: Number(price.split("-")[0]),
+            lte: Number(price.split("-")[1]),
+          },
+        }
+      : {};
 
-  //Rating Filter
   const ratingFilter: Prisma.ProductWhereInput =
-    rating && rating !== "all" ? {
-      rating: {
-        gte: Number(rating),
-      }
-    } : {};
+    rating && rating !== "all"
+      ? { rating: { gte: Number(rating) } }
+      : {};
 
-  const data = await prisma.product.findMany({
-    where: {
-      ...queryFilter,
-      ...categoryFilter,
-      ...priceFilter,
-      ...ratingFilter,
-    },
-    orderBy: sort === 'lowest'
-      ? { price: 'asc' }
-      : sort === 'highest'
-        ? { price: 'desc' }
-        : sort === 'rating'
-          ? { rating: 'desc' }
-          : { createdAt: 'desc' },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const where = {
+    ...categoryFilter,
+    ...priceFilter,
+    ...ratingFilter,
+    deletedAt: null,
+  };
 
-  const dataCount = await prisma.product.count({
-    where: {
-      name: {
-        contains: query,
-      },
-    },
-  });
+  const [data, dataCount] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      orderBy:
+        sort === "lowest"
+          ? { price: "asc" }
+          : sort === "highest"
+            ? { price: "desc" }
+            : sort === "rating"
+              ? { rating: "desc" }
+              : { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.product.count({ where }),
+  ]);
 
   return {
     data,
@@ -120,27 +200,27 @@ export async function getAllProducts({
   };
 }
 
-// Delete product
+// Delete product (soft delete)
 export async function deleteProduct(id: string) {
   try {
+    const t = await getTranslations("Actions");
     const productExists = await prisma.product.findFirst({
       where: {
         id: id,
       },
     });
 
-    if (!productExists) throw new Error("Product not found");
+    if (!productExists) throw new Error(t("productNotFound"));
 
-    await prisma.product.delete({
-      where: {
-        id: id,
-      },
+    await prisma.product.update({
+      where: { id },
+      data: { deletedAt: new Date() },
     });
 
     revalidatePath("/admin/products");
     revalidatePath("/products");
 
-    return { success: true, message: "Product deleted successfully" };
+    return { success: true, message: t("productDeletedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
@@ -149,7 +229,9 @@ export async function deleteProduct(id: string) {
 // Create a product
 export async function createProduct(data: z.infer<typeof insertProductSchema>) {
   try {
-    const product = insertProductSchema.parse(data);
+    const t = await getTranslations("Actions");
+    const tV = await getTranslations("Validation");
+    const product = createInsertProductSchema(tV).parse(data);
 
     await prisma.product.create({
       data: product,
@@ -158,7 +240,7 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
     revalidatePath("/admin/products");
     revalidatePath("/products");
 
-    return { success: true, message: "Product created successfully" };
+    return { success: true, message: t("productCreatedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
@@ -167,7 +249,9 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
 // Update a product
 export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
   try {
-    const product = updateProductSchema.parse(data);
+    const t = await getTranslations("Actions");
+    const tV = await getTranslations("Validation");
+    const product = createUpdateProductSchema(tV).parse(data);
 
     const productExists = await prisma.product.findFirst({
       where: {
@@ -176,7 +260,7 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
     });
 
 
-    if (!productExists) throw new Error("Product not found");
+    if (!productExists) throw new Error(t("productNotFound"));
 
     await prisma.product.update({
       where: {
@@ -188,21 +272,57 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
     revalidatePath("/admin/products");
     revalidatePath("/products");
 
-    return { success: true, message: "Product updated successfully" };
+    return { success: true, message: t("productUpdatedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
 }
 
-// Get all categories
+// Get all categories (legacy — from distinct text field)
 export async function getAllCategories() {
 
   const data = await prisma.product.groupBy({
     by: ["category"],
+    where: { deletedAt: null },
     _count: true,
   });
 
   return data;
+}
+
+// Get "Did you mean?" suggestions using pg_trgm similarity
+export async function getDidYouMean(query: string): Promise<string[]> {
+  if (!query || query.trim() === "") return [];
+
+  const results = await prisma.$queryRaw<{ name: string }[]>`
+    SELECT DISTINCT name, similarity(name, ${query}) AS sim
+    FROM "Product"
+    WHERE similarity(name, ${query}) > 0.15
+      AND "deletedAt" IS NULL
+    ORDER BY sim DESC
+    LIMIT 3
+  `;
+
+  return results.map((r) => r.name);
+}
+
+// Get related products by category
+export async function getRelatedProducts(
+  category: string,
+  excludeId: string,
+  limit = 4
+) {
+  const data = await prisma.product.findMany({
+    where: {
+      category,
+      id: { not: excludeId },
+      deletedAt: null,
+    },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+
+  return toPlainObject(data);
 }
 
 // Get featured products
@@ -210,6 +330,7 @@ export async function getFeaturedProducts() {
   const data = await prisma.product.findMany({
     where: {
       isFeatured: true,
+      deletedAt: null,
     },
     orderBy: {
       createdAt: "desc",

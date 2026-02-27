@@ -5,32 +5,34 @@ import { formatError, toPlainObject } from "../utils";
 import { auth } from "@/auth";
 import { getMyCart } from "./cart.actions";
 import { getUserById } from "./user.actions";
-import { insertOrderSchema } from "../validators";
+import { createInsertOrderSchema } from "../validators";
 import { prisma } from "@/db/prisma";
 import { CartItem, PaymentResult } from "@/types";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 
 export async function createOrder() {
   try {
+    const t = await getTranslations("Actions");
     const session = await auth();
     if (!session?.user) {
-      throw new Error("User in not authenticated");
+      throw new Error(t("userNotAuthenticated"));
     }
 
     const cart = await getMyCart();
     const userId = session?.user?.id;
 
-    if (!userId) throw new Error("User not found");
+    if (!userId) throw new Error(t("userNotFound"));
 
     const user = await getUserById(userId);
 
     if (!cart || cart.items.length === 0) {
       return {
         success: false,
-        message: "You cart is empty",
+        message: t("cartIsEmpty"),
         redirectTo: "/cart",
       };
     }
@@ -38,7 +40,7 @@ export async function createOrder() {
     if (!user.paymentMethod) {
       return {
         success: false,
-        message: "No payment method",
+        message: t("noPaymentMethod"),
         redirectTo: "/payment-method",
       };
     }
@@ -46,14 +48,15 @@ export async function createOrder() {
     if (!user.address) {
       return {
         success: false,
-        message: "No shipping address",
+        message: t("noShippingAddress"),
         redirectTo: "/shipping-address",
       };
     }
 
     // Create order object
 
-    const order = insertOrderSchema.parse({
+    const tV = await getTranslations("Validation");
+    const order = createInsertOrderSchema(tV).parse({
       userId: userId,
       shippingAddress: user.address,
       paymentMethod: user.paymentMethod,
@@ -61,13 +64,18 @@ export async function createOrder() {
       shippingPrice: cart.shippingPrice,
       taxPrice: cart.taxPrice,
       totalPrice: cart.totalPrice,
+      couponCode: cart.couponCode,
+      discountAmount: cart.discountAmount,
     });
 
     // Create a transaction to create order and order items
 
     const insertedOrderId = await prisma.$transaction(async (tx) => {
       const insertedOrder = await tx.order.create({
-        data: order,
+        data: {
+          ...order,
+          status: "pending",
+        },
       });
 
       for (const item of cart.items as CartItem[]) {
@@ -80,6 +88,15 @@ export async function createOrder() {
         });
       }
 
+      // Create initial status history entry
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId: insertedOrder.id,
+          status: "pending",
+          note: t("orderCreatedSuccessfully"),
+        },
+      });
+
       await tx.cart.update({
         where: {
           id: cart.id,
@@ -90,17 +107,19 @@ export async function createOrder() {
           shippingPrice: 0,
           taxPrice: 0,
           itemsPrice: 0,
+          couponCode: null,
+          discountAmount: 0,
         },
       });
 
       return insertedOrder.id;
     });
 
-    if (!insertedOrderId) throw new Error("Order not created");
+    if (!insertedOrderId) throw new Error(t("orderNotCreated"));
 
     return {
       success: true,
-      message: "Order created successfully",
+      message: t("orderCreatedSuccessfully"),
       redirectTo: `/order/${insertedOrderId}`,
     };
   } catch (error) {
@@ -122,6 +141,9 @@ export async function getOrderById(orderId: string) {
     include: {
       orderitems: true,
       user: { select: { name: true, email: true } },
+      statusHistory: {
+        orderBy: { createdAt: "asc" },
+      },
     },
   });
 
@@ -132,6 +154,7 @@ export async function getOrderById(orderId: string) {
 
 export async function createPaypalOrder(orderId: string) {
   try {
+    const t = await getTranslations("Actions");
     const order = await prisma.order.findFirst({
       where: {
         id: orderId,
@@ -159,11 +182,11 @@ export async function createPaypalOrder(orderId: string) {
 
       return {
         success: true,
-        message: "Item order created successfully",
+        message: t("itemOrderCreatedSuccessfully"),
         data: paypalOrder.id,
       };
     } else {
-      throw new Error("Order not found");
+      throw new Error(t("orderNotFound"));
     }
   } catch (error) {
     return { success: false, error: formatError(error) };
@@ -177,13 +200,14 @@ export async function approvePaypalOrder(
   data: { orderID: string }
 ) {
   try {
+    const t = await getTranslations("Actions");
     const order = await prisma.order.findFirst({
       where: {
         id: orderId,
       },
     });
 
-    if (!order) throw new Error("Order not found");
+    if (!order) throw new Error(t("orderNotFound"));
 
     const captureData = await paypal.capturePayment(data.orderID);
 
@@ -192,7 +216,7 @@ export async function approvePaypalOrder(
       captureData.id !== (order.paymentResult as PaymentResult)?.id ||
       captureData.status !== "COMPLETED"
     ) {
-      throw new Error("Error in PayPal payment");
+      throw new Error(t("errorInPaypalPayment"));
     }
 
     //Update order to paid
@@ -211,7 +235,7 @@ export async function approvePaypalOrder(
 
     return {
       success: true,
-      message: "Your order has been paid",
+      message: t("orderHasBeenPaid"),
     };
   } catch (error) {
     return { success: false, error: formatError(error) };
@@ -225,6 +249,7 @@ export async function updateOrderToPaid({
   orderId: string;
   paymentResult?: PaymentResult;
 }) {
+  const t = await getTranslations("Actions");
   const order = await prisma.order.findFirst({
     where: { id: orderId },
     include: {
@@ -232,9 +257,9 @@ export async function updateOrderToPaid({
     },
   });
 
-  if (!order) throw new Error("Order not found");
+  if (!order) throw new Error(t("orderNotFound"));
 
-  if (order.isPaid) throw new Error("Order already paid");
+  if (order.isPaid) throw new Error(t("orderAlreadyPaid"));
 
   await prisma.$transaction(async (tx) => {
     // Iterate over products and update stock
@@ -255,7 +280,17 @@ export async function updateOrderToPaid({
       data: {
         isPaid: true,
         paidAt: new Date(),
+        status: "confirmed",
         paymentResult,
+      },
+    });
+
+    // Record status change
+    await tx.orderStatusHistory.create({
+      data: {
+        orderId,
+        status: "confirmed",
+        note: t("orderHasBeenPaid"),
       },
     });
   });
@@ -272,7 +307,7 @@ export async function updateOrderToPaid({
 
   revalidatePath(`/order/${orderId}`);
 
-  if (!updatedOrder) throw new Error("Order not found");
+  if (!updatedOrder) throw new Error(t("orderNotFound"));
 }
 
 // Get the users orders
@@ -286,7 +321,8 @@ export async function getMyOrders({
 }) {
   const session = await auth();
   if (!session?.user) {
-    throw new Error("User not authenticated");
+    const t = await getTranslations("Actions");
+    throw new Error(t("userNotAuthenticated"));
   }
 
   const data = await prisma.order.findMany({
@@ -369,10 +405,12 @@ export async function getAllOrders({
   limit = PAGE_SIZE,
   page,
   query,
+  status,
 }: {
   limit?: number;
   page: number;
   query: string;
+  status?: string;
 }) {
 
   const queryFilter: Prisma.OrderWhereInput = query && query !== "all" ? {
@@ -384,10 +422,14 @@ export async function getAllOrders({
     },
   } : {};
 
+  const statusFilter: Prisma.OrderWhereInput = status && status !== "all"
+    ? { status }
+    : {};
 
   const data = await prisma.order.findMany({
     where: {
       ...queryFilter,
+      ...statusFilter,
     },
     orderBy: {
       createdAt: "desc",
@@ -402,6 +444,7 @@ export async function getAllOrders({
   const dataCount = await prisma.order.count({
     where: {
       ...queryFilter,
+      ...statusFilter,
     },
   });
 
@@ -415,11 +458,12 @@ export async function getAllOrders({
 
 export async function deleteOrder(id: string) {
   try {
+    const t = await getTranslations("Actions");
     await prisma.order.delete({ where: { id } });
 
     revalidatePath("/admin/orders");
 
-    return { success: true, message: "Order deleted successfully" };
+    return { success: true, message: t("orderDeletedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
@@ -429,11 +473,12 @@ export async function deleteOrder(id: string) {
 
 export async function updateOrderToPaidCOD(orderId: string) {
   try {
+    const t = await getTranslations("Actions");
     await updateOrderToPaid({ orderId });
 
     revalidatePath(`/order/${orderId}`);
 
-    return { success: true, message: "Order marked as paid" };
+    return { success: true, message: t("orderMarkedAsPaid") };
 
   } catch (error) {
     return { success: false, message: formatError(error) };
@@ -444,25 +489,108 @@ export async function updateOrderToPaidCOD(orderId: string) {
 
 export async function deliverOrder(orderId: string) {
   try {
+    const t = await getTranslations("Actions");
     const order = await prisma.order.findFirst({
       where: { id: orderId },
     });
 
-    if (!order) throw new Error("Order not found");
+    if (!order) throw new Error(t("orderNotFound"));
 
-    if (!order.isPaid) throw new Error("Order is not paid");
+    if (!order.isPaid) throw new Error(t("orderNotPaid"));
 
-    if (order.isDelivered) throw new Error("Order already delivered");
+    if (order.isDelivered) throw new Error(t("orderAlreadyDelivered"));
 
-    await prisma.order.update({
-      where: { id: orderId },
-      data: { isDelivered: true, deliveredAt: new Date() },
+    await prisma.$transaction(async (tx) => {
+      await tx.order.update({
+        where: { id: orderId },
+        data: {
+          isDelivered: true,
+          deliveredAt: new Date(),
+          status: "delivered",
+        },
+      });
+
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId,
+          status: "delivered",
+          note: t("orderMarkedAsDelivered"),
+        },
+      });
     });
 
     revalidatePath(`/order/${orderId}`);
 
-    return { success: true, message: "Order marked as delivered" };
+    return { success: true, message: t("orderMarkedAsDelivered") };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
+}
+
+// Update order status (admin)
+
+export async function updateOrderStatus({
+  orderId,
+  status,
+  note,
+}: {
+  orderId: string;
+  status: string;
+  note?: string | null;
+}) {
+  try {
+    const t = await getTranslations("Actions");
+    const session = await auth();
+
+    const order = await prisma.order.findFirst({
+      where: { id: orderId },
+    });
+
+    if (!order) throw new Error(t("orderNotFound"));
+
+    await prisma.$transaction(async (tx) => {
+      // Sync booleans with status
+      const updateData: Record<string, unknown> = { status };
+
+      if (status === "delivered") {
+        updateData.isDelivered = true;
+        updateData.deliveredAt = new Date();
+      }
+      if (status === "confirmed" && !order.isPaid) {
+        updateData.isPaid = true;
+        updateData.paidAt = new Date();
+      }
+
+      await tx.order.update({
+        where: { id: orderId },
+        data: updateData,
+      });
+
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId,
+          status,
+          note,
+          changedBy: session?.user?.id,
+        },
+      });
+    });
+
+    revalidatePath(`/order/${orderId}`);
+    revalidatePath("/admin/orders");
+
+    return { success: true, message: t("orderStatusUpdatedSuccessfully") };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// Get order status history
+export async function getOrderStatusHistory(orderId: string) {
+  const data = await prisma.orderStatusHistory.findMany({
+    where: { orderId },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return toPlainObject(data);
 }

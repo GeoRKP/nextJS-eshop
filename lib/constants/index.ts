@@ -42,6 +42,7 @@ export const productDefaultValues = {
   name: "",
   slug: "",
   category: "",
+  categoryId: null,
   images: [],
   brand: "",
   description: "",

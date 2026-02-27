@@ -2,10 +2,11 @@
 
 import { auth } from "@/auth";
 import { formatError } from "../utils";
-import { insertReviewSchema } from "../validators";
+import { insertReviewSchema, createInsertReviewSchema } from "../validators";
 import { z } from "zod";
 import { prisma } from "@/db/prisma";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 // Create and update reviews
 export async function createUpdateReview(
@@ -14,12 +15,14 @@ export async function createUpdateReview(
   const { productId, title, description, rating } = data;
 
   try {
+    const t = await getTranslations("Actions");
     const session = await auth();
 
-    if (!session) throw new Error("User is not authenticated");
+    if (!session) throw new Error(t("userNotAuthenticated"));
 
     // Validate and store the review
-    const review = insertReviewSchema.parse({
+    const tV = await getTranslations("Validation");
+    const review = createInsertReviewSchema(tV).parse({
       userId: session?.user?.id,
       productId,
       title,
@@ -34,7 +37,7 @@ export async function createUpdateReview(
       },
     });
 
-    if (!product) throw new Error("Product not found");
+    if (!product) throw new Error(t("productNotFound"));
 
     // Check if user has already reviewed this product
     const reviewExists = await prisma.review.findFirst({
@@ -97,7 +100,7 @@ export async function createUpdateReview(
 
     return {
       success: true,
-      message: "Review submitted successfully",
+      message: t("reviewSubmittedSuccessfully"),
     }
   } catch (error) {
     return {
@@ -132,7 +135,10 @@ export async function getReviews({ productId }: { productId: string }) {
 // Get a review written by the current user
 export const getReviewByProductId = async ({productId} : {productId: string}) => {
   const session = await auth();
-  if (!session) throw new Error("User is not authenticated");
+  if (!session) {
+    const t = await getTranslations("Actions");
+    throw new Error(t("userNotAuthenticated"));
+  }
 
   return await prisma.review.findFirst({
     where: {

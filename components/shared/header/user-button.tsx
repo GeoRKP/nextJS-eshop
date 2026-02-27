@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { signOutUser } from "@/lib/actions/user.actions";
 import {
@@ -10,15 +10,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { LogOutIcon, UserIcon } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export default async function UserButton() {
   const session = await auth();
+  const t = await getTranslations("UserNav");
 
   if (!session) {
     return (
       <Button asChild>
         <Link href="/sign-in">
-          <UserIcon /> Sign in
+          <UserIcon /> {t("signIn")}
         </Link>
       </Button>
     );
@@ -52,19 +54,19 @@ export default async function UserButton() {
           </DropdownMenuLabel>
           <DropdownMenuItem>
             <Link href="/user/profile" className="w-full">
-              User Profile
+              {t("userProfile")}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Link href="/user/orders" className="w-full">
-              Order History
+              {t("orderHistory")}
             </Link>
           </DropdownMenuItem>
 
           {session?.user?.role === "admin" && (
             <DropdownMenuItem>
               <Link href="/admin/overview" className="w-full">
-                Admin
+                {t("admin")}
               </Link>
             </DropdownMenuItem>
           )}
@@ -77,7 +79,7 @@ export default async function UserButton() {
                 className="w-full py-4 px-2 h-4 justify-start"
               >
                 <LogOutIcon className="w-4 h-4 mr-2" />
-                Sign Out
+                {t("signOut")}
               </Button>
             </form>
           </DropdownMenuItem>

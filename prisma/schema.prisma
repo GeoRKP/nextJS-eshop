@@ -8,24 +8,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+// ─── Category (hierarchical) ───────────────────────────────────
+
+model Category {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
-  slug        String      @unique(map: "product_slug_idx")
-  category    String
-  images      String[]
-  brand       String
-  description String
-  stock       Int
-  price       Decimal     @default(0) @db.Decimal(12, 2)
-  rating      Decimal     @default(0) @db.Decimal(10, 2)
-  numReviews  Int         @default(0)
-  isFeatured  Boolean     @default(false)
-  banner      String?
-  createdAt   DateTime    @default(now()) @db.Timestamp(6)
-  orderitems  OrderItem[]
-  Review      Review[]
+  slug        String     @unique
+  description String?
+  image       String?
+  parentId    String?    @db.Uuid
+  sortOrder   Int        @default(0)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime   @updatedAt @db.Timestamp(6)
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
+  products        Product[]
+  couponCategories CouponCategory[]
+
+  @@index([parentId])
+  @@index([sortOrder])
 }
+
+// ─── Product ───────────────────────────────────────────────────
+
+model Product {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String
+  slug             String    @unique(map: "product_slug_idx")
+  category         String
+  categoryId       String?   @db.Uuid
+  images           String[]
+  brand            String
+  description      String
+  stock            Int
+  price            Decimal   @default(0) @db.Decimal(12, 2)
+  rating           Decimal   @default(0) @db.Decimal(10, 2)
+  numReviews       Int       @default(0)
+  isFeatured       Boolean   @default(false)
+  banner           String?
+  lowStockThreshold Int      @default(5)
+  deletedAt        DateTime? @db.Timestamp(6)
+  createdAt        DateTime  @default(now()) @db.Timestamp(6)
+
+  categoryRef     Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  orderitems      OrderItem[]
+  Review          Review[]
+  wishlistItems   WishlistItem[]
+  couponProducts  CouponProduct[]
+
+  @@index([categoryId])
+}
+
+// ─── User ──────────────────────────────────────────────────────
 
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -37,14 +74,22 @@ model User {
   role          String    @default("user")
   address       Json?     @db.Json
   paymentMethod String?
+  deletedAt     DateTime? @db.Timestamp(6)
   createdAt     DateTime  @default(now()) @db.Timestamp(6)
   updatedAt     DateTime  @updatedAt @db.Timestamp(6)
+
   Account       Account[]
   Session       Session[]
   Cart          Cart[]
   Order         Order[]
   Review        Review[]
+  Wishlist      Wishlist?
+  addresses     Address[]
+  couponUsages  CouponUsage[]
+  notifications Notification[]
 }
+
+// ─── Auth models ───────────────────────────────────────────────
 
 model Account {
   userId            String  @db.Uuid
@@ -84,36 +129,58 @@ model VerificationToken {
   @@id([identifier, token])
 }
 
+// ─── Cart ──────────────────────────────────────────────────────
+
 model Cart {
-  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId        String?  @db.Uuid
-  sessionCartId String
-  items         Json[]   @default([]) @db.Json
-  itemsPrice    Decimal  @default(0) @db.Decimal(12, 2)
-  totalPrice    Decimal  @default(0) @db.Decimal(12, 2)
-  shippingPrice Decimal  @default(0) @db.Decimal(12, 2)
-  taxPrice      Decimal  @default(0) @db.Decimal(12, 2)
-  createdAt     DateTime @default(now()) @db.Timestamp(6)
-  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String?  @db.Uuid
+  sessionCartId  String
+  items          Json[]   @default([]) @db.Json
+  itemsPrice     Decimal  @default(0) @db.Decimal(12, 2)
+  totalPrice     Decimal  @default(0) @db.Decimal(12, 2)
+  shippingPrice  Decimal  @default(0) @db.Decimal(12, 2)
+  taxPrice       Decimal  @default(0) @db.Decimal(12, 2)
+  couponCode     String?
+  discountAmount Decimal  @default(0) @db.Decimal(12, 2)
+  createdAt      DateTime @default(now()) @db.Timestamp(6)
+  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionCartId])
 }
 
+// ─── Order ─────────────────────────────────────────────────────
+
 model Order {
-  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId          String      @db.Uuid
-  shippingAddress Json        @db.Json
-  paymentMethod   String
-  paymentResult   Json?       @db.Json
-  itemsPrice      Decimal     @db.Decimal(12, 2)
-  shippingPrice   Decimal     @db.Decimal(12, 2)
-  taxPrice        Decimal     @db.Decimal(12, 2)
-  totalPrice      Decimal     @db.Decimal(12, 2)
-  isPaid          Boolean     @default(false)
-  paidAt          DateTime?   @db.Timestamp(6)
-  isDelivered     Boolean     @default(false)
-  deliveredAt     DateTime?   @db.Timestamp(6)
-  createdAt       DateTime    @default(now()) @db.Timestamp(6)
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  orderitems      OrderItem[]
+  id                String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String      @db.Uuid
+  shippingAddress   Json        @db.Json
+  paymentMethod     String
+  paymentResult     Json?       @db.Json
+  itemsPrice        Decimal     @db.Decimal(12, 2)
+  shippingPrice     Decimal     @db.Decimal(12, 2)
+  taxPrice          Decimal     @db.Decimal(12, 2)
+  totalPrice        Decimal     @db.Decimal(12, 2)
+  isPaid            Boolean     @default(false)
+  paidAt            DateTime?   @db.Timestamp(6)
+  isDelivered       Boolean     @default(false)
+  deliveredAt       DateTime?   @db.Timestamp(6)
+  status            String      @default("pending")
+  couponId          String?     @db.Uuid
+  couponCode        String?
+  discountAmount    Decimal     @default(0) @db.Decimal(12, 2)
+  shippingAddressId String?     @db.Uuid
+  createdAt         DateTime    @default(now()) @db.Timestamp(6)
+
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderitems        OrderItem[]
+  statusHistory     OrderStatusHistory[]
+  coupon            Coupon?           @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  shippingAddr      Address?          @relation(fields: [shippingAddressId], references: [id], onDelete: SetNull)
+  couponUsages      CouponUsage[]
+  returnRequests    ReturnRequest[]
+
+  @@index([userId])
+  @@index([status])
 }
 
 model OrderItem {
@@ -128,7 +195,26 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([orderId, productId], map: "orderitems_orderId_productId_pk")
+  @@index([productId])
 }
+
+// ─── Order Status History ──────────────────────────────────────
+
+model OrderStatusHistory {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId   String   @db.Uuid
+  status    String
+  note      String?
+  changedBy String?  @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([orderId, createdAt])
+}
+
+// ─── Review ────────────────────────────────────────────────────
 
 model Review {
   id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -141,4 +227,159 @@ model Review {
   createdAt          DateTime @default(now()) @db.Timestamp(6)
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([productId])
+}
+
+// ─── Wishlist ──────────────────────────────────────────────────
+
+model Wishlist {
+  id        String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String         @unique @db.Uuid
+  createdAt DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt DateTime       @updatedAt @db.Timestamp(6)
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items WishlistItem[]
+}
+
+model WishlistItem {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  wishlistId String   @db.Uuid
+  productId  String   @db.Uuid
+  addedAt    DateTime @default(now()) @db.Timestamp(6)
+
+  wishlist Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([wishlistId, productId])
+}
+
+// ─── Coupon / Discount ─────────────────────────────────────────
+
+model Coupon {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code            String    @unique
+  description     String?
+  discountType    String    // "percentage" | "fixed_amount" | "free_shipping"
+  discountValue   Decimal   @db.Decimal(12, 2)
+  minOrderAmount  Decimal?  @db.Decimal(12, 2)
+  maxDiscount     Decimal?  @db.Decimal(12, 2)
+  maxUses         Int?
+  maxUsesPerUser  Int       @default(1)
+  usedCount       Int       @default(0)
+  validFrom       DateTime  @db.Timestamp(6)
+  validUntil      DateTime? @db.Timestamp(6)
+  isActive        Boolean   @default(true)
+  appliesToAll    Boolean   @default(true)
+  createdAt       DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime  @updatedAt @db.Timestamp(6)
+
+  categories CouponCategory[]
+  products   CouponProduct[]
+  usages     CouponUsage[]
+  orders     Order[]
+}
+
+model CouponCategory {
+  couponId   String @db.Uuid
+  categoryId String @db.Uuid
+
+  coupon   Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([couponId, categoryId])
+}
+
+model CouponProduct {
+  couponId  String @db.Uuid
+  productId String @db.Uuid
+
+  coupon  Coupon  @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([couponId, productId])
+}
+
+model CouponUsage {
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  couponId String   @db.Uuid
+  userId   String   @db.Uuid
+  orderId  String   @db.Uuid
+  usedAt   DateTime @default(now()) @db.Timestamp(6)
+
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+// ─── Address Book ──────────────────────────────────────────────
+
+model Address {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @db.Uuid
+  label      String?
+  fullName   String
+  phone      String?
+  address    String
+  address2   String?
+  city       String
+  state      String?
+  postalCode String
+  country    String
+  lat        Float?
+  lng        Float?
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @updatedAt @db.Timestamp(6)
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@index([userId])
+  @@index([userId, isDefault])
+}
+
+// ─── Return Requests ───────────────────────────────────────────
+
+model ReturnRequest {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId      String    @db.Uuid
+  userId       String    @db.Uuid
+  status       String    @default("requested") // requested | approved | rejected | received | refunded
+  reason       String
+  description  String?
+  images       String[]
+  refundAmount Decimal?  @db.Decimal(12, 2)
+  refundMethod String?
+  adminNote    String?
+  resolvedBy   String?   @db.Uuid
+  resolvedAt   DateTime? @db.Timestamp(6)
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamp(6)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([userId])
+}
+
+// ─── Notification ──────────────────────────────────────────────
+
+model Notification {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String    @db.Uuid
+  type      String
+  title     String
+  message   String
+  data      Json?     @db.Json
+  isRead    Boolean   @default(false)
+  readAt    DateTime? @db.Timestamp(6)
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isRead])
 }

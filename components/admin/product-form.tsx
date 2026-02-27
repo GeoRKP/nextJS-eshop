@@ -1,10 +1,10 @@
 "use client";
 
-import { insertProductSchema, updateProductSchema } from "@/lib/validators";
+import { insertProductSchema, updateProductSchema, createInsertProductSchema } from "@/lib/validators";
 import { useToast } from "@/hooks/use-toast";
 import { ControllerRenderProps, useForm } from "react-hook-form";
 import { Product } from "@/types";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { productDefaultValues } from "@/lib/constants";
@@ -25,23 +25,37 @@ import { UploadButton } from "@/lib/uploadthing";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Checkbox } from "../ui/checkbox";
+import { useTranslations } from "next-intl";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Category } from "@/types";
 
 export default function ProductForm({
   type = "Create",
   product,
   productId,
+  categories = [],
 }: {
   type?: "Create" | "Update";
   product?: Product;
   productId?: string;
+  categories?: Category[];
 }) {
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslations("ProductForm");
+  const tCommon = useTranslations("Common");
+  const tV = useTranslations("Validation");
 
   const form = useForm<
     z.infer<typeof insertProductSchema> | z.infer<typeof updateProductSchema>
   >({
-    resolver: zodResolver(insertProductSchema),
+    resolver: zodResolver(createInsertProductSchema(tV)),
     defaultValues:
       product && type === "Update" ? product : productDefaultValues,
   });
@@ -109,9 +123,9 @@ export default function ProductForm({
               >;
             }) => (
               <FormItem className="w-full">
-                <FormLabel>Name</FormLabel>
+                <FormLabel>{t("name")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter product name" {...field} />
+                  <Input placeholder={t("enterProductName")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -129,10 +143,10 @@ export default function ProductForm({
               >;
             }) => (
               <FormItem className="w-full">
-                <FormLabel>Slug</FormLabel>
+                <FormLabel>{t("slug")}</FormLabel>
                 <FormControl>
                   <div>
-                    <Input placeholder="Enter slug" {...field} />
+                    <Input placeholder={t("enterSlug")} {...field} />
                     <Button
                       type="button"
                       className="bg-gray-500 hover:bg-gray-600 text-white px-4 mt-2"
@@ -143,7 +157,7 @@ export default function ProductForm({
                         );
                       }}
                     >
-                      Generate
+                      {tCommon("generate")}
                     </Button>
                   </div>
                 </FormControl>
@@ -165,10 +179,36 @@ export default function ProductForm({
               >;
             }) => (
               <FormItem className="w-full">
-                <FormLabel>Category</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter category" {...field} />
-                </FormControl>
+                <FormLabel>{t("category")}</FormLabel>
+                {categories.length > 0 ? (
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      const cat = categories.find((c) => c.name === value);
+                      if (cat) {
+                        form.setValue("categoryId", cat.id);
+                      }
+                    }}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("selectCategory")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.name}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <FormControl>
+                    <Input placeholder={t("enterCategory")} {...field} />
+                  </FormControl>
+                )}
                 <FormMessage />
               </FormItem>
             )}
@@ -185,9 +225,9 @@ export default function ProductForm({
               >;
             }) => (
               <FormItem className="w-full">
-                <FormLabel>Brand</FormLabel>
+                <FormLabel>{t("brand")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter brand" {...field} />
+                  <Input placeholder={t("enterBrand")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -207,9 +247,9 @@ export default function ProductForm({
               >;
             }) => (
               <FormItem className="w-full">
-                <FormLabel>Price</FormLabel>
+                <FormLabel>{t("price")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter product price" {...field} />
+                  <Input placeholder={t("enterPrice")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -227,9 +267,9 @@ export default function ProductForm({
               >;
             }) => (
               <FormItem className="w-full">
-                <FormLabel>Stock</FormLabel>
+                <FormLabel>{t("stock")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter stock" {...field} />
+                  <Input placeholder={t("enterStock")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -245,7 +285,7 @@ export default function ProductForm({
             name="images"
             render={() => (
               <FormItem className="w-full">
-                <FormLabel>Images</FormLabel>
+                <FormLabel>{t("images")}</FormLabel>
                 <Card>
                   <CardContent className="space-y-2 mt-2 min-h-48">
                     <div className="flex-start space-x-2">
@@ -282,7 +322,7 @@ export default function ProductForm({
           />
         </div>
         <div className="upload-field">
-          Feutured Product
+          {t("featuredProduct")}
           <Card>
             <CardContent className="space-y-2 mt-2">
               <FormField
@@ -296,7 +336,7 @@ export default function ProductForm({
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <FormLabel>Is Featured?</FormLabel>
+                    <FormLabel>{t("isFeatured")}</FormLabel>
                   </FormItem>
                 )}
               />
@@ -339,10 +379,10 @@ export default function ProductForm({
               >;
             }) => (
               <FormItem className="w-full">
-                <FormLabel>Description</FormLabel>
+                <FormLabel>{t("description")}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Enter product description"
+                    placeholder={t("enterDescription")}
                     className="resize-none"
                     {...field}
                   />
@@ -359,7 +399,7 @@ export default function ProductForm({
             disabled={form.formState.isSubmitting}
             className="button col-span-2 w-full"
           >
-            {form.formState.isSubmitting ? "Submitting..." : `${type} Product`}
+            {form.formState.isSubmitting ? tCommon("submitting") : type === "Create" ? t("createButton") : t("updateButton")}
           </Button>
         </div>
       </form>

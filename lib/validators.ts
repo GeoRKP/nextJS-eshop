@@ -2,12 +2,52 @@ import { z } from "zod";
 import { formatNumberWithDecimal } from "./utils";
 import { PAYMENT_METHODS } from "./constants";
 
+// Translation function type — compatible with both useTranslations and getTranslations
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type T = (key: string, values?: any) => string;
+
 const currency = z
   .string()
   .refine(
     (value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(Number(value))),
     "Price must have exact two decimal places"
   );
+
+const createCurrency = (t: T) =>
+  z
+    .string()
+    .refine(
+      (value) =>
+        /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(Number(value))),
+      t("priceDecimal")
+    );
+
+// ── Order status constants ──
+
+export const ORDER_STATUSES = [
+  "pending",
+  "confirmed",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+  "refund_requested",
+  "refunded",
+] as const;
+
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+// ── Coupon discount type constants ──
+
+export const COUPON_DISCOUNT_TYPES = [
+  "percentage",
+  "fixed_amount",
+  "free_shipping",
+] as const;
+
+export type CouponDiscountType = (typeof COUPON_DISCOUNT_TYPES)[number];
+
+// ── Base schemas (for type inference) ──
 
 //Schema for creating a product
 
@@ -21,6 +61,7 @@ export const insertProductSchema = z.object({
   category: z
     .string()
     .min(3, { message: "Category must be at least 3 characters long" }),
+  categoryId: z.string().uuid().optional().nullable(),
   brand: z
     .string()
     .min(3, { message: "Brand must be at least 3 characters long" }),
@@ -90,6 +131,8 @@ export const insertCartSchema = z.object({
   taxPrice: currency,
   sessionCartId: z.string().min(1, { message: "Session cart id is required" }),
   userId: z.string().optional().nullable(),
+  couponCode: z.string().optional().nullable(),
+  discountAmount: currency.optional().default("0.00"),
 });
 
 export const shippingAddressSchema = z.object({
@@ -133,6 +176,9 @@ export const insertOrderSchema = z.object({
     message: "Invalid payment method",
   }),
   shippingAddress: shippingAddressSchema,
+  couponId: z.string().uuid().optional().nullable(),
+  couponCode: z.string().optional().nullable(),
+  discountAmount: currency.optional().default("0.00"),
 });
 
 // Schema for inserting an order item
@@ -153,7 +199,7 @@ export const paymentResultSchema = z.object({
   pricePaid: z.string(),
 });
 
-// Svhema for updating the user profile
+// Schema for updating the user profile
 
 export const updateUserProfileSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters long" }),
@@ -176,3 +222,250 @@ export const insertReviewSchema = z.object({
   userId: z.string().min(1, { message: "User is required" }),
   rating: z.coerce.number().int().min(1, { message: "Rating must be at least 1" }).max(5, { message: "Rating must be at most 5" }),
 });
+
+// ── Category schemas ──
+
+export const insertCategorySchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters long" }),
+  slug: z.string().min(2, { message: "Slug must be at least 2 characters long" }),
+  description: z.string().optional().nullable(),
+  image: z.string().optional().nullable(),
+  parentId: z.string().uuid().optional().nullable(),
+  sortOrder: z.coerce.number().int().default(0),
+  isActive: z.boolean().default(true),
+});
+
+export const updateCategorySchema = insertCategorySchema.extend({
+  id: z.string().min(1, { message: "Id is required" }),
+});
+
+// ── Address schemas ──
+
+export const insertAddressSchema = z.object({
+  label: z.string().optional().nullable(),
+  fullName: z.string().min(3, { message: "Full name must be at least 3 characters long" }),
+  phone: z.string().optional().nullable(),
+  address: z.string().min(3, { message: "Address must be at least 3 characters long" }),
+  address2: z.string().optional().nullable(),
+  city: z.string().min(3, { message: "City must be at least 3 characters long" }),
+  state: z.string().optional().nullable(),
+  postalCode: z.string().min(3, { message: "Postal code must be at least 3 characters long" }),
+  country: z.string().min(3, { message: "Country must be at least 3 characters long" }),
+  lat: z.number().optional().nullable(),
+  lng: z.number().optional().nullable(),
+  isDefault: z.boolean().default(false),
+});
+
+export const updateAddressSchema = insertAddressSchema.extend({
+  id: z.string().min(1, { message: "Id is required" }),
+});
+
+// ── Coupon schemas ──
+
+export const insertCouponSchema = z.object({
+  code: z.string().min(3, { message: "Code must be at least 3 characters" }).toUpperCase(),
+  description: z.string().optional().nullable(),
+  discountType: z.enum(["percentage", "fixed_amount", "free_shipping"]),
+  discountValue: currency,
+  minOrderAmount: currency.optional().nullable(),
+  maxDiscount: currency.optional().nullable(),
+  maxUses: z.coerce.number().int().positive().optional().nullable(),
+  maxUsesPerUser: z.coerce.number().int().positive().default(1),
+  validFrom: z.coerce.date(),
+  validUntil: z.coerce.date().optional().nullable(),
+  isActive: z.boolean().default(true),
+  appliesToAll: z.boolean().default(true),
+  categoryIds: z.array(z.string().uuid()).optional().default([]),
+  productIds: z.array(z.string().uuid()).optional().default([]),
+});
+
+export const updateCouponSchema = insertCouponSchema.extend({
+  id: z.string().min(1, { message: "Id is required" }),
+});
+
+// ── Order status update schema ──
+
+export const updateOrderStatusSchema = z.object({
+  orderId: z.string().min(1, { message: "Order ID is required" }),
+  status: z.enum(ORDER_STATUSES as unknown as [string, ...string[]]),
+  note: z.string().optional().nullable(),
+});
+
+// ── Localized schema factory functions ──
+// Pass t = useTranslations("Validation") or getTranslations("Validation")
+
+export function createInsertProductSchema(t: T) {
+  const cur = createCurrency(t);
+  return z.object({
+    name: z.string().min(3, { message: t("nameMin") }),
+    slug: z.string().min(3, { message: t("slugMin") }),
+    category: z.string().min(3, { message: t("categoryMin") }),
+    categoryId: z.string().uuid().optional().nullable(),
+    brand: z.string().min(3, { message: t("brandMin") }),
+    description: z.string().min(3, { message: t("descriptionMin") }),
+    stock: z.coerce.number().min(0, { message: t("stockMin") }),
+    images: z.array(z.string()).min(1, { message: t("imagesMin") }),
+    isFeatured: z.boolean(),
+    banner: z.string().nullable(),
+    price: cur,
+  });
+}
+
+export function createUpdateProductSchema(t: T) {
+  return createInsertProductSchema(t).extend({
+    id: z.string().min(1, { message: t("idRequired") }),
+  });
+}
+
+export function createSignInFormSchema(t: T) {
+  return z.object({
+    email: z.string().email({ message: t("invalidEmail") }),
+    password: z.string().min(8, { message: t("passwordMin") }),
+  });
+}
+
+export function createSignUpFormSchema(t: T) {
+  return z
+    .object({
+      name: z.string().min(3, { message: t("nameMinChars") }),
+      email: z.string().email({ message: t("invalidEmail") }),
+      password: z.string().min(8, { message: t("passwordMin") }),
+      confirmPassword: z.string().min(8, { message: t("confirmPasswordMin") }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      path: ["confirmPassword"],
+      message: t("passwordsDontMatch"),
+    });
+}
+
+export function createShippingAddressSchema(t: T) {
+  return z.object({
+    fullName: z.string().min(3, { message: t("fullNameMin") }),
+    address: z.string().min(3, { message: t("addressMin") }),
+    city: z.string().min(3, { message: t("cityMin") }),
+    postalCode: z.string().min(3, { message: t("postalCodeMin") }),
+    country: z.string().min(3, { message: t("countryMin") }),
+    lat: z.number().optional().nullable(),
+    lng: z.number().optional().nullable(),
+  });
+}
+
+export function createPaymentMethodSchema(t: T) {
+  return z
+    .object({
+      type: z.string().min(1, t("paymentMethodRequired")),
+    })
+    .refine((data) => PAYMENT_METHODS.includes(data.type), {
+      path: ["type"],
+      message: t("invalidPaymentMethod"),
+    });
+}
+
+export function createInsertOrderSchema(t: T) {
+  const cur = createCurrency(t);
+  return z.object({
+    userId: z.string().min(1, { message: t("userRequired") }),
+    itemsPrice: cur,
+    shippingPrice: cur,
+    taxPrice: cur,
+    totalPrice: cur,
+    paymentMethod: z.string().refine((data) => PAYMENT_METHODS.includes(data), {
+      message: t("invalidPaymentMethod"),
+    }),
+    shippingAddress: createShippingAddressSchema(t),
+    couponId: z.string().uuid().optional().nullable(),
+    couponCode: z.string().optional().nullable(),
+    discountAmount: cur.optional().default("0.00"),
+  });
+}
+
+export function createUpdateUserProfileSchema(t: T) {
+  return z.object({
+    name: z.string().min(3, { message: t("nameMin") }),
+    email: z.string().email({ message: t("invalidEmail") }),
+  });
+}
+
+export function createUpdateUserSchema(t: T) {
+  return createUpdateUserProfileSchema(t).extend({
+    id: z.string().min(1, { message: t("idRequired") }),
+    role: z.string().min(1, { message: t("roleRequired") }),
+  });
+}
+
+export function createInsertReviewSchema(t: T) {
+  return z.object({
+    title: z.string().min(3, { message: t("titleMin") }),
+    description: z.string().min(3, { message: t("descriptionMin") }),
+    productId: z.string().min(1, { message: t("productRequired") }),
+    userId: z.string().min(1, { message: t("userRequired") }),
+    rating: z.coerce.number().int().min(1, { message: t("ratingMin") }).max(5, { message: t("ratingMax") }),
+  });
+}
+
+export function createInsertCategorySchema(t: T) {
+  return z.object({
+    name: z.string().min(2, { message: t("nameMin") }),
+    slug: z.string().min(2, { message: t("slugMin") }),
+    description: z.string().optional().nullable(),
+    image: z.string().optional().nullable(),
+    parentId: z.string().uuid().optional().nullable(),
+    sortOrder: z.coerce.number().int().default(0),
+    isActive: z.boolean().default(true),
+  });
+}
+
+export function createUpdateCategorySchema(t: T) {
+  return createInsertCategorySchema(t).extend({
+    id: z.string().min(1, { message: t("idRequired") }),
+  });
+}
+
+export function createInsertAddressSchema(t: T) {
+  return z.object({
+    label: z.string().optional().nullable(),
+    fullName: z.string().min(3, { message: t("fullNameMin") }),
+    phone: z.string().optional().nullable(),
+    address: z.string().min(3, { message: t("addressMin") }),
+    address2: z.string().optional().nullable(),
+    city: z.string().min(3, { message: t("cityMin") }),
+    state: z.string().optional().nullable(),
+    postalCode: z.string().min(3, { message: t("postalCodeMin") }),
+    country: z.string().min(3, { message: t("countryMin") }),
+    lat: z.number().optional().nullable(),
+    lng: z.number().optional().nullable(),
+    isDefault: z.boolean().default(false),
+  });
+}
+
+export function createUpdateAddressSchema(t: T) {
+  return createInsertAddressSchema(t).extend({
+    id: z.string().min(1, { message: t("idRequired") }),
+  });
+}
+
+export function createInsertCouponSchema(t: T) {
+  const cur = createCurrency(t);
+  return z.object({
+    code: z.string().min(3, { message: t("couponCodeMin") }).toUpperCase(),
+    description: z.string().optional().nullable(),
+    discountType: z.enum(["percentage", "fixed_amount", "free_shipping"]),
+    discountValue: cur,
+    minOrderAmount: cur.optional().nullable(),
+    maxDiscount: cur.optional().nullable(),
+    maxUses: z.coerce.number().int().positive().optional().nullable(),
+    maxUsesPerUser: z.coerce.number().int().positive().default(1),
+    validFrom: z.coerce.date(),
+    validUntil: z.coerce.date().optional().nullable(),
+    isActive: z.boolean().default(true),
+    appliesToAll: z.boolean().default(true),
+    categoryIds: z.array(z.string().uuid()).optional().default([]),
+    productIds: z.array(z.string().uuid()).optional().default([]),
+  });
+}
+
+export function createUpdateCouponSchema(t: T) {
+  return createInsertCouponSchema(t).extend({
+    id: z.string().min(1, { message: t("idRequired") }),
+  });
+}
