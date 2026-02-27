@@ -81,9 +81,7 @@ function ChangeIndicator({
   label: string;
 }) {
   if (change === null) {
-    return (
-      <p className="text-xs text-muted-foreground mt-1">—</p>
-    );
+    return <p className="text-xs text-muted-foreground mt-1">—</p>;
   }
 
   const isPositive = change >= 0;

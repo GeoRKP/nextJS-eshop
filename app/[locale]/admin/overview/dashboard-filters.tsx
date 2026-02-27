@@ -56,12 +56,10 @@ export default function DashboardFilters({
   }
 
   function handlePeriodChange(value: string) {
-    // Preset clears custom dates
     updateParams({ period: value, from: null, to: null });
   }
 
   function handleDateChange(field: "from" | "to", value: string) {
-    // Custom dates clear period preset
     updateParams({ [field]: value || null, period: null });
   }
 

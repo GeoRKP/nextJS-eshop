@@ -41,7 +41,6 @@ export default async function AdminOverviewPage(props: {
 
   const data = await getDashboardData(filters);
   const t = await getTranslations("AdminDashboard");
-  const tCommon = await getTranslations("Common");
 
   return (
     <div className="space-y-4">
@@ -66,7 +65,7 @@ export default async function AdminOverviewPage(props: {
         noDataLabel={t("noData")}
       />
 
-      {/* Bottom row: Coupon Stats + Low Stock + Recent Orders */}
+      {/* Bottom row: Coupon Stats + Recent Orders */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         {/* Coupon Performance */}
         <Card className="col-span-4">
@@ -215,7 +214,10 @@ export default async function AdminOverviewPage(props: {
                       {p.stock === 0 ? (
                         <Badge variant="destructive">{t("outOfStock")}</Badge>
                       ) : (
-                        <Badge variant="outline" className="text-amber-600 border-amber-600">
+                        <Badge
+                          variant="outline"
+                          className="text-amber-600 border-amber-600"
+                        >
                           {t("lowStock")}
                         </Badge>
                       )}
@@ -232,7 +234,10 @@ export default async function AdminOverviewPage(props: {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+  const variants: Record<
+    string,
+    "default" | "secondary" | "destructive" | "outline"
+  > = {
     pending: "outline",
     confirmed: "secondary",
     processing: "secondary",

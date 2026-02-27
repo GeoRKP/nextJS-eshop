@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  AreaChart,
   Area,
   BarChart,
   Bar,
@@ -20,7 +19,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// ── Color palette ──
+// -- Color palette --
 
 const CHART_COLORS = [
   "hsl(210, 70%, 55%)", // blue
@@ -33,7 +32,7 @@ const CHART_COLORS = [
   "hsl(90, 60%, 45%)", // lime
 ];
 
-// ── Types ──
+// -- Types --
 
 type ChartsProps = {
   salesTimeSeries: { date: string; revenue: number; orders: number }[];
@@ -44,7 +43,7 @@ type ChartsProps = {
   noDataLabel: string;
 };
 
-// ── Main component ──
+// -- Main component --
 
 export default function Charts({
   salesTimeSeries,
@@ -111,7 +110,7 @@ export default function Charts({
   );
 }
 
-// ── Empty state ──
+// -- Empty state --
 
 function NoData({ label }: { label: string }) {
   return (
@@ -121,7 +120,15 @@ function NoData({ label }: { label: string }) {
   );
 }
 
-// ── 1. Revenue & Orders Over Time (ComposedChart) ──
+// -- Shared tooltip style --
+
+const tooltipStyle = {
+  borderRadius: "8px",
+  border: "1px solid hsl(var(--border))",
+  background: "hsl(var(--background))",
+};
+
+// -- 1. Revenue & Orders Over Time (ComposedChart) --
 
 function RevenueChart({
   data,
@@ -155,7 +162,9 @@ function RevenueChart({
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(v) => `€${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`}
+          tickFormatter={(v) =>
+            `\u20AC${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`
+          }
         />
         <YAxis
           yAxisId="orders"
@@ -171,11 +180,7 @@ function RevenueChart({
             name === "revenue" ? "Revenue" : "Orders",
           ]}
           labelFormatter={(label) => label}
-          contentStyle={{
-            borderRadius: "8px",
-            border: "1px solid hsl(var(--border))",
-            background: "hsl(var(--background))",
-          }}
+          contentStyle={tooltipStyle}
         />
         <Legend />
         <Area
@@ -202,7 +207,7 @@ function RevenueChart({
   );
 }
 
-// ── 2. Orders by Status (Donut) ──
+// -- 2. Orders by Status (Donut) --
 
 function StatusDonut({
   data,
@@ -227,10 +232,6 @@ function StatusDonut({
           innerRadius={55}
           outerRadius={95}
           paddingAngle={2}
-          label={({ status, count }) =>
-            `${status} (${((count / total) * 100).toFixed(0)}%)`
-          }
-          labelLine={false}
         >
           {data.map((_, i) => (
             <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
@@ -241,18 +242,15 @@ function StatusDonut({
             `${value} (${((value / total) * 100).toFixed(1)}%)`,
             name,
           ]}
-          contentStyle={{
-            borderRadius: "8px",
-            border: "1px solid hsl(var(--border))",
-            background: "hsl(var(--background))",
-          }}
+          contentStyle={tooltipStyle}
         />
+        <Legend />
       </PieChart>
     </ResponsiveContainer>
   );
 }
 
-// ── 3. Revenue by Payment Method (Donut) ──
+// -- 3. Revenue by Payment Method (Donut) --
 
 function PaymentDonut({
   data,
@@ -282,11 +280,7 @@ function PaymentDonut({
         </Pie>
         <Tooltip
           formatter={(value: number) => [formatCurrency(value), "Revenue"]}
-          contentStyle={{
-            borderRadius: "8px",
-            border: "1px solid hsl(var(--border))",
-            background: "hsl(var(--background))",
-          }}
+          contentStyle={tooltipStyle}
         />
         <Legend />
       </PieChart>
@@ -294,7 +288,7 @@ function PaymentDonut({
   );
 }
 
-// ── 4. Top Products (Horizontal Bar) ──
+// -- 4. Top Products (Horizontal Bar) --
 
 function TopProductsChart({
   data,
@@ -305,7 +299,6 @@ function TopProductsChart({
 }) {
   if (data.length === 0) return <NoData label={noDataLabel} />;
 
-  // Truncate long product names for the axis
   const chartData = data.map((d) => ({
     ...d,
     shortName: d.name.length > 25 ? d.name.slice(0, 22) + "..." : d.name,
@@ -317,7 +310,9 @@ function TopProductsChart({
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis
           type="number"
-          tickFormatter={(v) => `€${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`}
+          tickFormatter={(v) =>
+            `\u20AC${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`
+          }
           stroke="#888888"
           fontSize={12}
         />
@@ -334,11 +329,7 @@ function TopProductsChart({
             name === "revenue" ? formatCurrency(value) : value,
             name === "revenue" ? "Revenue" : "Units Sold",
           ]}
-          contentStyle={{
-            borderRadius: "8px",
-            border: "1px solid hsl(var(--border))",
-            background: "hsl(var(--background))",
-          }}
+          contentStyle={tooltipStyle}
         />
         <Bar
           dataKey="revenue"
@@ -351,7 +342,7 @@ function TopProductsChart({
   );
 }
 
-// ── 5. Sales by Category (Pie) ──
+// -- 5. Sales by Category (Pie) --
 
 function CategoryPie({
   data,
@@ -384,11 +375,7 @@ function CategoryPie({
         </Pie>
         <Tooltip
           formatter={(value: number) => [formatCurrency(value), "Revenue"]}
-          contentStyle={{
-            borderRadius: "8px",
-            border: "1px solid hsl(var(--border))",
-            background: "hsl(var(--background))",
-          }}
+          contentStyle={tooltipStyle}
         />
         <Legend />
       </PieChart>
