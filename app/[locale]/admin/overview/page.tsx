@@ -1,128 +1,177 @@
-import { getOrderSummary } from "@/lib/actions/order.actions";
-import { auth } from "@/auth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BadgeDollarSign, Barcode, CreditCard, Eye, Users } from "lucide-react";
-import { formatCurrency, formatDateTime, formatNumber } from "@/lib/utils";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Link } from "@/i18n/navigation";
-import  Charts from './charts'
 import { requireAdmin } from "@/lib/auth-guard";
+import { getDashboardData, type DashboardFilters as DashboardFiltersType } from "@/lib/actions/dashboard.actions";
 import { getTranslations } from "next-intl/server";
+import { Suspense } from "react";
+import DashboardFilters from "./dashboard-filters";
+import KpiCards from "./kpi-cards";
+import Charts from "./charts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "@/i18n/navigation";
+import { Eye, AlertTriangle } from "lucide-react";
+import { formatCurrency, formatDateTime } from "@/lib/utils";
 
 export async function generateMetadata() {
   const t = await getTranslations("Metadata");
-  return {
-    title: t("adminDashboard"),
-  };
+  return { title: t("adminDashboard") };
 }
 
-export default async function AdminOverviewPage() {
-
+export default async function AdminOverviewPage(props: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
   await requireAdmin();
-  const session = await auth();
 
-  if (session?.user?.role !== "admin")
-    throw new Error("User is not authorized to access this page");
+  const searchParams = await props.searchParams;
+  const filters: DashboardFiltersType = {
+    period: searchParams.period,
+    from: searchParams.from,
+    to: searchParams.to,
+    paidStatus: searchParams.paidStatus,
+    paymentMethod: searchParams.paymentMethod,
+    category: searchParams.category,
+  };
 
-  const summary = await getOrderSummary();
+  const data = await getDashboardData(filters);
   const t = await getTranslations("AdminDashboard");
-  const tCommon = await getTranslations("Common");
-
-  console.log(summary);
 
   return (
-    <div className="space-y-2">
-      <h1 className="h2-bold">{t("dashboard")}</h1>
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t("totalRevenue")}</CardTitle>
-            <BadgeDollarSign />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(
-                summary.totalSales._sum.totalPrice?.toString() ?? "0"
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t("sales")}</CardTitle>
-            <CreditCard />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatNumber(summary.ordersCount)}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t("customers")}</CardTitle>
-            <Users />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatNumber(summary.usersCount)}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t("products")}</CardTitle>
-            <Barcode />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatNumber(summary.productsCount)}
-            </div>
-          </CardContent>
-        </Card>
+    <div className="space-y-4">
+      {/* Header + Filters */}
+      <div className="flex flex-col gap-4">
+        <h1 className="h2-bold">{t("dashboard")}</h1>
+        <Suspense>
+          <DashboardFilters categories={data.categories} />
+        </Suspense>
       </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-7 gap-4">
-        <Card className="col-span-4">
-          <CardHeader>{t("overview")}</CardHeader>
-          <CardContent>
-            <Charts data={{
-              salesData: summary.salesData,
-            }} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>{t("recentSales")}</CardHeader>
+
+      {/* KPI Cards */}
+      <KpiCards kpi={data.kpi} t={(key) => t(key as Parameters<typeof t>[0])} />
+
+      {/* Charts */}
+      <Charts
+        salesTimeSeries={data.salesTimeSeries}
+        ordersByStatus={data.ordersByStatus}
+        revenueByPaymentMethod={data.revenueByPaymentMethod}
+        topProducts={data.topProducts}
+        salesByCategory={data.salesByCategory}
+        noDataLabel={t("noData")}
+      />
+
+      {/* Recent Orders */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("recentSales")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("buyer")}</TableHead>
+                <TableHead>{t("date")}</TableHead>
+                <TableHead>{t("total")}</TableHead>
+                <TableHead>{t("status")}</TableHead>
+                <TableHead>{t("actions")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.latestOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell className="text-sm">
+                    {order.userName}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {formatDateTime(order.createdAt).dateOnly}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {formatCurrency(order.totalPrice)}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={order.status} />
+                  </TableCell>
+                  <TableCell>
+                    <Link href={`/order/${order.id}`}>
+                      <Eye className="h-4 w-4" />
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Low Stock Alerts */}
+      {data.lowStockProducts.length > 0 && (
+        <Card>
+          <CardHeader className="flex flex-row items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <CardTitle className="text-base">{t("lowStockAlerts")}</CardTitle>
+          </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t("buyer")}</TableHead>
-                  <TableHead>{t("date")}</TableHead>
-                  <TableHead>{t("total")}</TableHead>
-                  <TableHead>{t("actions")}</TableHead>
+                  <TableHead>{t("productName")}</TableHead>
+                  <TableHead>{t("stock")}</TableHead>
+                  <TableHead>{t("status")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {summary.latestSales.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell>{order?.user?.name ? order.user.name : tCommon('deletedUser')}</TableCell>
-                    <TableCell>{formatDateTime(order.createdAt).dateOnly}</TableCell>
-                    <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
+                {data.lowStockProducts.map((p) => (
+                  <TableRow key={p.id}>
                     <TableCell>
-                      <Link href={`/order/${order.id}`}>
-                      <span className="items-center justify-center">
-                        <Eye />
-                      </span>
+                      <Link
+                        href={`/product/${p.slug}`}
+                        className="hover:underline"
+                      >
+                        {p.name}
                       </Link>
+                    </TableCell>
+                    <TableCell className="font-mono">{p.stock}</TableCell>
+                    <TableCell>
+                      {p.stock === 0 ? (
+                        <Badge variant="destructive">{t("outOfStock")}</Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="text-amber-600 border-amber-600"
+                        >
+                          {t("lowStock")}
+                        </Badge>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-
             </Table>
           </CardContent>
         </Card>
-      </div>
+      )}
     </div>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const variants: Record<
+    string,
+    "default" | "secondary" | "destructive" | "outline"
+  > = {
+    Pending: "outline",
+    Paid: "secondary",
+    Delivered: "default",
+  };
+
+  return (
+    <Badge variant={variants[status] || "outline"} className="text-xs">
+      {status}
+    </Badge>
   );
 }
