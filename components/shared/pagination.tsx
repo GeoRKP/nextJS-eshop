@@ -54,48 +54,55 @@ export default function Pagination({
   };
 
   return (
-    <div className="flex items-center gap-1">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="w-9 h-9 rounded-full"
-        disabled={currentPage === 1}
-        onClick={() => handleClick(currentPage - 1)}
-      >
-        <ChevronLeft className="w-4 h-4" />
-        <span className="sr-only">{t("previous")}</span>
-      </Button>
+    <nav aria-label="Pagination">
+      <div className="inline-flex items-center gap-1 bg-card border border-border/50 rounded-xl p-1.5 shadow-card-subtle">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="w-9 h-9 rounded-lg"
+          disabled={currentPage === 1}
+          onClick={() => handleClick(currentPage - 1)}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span className="sr-only">{t("previous")}</span>
+        </Button>
 
-      {getPageNumbers().map((p, i) =>
-        typeof p === "string" ? (
-          <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-xs text-muted-foreground">
-            ...
-          </span>
-        ) : (
-          <Button
-            key={p}
-            variant={p === currentPage ? "default" : "ghost"}
-            size="icon"
-            className={`w-9 h-9 rounded-full text-xs font-medium ${
-              p === currentPage ? "bg-brand-orange text-white hover:bg-brand-orange-dark" : ""
-            }`}
-            onClick={() => handleClick(p)}
-          >
-            {p}
-          </Button>
-        )
-      )}
+        {getPageNumbers().map((p, i) =>
+          typeof p === "string" ? (
+            <span
+              key={`ellipsis-${i}`}
+              className="w-9 h-9 flex items-center justify-center text-xs text-muted-foreground"
+            >
+              ...
+            </span>
+          ) : (
+            <Button
+              key={p}
+              variant={p === currentPage ? "default" : "ghost"}
+              size="icon"
+              className={`w-9 h-9 rounded-lg text-xs font-medium ${
+                p === currentPage
+                  ? "bg-brand-accent text-white shadow-sm hover:bg-brand-accent-dark"
+                  : "hover:bg-brand-accent/10"
+              }`}
+              onClick={() => handleClick(p)}
+            >
+              {p}
+            </Button>
+          )
+        )}
 
-      <Button
-        variant="ghost"
-        size="icon"
-        className="w-9 h-9 rounded-full"
-        disabled={currentPage >= totalPages}
-        onClick={() => handleClick(currentPage + 1)}
-      >
-        <ChevronRight className="w-4 h-4" />
-        <span className="sr-only">{t("next")}</span>
-      </Button>
-    </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="w-9 h-9 rounded-lg"
+          disabled={currentPage >= totalPages}
+          onClick={() => handleClick(currentPage + 1)}
+        >
+          <ChevronRight className="w-4 h-4" />
+          <span className="sr-only">{t("next")}</span>
+        </Button>
+      </div>
+    </nav>
   );
 }

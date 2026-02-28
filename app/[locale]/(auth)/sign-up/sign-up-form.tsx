@@ -141,19 +141,22 @@ export default function SignUpForm() {
           )}
         />
         <div>
-          <Button className="w-full" type="submit" disabled={isPending}>
+          <Button variant="accent" size="lg" className="w-full" type="submit" disabled={isPending}>
             {isPending ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : null}
             {t("signUp")}
           </Button>
           {serverError && (
-            <div className="text-center text-destructive text-sm mt-2">
+            <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-center text-destructive text-sm mt-2">
               {serverError}
             </div>
           )}
           <div className="text-sm text-center text-muted-foreground mt-2">
-            {t("hasAccount")} <Link href="/sign-in">{t("signIn")}</Link>
+            {t("hasAccount")}{" "}
+            <Link href="/sign-in" className="text-accent font-semibold hover:underline">
+              {t("signIn")}
+            </Link>
           </div>
         </div>
       </form>

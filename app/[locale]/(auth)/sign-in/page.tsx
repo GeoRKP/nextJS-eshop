@@ -36,7 +36,7 @@ export default async function SignInPage(props: {
             priority={true}
           />
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight">{t("welcomeBack")}</h1>
+        <h1 className="h2-bold">{t("welcomeBack")}</h1>
         <p className="text-muted-foreground text-sm mt-1">
           {t("signInDescription")}
         </p>

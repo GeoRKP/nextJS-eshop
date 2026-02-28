@@ -4,7 +4,7 @@ import { useRouter } from "@/i18n/navigation";
 import { createOrder } from "@/lib/actions/order.actions";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Check, Loader2 } from "lucide-react";
+import { ShoppingBag, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function PlaceOrderForm() {
@@ -22,13 +22,16 @@ export default function PlaceOrderForm() {
   const PlaceOrderButton = () => {
     const { pending } = useFormStatus();
     return (
-      <Button disabled={pending} className="w-full">
+      <Button
+        disabled={pending}
+        className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all shadow-md hover:shadow-lg"
+      >
         {pending ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 className="w-5 h-5 animate-spin mr-2" />
         ) : (
-          <Check className="w-4 h-4 " />
-        )}{" "}
-        {t("placeOrder")}
+          <ShoppingBag className="w-5 h-5 mr-2" />
+        )}
+        {pending ? t("orderProcessing") : t("confirmOrder")}
       </Button>
     );
   };

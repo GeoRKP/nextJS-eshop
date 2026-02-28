@@ -22,8 +22,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { createProduct, updateProduct } from "@/lib/actions/product.actions";
 import { UploadButton } from "@/lib/uploadthing";
-import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { useTranslations } from "next-intl";
 import {
@@ -74,7 +74,7 @@ export default function ProductForm({
         });
       } else {
         toast({
-          description: "Product created successfully",
+          description: res.message,
         });
         router.push("/admin/products");
       }
@@ -92,7 +92,7 @@ export default function ProductForm({
         });
       } else {
         toast({
-          description: "Product updated successfully",
+          description: res.message,
         });
         router.push("/admin/products");
       }
@@ -149,7 +149,9 @@ export default function ProductForm({
                     <Input placeholder={t("enterSlug")} {...field} />
                     <Button
                       type="button"
-                      className="bg-gray-500 hover:bg-gray-600 text-white px-4 mt-2"
+                      variant="secondary"
+                      size="sm"
+                      className="mt-2"
                       onClick={() => {
                         form.setValue(
                           "slug",
@@ -276,46 +278,41 @@ export default function ProductForm({
             )}
           />
         </div>
-        <div className="flex flex-col md:flex-row gap-5"></div>
-        <div className=" upload-field flex flex-col md:flex-row gap-5"></div>
-        <div className=" upload-field flex flex-col md:flex-row gap-5"></div>
-        <div className=" upload-field flex flex-col md:flex-row gap-5">
+        <div className="upload-field flex flex-col md:flex-row gap-5">
           <FormField
             control={form.control}
             name="images"
             render={() => (
               <FormItem className="w-full">
                 <FormLabel>{t("images")}</FormLabel>
-                <Card>
-                  <CardContent className="space-y-2 mt-2 min-h-48">
-                    <div className="flex-start space-x-2">
-                      {images.map((image: string) => (
-                        <Image
-                          key={image}
-                          src={image}
-                          alt="Product image"
-                          className="w-20 h-20 object-cover object-center rounded-sm"
-                          width={100}
-                          height={100}
-                        />
-                      ))}
-                      <FormControl>
-                        <UploadButton
-                          endpoint="imageUploader"
-                          onClientUploadComplete={(res: { url: string }[]) => {
-                            form.setValue("images", [...images, res[0].url]);
-                          }}
-                          onUploadError={(error: Error) => {
-                            toast({
-                              description: error.message,
-                              variant: "destructive",
-                            });
-                          }}
-                        />
-                      </FormControl>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="card-premium p-4 space-y-2 min-h-48">
+                  <div className="flex-start space-x-2">
+                    {images.map((image: string) => (
+                      <Image
+                        key={image}
+                        src={image}
+                        alt="Product image"
+                        className="w-20 h-20 object-cover object-center rounded-sm"
+                        width={100}
+                        height={100}
+                      />
+                    ))}
+                    <FormControl>
+                      <UploadButton
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res: { url: string }[]) => {
+                          form.setValue("images", [...images, res[0].url]);
+                        }}
+                        onUploadError={(error: Error) => {
+                          toast({
+                            description: error.message,
+                            variant: "destructive",
+                          });
+                        }}
+                      />
+                    </FormControl>
+                  </div>
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -323,8 +320,7 @@ export default function ProductForm({
         </div>
         <div className="upload-field">
           {t("featuredProduct")}
-          <Card>
-            <CardContent className="space-y-2 mt-2">
+          <div className="card-premium p-4 space-y-2 mt-2">
               <FormField
                 control={form.control}
                 name="isFeatured"
@@ -363,8 +359,7 @@ export default function ProductForm({
                   }}
                 />
               )}
-            </CardContent>
-          </Card>
+          </div>
         </div>
         <div>
           <FormField
@@ -395,11 +390,18 @@ export default function ProductForm({
         <div>
           <Button
             type="submit"
+            variant="accent"
             size="lg"
             disabled={form.formState.isSubmitting}
-            className="button col-span-2 w-full"
+            className="w-full"
           >
-            {form.formState.isSubmitting ? tCommon("submitting") : type === "Create" ? t("createButton") : t("updateButton")}
+            {form.formState.isSubmitting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : type === "Create" ? (
+              t("createButton")
+            ) : (
+              t("updateButton")
+            )}
           </Button>
         </div>
       </form>

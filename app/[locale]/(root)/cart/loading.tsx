@@ -3,36 +3,56 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function CartLoading() {
   return (
     <div className="wrapper">
-      <Skeleton className="h-8 w-48 my-4" />
-      <div className="grid md:grid-cols-4 md:gap-5">
-        <div className="md:col-span-3 space-y-4">
-          {/* Table header */}
-          <div className="grid grid-cols-3 gap-4 py-3 border-b">
-            <Skeleton className="h-4 w-16" />
-            <Skeleton className="h-4 w-20 mx-auto" />
-            <Skeleton className="h-4 w-16 ml-auto" />
-          </div>
-          {/* Table rows */}
+      {/* Page header */}
+      <div className="flex items-center gap-3 py-6">
+        <Skeleton className="w-7 h-7 rounded" />
+        <Skeleton className="h-8 w-48" />
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Cart items */}
+        <div className="lg:col-span-2 space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="grid grid-cols-3 gap-4 py-3 items-center">
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-12 w-12 rounded" />
-                <Skeleton className="h-4 w-24" />
+            <div
+              key={i}
+              className="card-premium p-4 flex gap-4"
+            >
+              <Skeleton className="w-20 h-20 md:w-24 md:h-24 rounded-lg flex-shrink-0" />
+              <div className="flex-1 min-w-0 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+                <div className="flex items-center justify-between mt-3">
+                  <Skeleton className="h-9 w-28 rounded-lg" />
+                  <Skeleton className="h-6 w-16" />
+                </div>
               </div>
-              <div className="flex justify-center gap-2">
-                <Skeleton className="h-8 w-8 rounded" />
-                <Skeleton className="h-4 w-4" />
-                <Skeleton className="h-8 w-8 rounded" />
-              </div>
-              <Skeleton className="h-4 w-16 ml-auto" />
             </div>
           ))}
         </div>
-        {/* Summary card */}
-        <div className="space-y-4 p-4 border rounded-lg">
-          <Skeleton className="h-6 w-32" />
-          <Skeleton className="h-5 w-24" />
-          <Skeleton className="h-10 w-full rounded" />
+
+        {/* Summary sidebar */}
+        <div>
+          <div className="card-premium p-6 space-y-5">
+            <Skeleton className="h-6 w-40" />
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+              <div className="flex justify-between">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-12" />
+              </div>
+            </div>
+            <Skeleton className="h-px w-full" />
+            <div className="flex justify-between items-baseline">
+              <Skeleton className="h-5 w-28" />
+              <Skeleton className="h-8 w-20" />
+            </div>
+            <Skeleton className="h-12 w-full rounded-lg" />
+          </div>
         </div>
       </div>
     </div>

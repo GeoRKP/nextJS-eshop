@@ -24,13 +24,13 @@ function QuantityControls({
   onAdd: () => void;
 }) {
   return (
-    <div className="flex items-center border border-border rounded-xl overflow-hidden">
+    <div className="flex items-center border-2 border-border rounded-lg overflow-hidden">
       <Button
         disabled={isPending}
         variant="ghost"
         size="icon"
         type="button"
-        className="w-9 h-9 rounded-none"
+        className="w-9 h-9 rounded-none hover:bg-brand-accent/10"
         onClick={onRemove}
       >
         {isPending ? (
@@ -39,13 +39,13 @@ function QuantityControls({
           <Minus className="w-4 h-4" />
         )}
       </Button>
-      <span className="w-10 text-center font-semibold">{item.qty}</span>
+      <span className="w-12 text-center font-semibold tabular-nums select-none">{item.qty}</span>
       <Button
         disabled={isPending}
         variant="ghost"
         size="icon"
         type="button"
-        className="w-9 h-9 rounded-none"
+        className="w-9 h-9 rounded-none hover:bg-brand-accent/10"
         onClick={onAdd}
       >
         {isPending ? (
@@ -92,7 +92,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
         <ShoppingCart className="w-7 h-7" />
         <h1 className="h2-bold">{t("shoppingCart")}</h1>
         {cart && cart.items.length > 0 && (
-          <span className="bg-brand-orange text-white text-sm font-bold px-2.5 py-0.5 rounded-full">
+          <span className="bg-brand-accent text-white text-sm font-bold px-2.5 py-0.5 rounded-full">
             {itemCount}
           </span>
         )}
@@ -108,7 +108,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
             <p className="text-muted-foreground text-sm mb-6">
               {t("cartEmptyDesc")}
             </p>
-            <Button asChild className="bg-brand-orange hover:bg-brand-orange-dark text-white rounded-xl px-8">
+            <Button asChild className="bg-brand-accent hover:bg-brand-accent-dark text-white rounded-lg px-8 uppercase tracking-wide active:scale-[0.98] transition-all">
               <Link href="/">{tc("goShopping")}</Link>
             </Button>
           </div>
@@ -123,7 +123,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                 className="card-premium p-4 flex gap-4 group/item"
               >
                 <Link href={`/product/${item.slug}`} className="flex-shrink-0">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-muted/30">
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden bg-muted/30">
                     <Image
                       src={item.image}
                       alt={item.name}
@@ -137,7 +137,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <Link href={`/product/${item.slug}`}>
-                        <h3 className="font-semibold text-sm md:text-base line-clamp-2 hover:text-brand-orange transition-colors">
+                        <h3 className="font-semibold text-sm md:text-base line-clamp-2 hover:text-brand-accent transition-colors">
                           {item.name}
                         </h3>
                       </Link>
@@ -202,7 +202,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
               </div>
 
               <Button
-                className="w-full h-12 rounded-xl bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold text-base"
+                className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
                 disabled={isPending}
                 onClick={() => {
                   startTransition(async () => {

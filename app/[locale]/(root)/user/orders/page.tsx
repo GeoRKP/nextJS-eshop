@@ -94,7 +94,7 @@ export default async function OrdersPage(props: {
                     <TableCell>
                       <Link
                         href={`/order/${order.id}`}
-                        className="inline-flex items-center gap-1 text-xs text-brand-orange hover:text-brand-orange-dark transition-colors font-medium"
+                        className="inline-flex items-center gap-1 text-xs text-brand-accent hover:text-brand-accent-dark transition-colors font-medium"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         {tCommon("details")}

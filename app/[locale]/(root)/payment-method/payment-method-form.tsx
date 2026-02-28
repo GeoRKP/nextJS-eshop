@@ -22,6 +22,12 @@ const paymentIcons: Record<string, typeof CreditCard> = {
   CashOnDelivery: Banknote,
 };
 
+const paymentDescKeys: Record<string, string> = {
+  Stripe: "payWithCard",
+  PayPal: "payWithPaypal",
+  CashOnDelivery: "payOnDelivery",
+};
+
 export default function PaymentMethodForm({
   preferredPaymentMethod,
 }: {
@@ -85,23 +91,26 @@ export default function PaymentMethodForm({
                             key={paymentMethod}
                             onClick={() => field.onChange(paymentMethod)}
                             className={cn(
-                              "relative flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left",
+                              "relative flex items-center gap-4 p-4 rounded-lg border-2 transition-all duration-200 text-left",
                               isSelected
-                                ? "border-brand-orange bg-brand-orange/5 shadow-card-glow"
+                                ? "border-brand-accent bg-brand-accent/5 shadow-card-glow"
                                 : "border-border hover:border-muted-foreground/30 hover:bg-muted/30"
                             )}
                           >
                             <div className={cn(
-                              "w-12 h-12 rounded-xl flex items-center justify-center",
-                              isSelected ? "bg-brand-orange/10 text-brand-orange" : "bg-muted text-muted-foreground"
+                              "w-12 h-12 rounded-lg flex items-center justify-center",
+                              isSelected ? "bg-brand-accent/10 text-brand-accent" : "bg-muted text-muted-foreground"
                             )}>
                               <Icon className="w-6 h-6" />
                             </div>
                             <div className="flex-1">
                               <p className="font-semibold">{paymentMethod}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {t(paymentDescKeys[paymentMethod] as Parameters<typeof t>[0])}
+                              </p>
                             </div>
                             {isSelected && (
-                              <div className="w-6 h-6 rounded-full bg-brand-orange text-white flex items-center justify-center">
+                              <div className="w-6 h-6 rounded-full bg-brand-accent text-white flex items-center justify-center">
                                 <Check className="w-4 h-4" strokeWidth={3} />
                               </div>
                             )}
@@ -117,7 +126,7 @@ export default function PaymentMethodForm({
               <Button
                 type="submit"
                 disabled={isPending}
-                className="w-full h-12 rounded-xl bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold text-base"
+                className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
               >
                 {isPending ? (
                   <Loader2 className="w-5 h-5 animate-spin mr-2" />

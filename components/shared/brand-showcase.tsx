@@ -1,4 +1,3 @@
-import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 import BrandShowcaseClient from "./brand-showcase-client";
 
@@ -14,17 +13,14 @@ export default async function BrandShowcase({
   if (brands.length === 0) return null;
 
   return (
-    <div className="my-10">
-      <div className="flex items-center justify-between mb-4">
+    <section className="border-y border-border/50 py-10">
+      <div className="text-center mb-8">
+        <span className="text-label text-brand-accent block mb-1">
+          {t("trustedBy")}
+        </span>
         <h2 className="h2-bold">{t("shopByBrand")}</h2>
-        <Link
-          href="/search"
-          className="text-brand-orange text-sm font-semibold hover:underline flex items-center gap-1"
-        >
-          {t("viewAll")} →
-        </Link>
       </div>
       <BrandShowcaseClient brands={brands} />
-    </div>
+    </section>
   );
 }

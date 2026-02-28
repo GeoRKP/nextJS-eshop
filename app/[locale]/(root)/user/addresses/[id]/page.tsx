@@ -16,7 +16,7 @@ export default async function EditAddressPage(props: {
   if (!address) notFound();
 
   return (
-    <div className="space-y-8 max-w-lg mx-auto">
+    <div className="space-y-8 max-w-2xl mx-auto">
       <AddressForm type="Update" address={address} addressId={id} />
     </div>
   );

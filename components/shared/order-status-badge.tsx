@@ -2,14 +2,14 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const statusColors: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-  confirmed: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-  processing: "bg-indigo-100 text-indigo-800 hover:bg-indigo-200",
-  shipped: "bg-purple-100 text-purple-800 hover:bg-purple-200",
-  delivered: "bg-green-100 text-green-800 hover:bg-green-200",
-  cancelled: "bg-red-100 text-red-800 hover:bg-red-200",
-  refund_requested: "bg-orange-100 text-orange-800 hover:bg-orange-200",
-  refunded: "bg-gray-100 text-gray-800 hover:bg-gray-200",
+  pending: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
+  confirmed: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+  processing: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+  shipped: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+  delivered: "bg-green-500/10 text-green-600 dark:text-green-400",
+  cancelled: "bg-red-500/10 text-red-600 dark:text-red-400",
+  refund_requested: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+  refunded: "bg-gray-500/10 text-gray-600 dark:text-gray-400",
 };
 
 export default function OrderStatusBadge({
@@ -24,7 +24,7 @@ export default function OrderStatusBadge({
       variant="outline"
       className={cn(
         "font-medium border-0",
-        statusColors[status] || "bg-gray-100 text-gray-800"
+        statusColors[status] || "bg-gray-500/10 text-gray-600 dark:text-gray-400"
       )}
     >
       {label}

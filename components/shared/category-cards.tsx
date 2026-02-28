@@ -3,11 +3,24 @@ import { getAllCategories } from "@/lib/actions/product.actions";
 import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, ArrowRight, ArrowUpRight } from "lucide-react";
 import { getCategoryIcon } from "@/lib/category-icons";
+
+// Bento grid pattern: spans for 12-col grid on desktop
+// Row 1: 7 + 5, Row 2: 4 + 4 + 4, Row 3: 5 + 7
+const bentoSpans = [
+  "lg:col-span-7",
+  "lg:col-span-5",
+  "lg:col-span-4",
+  "lg:col-span-4",
+  "lg:col-span-4",
+  "lg:col-span-5",
+  "lg:col-span-7",
+];
 
 export default async function CategoryCards() {
   const t = await getTranslations("Categories");
+  const tHome = await getTranslations("HomePage");
 
   // Try hierarchical categories first
   let treeCategories: Awaited<ReturnType<typeof getCategoryTree>> = [];
@@ -20,50 +33,65 @@ export default async function CategoryCards() {
   if (treeCategories.length > 0) {
     return (
       <div className="my-10">
-        <h2 className="h2-bold mb-6">{t("shopByCategory")}</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[180px]">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <span className="text-label text-brand-accent block mb-1">
+              {tHome("categoryLabel")}
+            </span>
+            <h2 className="h2-bold">{t("shopByCategory")}</h2>
+          </div>
+          <Link
+            href="/search"
+            className="text-brand-accent text-sm font-semibold hover:underline flex items-center gap-1"
+          >
+            {tHome("viewAllCategories")}
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-12 gap-4 auto-rows-[200px]">
           {treeCategories.map((cat, i) => {
             const Icon = getCategoryIcon(cat.name);
             const subcategoryCount = cat.children?.length ?? 0;
-            // First and fourth items are large (span 2 cols, 2 rows) on desktop
-            const isLarge = i === 0 || i === 3;
+            const span = bentoSpans[i % bentoSpans.length];
 
             return (
               <Link
                 key={cat.id}
                 href={`/search?category=${encodeURIComponent(cat.name)}`}
-                className={`group relative flex flex-col items-center justify-center gap-3 rounded-xl bg-card border border-border hover:border-brand-orange/50 hover:shadow-card-hover transition-all duration-200 overflow-hidden ${
-                  isLarge ? "lg:col-span-2 lg:row-span-2" : ""
-                }`}
+                className={`group relative flex flex-col justify-end rounded-xl overflow-hidden ${span}`}
               >
+                {/* Background image or gradient */}
                 {cat.image ? (
-                  <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <Image
-                      src={cat.image}
-                      alt={cat.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ) : null}
-                <div className="relative">
-                  <Icon
-                    className={`text-brand-orange group-hover:scale-110 transition-all duration-200 ${
-                      isLarge ? "h-12 w-12" : "h-8 w-8"
-                    }`}
+                  <Image
+                    src={cat.image}
+                    alt={cat.name}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-industrial" />
+                )}
+                {/* Dark overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+                {/* Hover arrow top-right */}
+                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ArrowUpRight className="h-5 w-5 text-white" />
                 </div>
-                <div className="relative text-center">
-                  <p className={`font-bold ${isLarge ? "text-lg" : "text-sm"}`}>
+
+                {/* Content at bottom */}
+                <div className="relative p-4 md:p-5">
+                  <Icon className="h-7 w-7 text-brand-accent mb-2" />
+                  <p className="font-bold text-white text-base md:text-lg">
                     {cat.name}
                   </p>
                   {subcategoryCount > 0 && (
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-white/60 mt-1">
                       {subcategoryCount} subcategories
                     </p>
                   )}
                   {cat._count?.products ? (
-                    <span className="inline-block mt-2 bg-brand-orange/10 text-brand-orange text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    <span className="inline-block mt-2 text-brand-accent text-xs font-medium">
                       {t("productCount", { count: cat._count.products })}
                     </span>
                   ) : null}
@@ -82,21 +110,41 @@ export default async function CategoryCards() {
 
   return (
     <div className="my-10">
-      <h2 className="h2-bold mb-6">{t("shopByCategory")}</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {categories.map((cat) => {
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <span className="text-label text-brand-accent block mb-1">
+            {tHome("categoryLabel")}
+          </span>
+          <h2 className="h2-bold">{t("shopByCategory")}</h2>
+        </div>
+        <Link
+          href="/search"
+          className="text-brand-accent text-sm font-semibold hover:underline flex items-center gap-1"
+        >
+          {tHome("viewAllCategories")}
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-12 gap-4 auto-rows-[200px]">
+        {categories.map((cat, i) => {
           const Icon = getCategoryIcon(cat.category) || ShoppingBag;
+          const span = bentoSpans[i % bentoSpans.length];
 
           return (
             <Link
               key={cat.category}
               href={`/search?category=${encodeURIComponent(cat.category)}`}
-              className="group flex flex-col items-center justify-center gap-3 p-6 md:p-8 rounded-xl bg-card border border-border hover:border-brand-orange/50 hover:shadow-card-hover transition-all duration-200"
+              className={`group relative flex flex-col justify-end rounded-xl overflow-hidden ${span}`}
             >
-              <Icon className="h-8 w-8 text-brand-orange group-hover:scale-110 transition-all duration-200" />
-              <div className="text-center">
-                <p className="font-bold text-sm">{cat.category}</p>
-                <span className="inline-block mt-2 bg-brand-orange/10 text-brand-orange text-xs font-medium px-2.5 py-0.5 rounded-full">
+              <div className="absolute inset-0 bg-gradient-industrial" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ArrowUpRight className="h-5 w-5 text-white" />
+              </div>
+              <div className="relative p-4 md:p-5">
+                <Icon className="h-7 w-7 text-brand-accent mb-2" />
+                <p className="font-bold text-white text-base">{cat.category}</p>
+                <span className="inline-block mt-2 text-brand-accent text-xs font-medium">
                   {t("productCount", { count: cat._count })}
                 </span>
               </div>

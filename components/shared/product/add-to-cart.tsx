@@ -76,12 +76,12 @@ export default function AddToCart({
 
   return existItem ? (
     <div className="flex items-center gap-3 w-full">
-      <div className="flex items-center border border-border rounded-xl overflow-hidden">
+      <div className="flex items-center border-2 border-border rounded-lg overflow-hidden">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="rounded-none h-11 w-11"
+          className="rounded-none h-12 w-12 hover:bg-brand-accent/10"
           onClick={handleRemoveFromCart}
         >
           {isPending ? (
@@ -90,12 +90,12 @@ export default function AddToCart({
             <Minus className="h-4 w-4" />
           )}
         </Button>
-        <span className="w-12 text-center font-semibold text-lg">{existItem.qty}</span>
+        <span className="w-14 text-center font-semibold text-lg tabular-nums select-none">{existItem.qty}</span>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="rounded-none h-11 w-11"
+          className="rounded-none h-12 w-12 hover:bg-brand-accent/10"
           onClick={handleAddToCart}
         >
           {isPending ? (
@@ -106,7 +106,7 @@ export default function AddToCart({
         </Button>
       </div>
       <Button
-        className="flex-1 h-11 rounded-xl bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold"
+        className="flex-1 h-12 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
         type="button"
         onClick={() => router.push("/cart")}
       >
@@ -116,7 +116,7 @@ export default function AddToCart({
     </div>
   ) : (
     <Button
-      className="w-full h-12 rounded-xl bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold text-base"
+      className="w-full h-13 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide shadow-md hover:shadow-lg active:scale-[0.98] transition-all"
       type="button"
       onClick={handleAddToCart}
     >

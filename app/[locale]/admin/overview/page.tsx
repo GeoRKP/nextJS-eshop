@@ -1,11 +1,13 @@
 import { requireAdmin } from "@/lib/auth-guard";
-import { getDashboardData, type DashboardFilters as DashboardFiltersType } from "@/lib/actions/dashboard.actions";
+import {
+  getDashboardData,
+  type DashboardFilters as DashboardFiltersType,
+} from "@/lib/actions/dashboard.actions";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import DashboardFilters from "./dashboard-filters";
 import KpiCards from "./kpi-cards";
 import Charts from "./charts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -63,14 +65,17 @@ export default async function AdminOverviewPage(props: {
         topProducts={data.topProducts}
         salesByCategory={data.salesByCategory}
         noDataLabel={t("noData")}
+        t={(key) => t(key as Parameters<typeof t>[0])}
       />
 
       {/* Recent Orders */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t("recentSales")}</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="card-premium">
+        <div className="px-5 py-3 border-b border-border/40">
+          <h3 className="font-heading font-bold text-sm uppercase">
+            {t("recentSales")}
+          </h3>
+        </div>
+        <div className="p-5">
           <Table>
             <TableHeader>
               <TableRow>
@@ -84,9 +89,7 @@ export default async function AdminOverviewPage(props: {
             <TableBody>
               {data.latestOrders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell className="text-sm">
-                    {order.userName}
-                  </TableCell>
+                  <TableCell className="text-sm">{order.userName}</TableCell>
                   <TableCell className="text-sm">
                     {formatDateTime(order.createdAt).dateOnly}
                   </TableCell>
@@ -105,17 +108,19 @@ export default async function AdminOverviewPage(props: {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Low Stock Alerts */}
       {data.lowStockProducts.length > 0 && (
-        <Card>
-          <CardHeader className="flex flex-row items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-500" />
-            <CardTitle className="text-base">{t("lowStockAlerts")}</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="card-premium">
+          <div className="px-5 py-3 border-b border-border/40 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-warning" />
+            <h3 className="font-heading font-bold text-sm uppercase">
+              {t("lowStockAlerts")}
+            </h3>
+          </div>
+          <div className="p-5">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -140,20 +145,15 @@ export default async function AdminOverviewPage(props: {
                       {p.stock === 0 ? (
                         <Badge variant="destructive">{t("outOfStock")}</Badge>
                       ) : (
-                        <Badge
-                          variant="outline"
-                          className="text-amber-600 border-amber-600"
-                        >
-                          {t("lowStock")}
-                        </Badge>
+                        <Badge variant="warning">{t("lowStock")}</Badge>
                       )}
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -162,11 +162,11 @@ export default async function AdminOverviewPage(props: {
 function StatusBadge({ status }: { status: string }) {
   const variants: Record<
     string,
-    "default" | "secondary" | "destructive" | "outline"
+    "default" | "secondary" | "destructive" | "outline" | "accent" | "success" | "warning"
   > = {
     Pending: "outline",
-    Paid: "secondary",
-    Delivered: "default",
+    Paid: "accent",
+    Delivered: "success",
   };
 
   return (

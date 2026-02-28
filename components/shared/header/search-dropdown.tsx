@@ -40,14 +40,14 @@ export default function SearchDropdown({
   return (
     <div
       id="search-dropdown"
-      className="absolute top-full left-0 right-0 z-50 mt-1 max-h-[400px] overflow-y-auto rounded-md border bg-popover shadow-lg"
+      className="absolute top-full left-0 right-0 z-50 mt-2 max-h-[400px] overflow-y-auto rounded-xl border border-t-2 border-t-brand-accent bg-popover shadow-elevated"
       role="listbox"
     >
       {/* Recent searches */}
       {showRecents && (
-        <div className="p-2">
-          <div className="flex items-center justify-between px-2 pb-1">
-            <span className="text-xs font-medium text-muted-foreground">
+        <div className="p-3">
+          <div className="flex items-center justify-between px-1 pb-2">
+            <span className="text-label text-muted-foreground">
               Recent Searches
             </span>
             <button
@@ -69,8 +69,8 @@ export default function SearchDropdown({
                 key={term}
                 role="option"
                 aria-selected={highlightedIndex === idx}
-                className={`flex cursor-pointer items-center justify-between rounded-sm px-2 py-1.5 text-sm ${
-                  highlightedIndex === idx ? "bg-accent" : ""
+                className={`flex cursor-pointer items-center justify-between rounded-lg px-2 py-2 text-sm ${
+                  highlightedIndex === idx ? "bg-brand-accent/10 text-brand-accent" : ""
                 }`}
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -100,8 +100,8 @@ export default function SearchDropdown({
 
       {/* Product suggestions */}
       {showProducts && (
-        <div className="p-2">
-          <span className="px-2 text-xs font-medium text-muted-foreground">
+        <div className="p-3">
+          <span className="text-label text-muted-foreground px-1">
             Products
           </span>
           {products.map((product) => {
@@ -112,8 +112,8 @@ export default function SearchDropdown({
                 key={product.id}
                 role="option"
                 aria-selected={highlightedIndex === idx}
-                className={`flex cursor-pointer items-center gap-3 rounded-sm px-2 py-1.5 ${
-                  highlightedIndex === idx ? "bg-accent" : ""
+                className={`flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 ${
+                  highlightedIndex === idx ? "bg-brand-accent/10 text-brand-accent" : ""
                 }`}
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -123,19 +123,19 @@ export default function SearchDropdown({
                 <Image
                   src={product.image}
                   alt={product.name}
-                  width={36}
-                  height={36}
-                  className="rounded-sm object-cover"
+                  width={44}
+                  height={44}
+                  className="rounded-lg object-cover border"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="truncate text-sm font-medium">
                     {product.name}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-label text-muted-foreground">
                     {product.brand}
                   </p>
                 </div>
-                <span className="text-sm font-medium whitespace-nowrap">
+                <span className="text-sm font-bold whitespace-nowrap">
                   {formatCurrency(product.price)}
                 </span>
               </div>
@@ -146,8 +146,8 @@ export default function SearchDropdown({
 
       {/* Category suggestions */}
       {showCategories && (
-        <div className="p-2 border-t">
-          <span className="px-2 text-xs font-medium text-muted-foreground">
+        <div className="p-3 border-t">
+          <span className="text-label text-muted-foreground px-1">
             Categories
           </span>
           {categories.map((cat) => {
@@ -158,8 +158,8 @@ export default function SearchDropdown({
                 key={cat.category}
                 role="option"
                 aria-selected={highlightedIndex === idx}
-                className={`flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm ${
-                  highlightedIndex === idx ? "bg-accent" : ""
+                className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm ${
+                  highlightedIndex === idx ? "bg-brand-accent/10 text-brand-accent" : ""
                 }`}
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -179,12 +179,12 @@ export default function SearchDropdown({
 
       {/* Fallback: search for query */}
       {showFallback && (
-        <div className="p-2">
+        <div className="p-3">
           <div
             role="option"
             aria-selected={highlightedIndex === 0}
-            className={`flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm ${
-              highlightedIndex === 0 ? "bg-accent" : ""
+            className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm ${
+              highlightedIndex === 0 ? "bg-brand-accent/10 text-brand-accent" : ""
             }`}
             onMouseDown={(e) => {
               e.preventDefault();
@@ -201,7 +201,7 @@ export default function SearchDropdown({
 
       {/* "Search for ..." when there ARE suggestions too */}
       {query && (products.length > 0 || categories.length > 0) && (
-        <div className="border-t p-2">
+        <div className="border-t p-3">
           {(() => {
             itemIndex++;
             const idx = itemIndex;
@@ -209,8 +209,8 @@ export default function SearchDropdown({
               <div
                 role="option"
                 aria-selected={highlightedIndex === idx}
-                className={`flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm ${
-                  highlightedIndex === idx ? "bg-accent" : ""
+                className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm ${
+                  highlightedIndex === idx ? "bg-brand-accent/10 text-brand-accent" : ""
                 }`}
                 onMouseDown={(e) => {
                   e.preventDefault();

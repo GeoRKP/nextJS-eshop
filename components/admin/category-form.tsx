@@ -26,9 +26,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createCategory, updateCategory } from "@/lib/actions/category.actions";
-import { insertCategorySchema } from "@/lib/validators";
+import { insertCategorySchema, createInsertCategorySchema } from "@/lib/validators";
 import { useTranslations } from "next-intl";
 import { Category } from "@/types";
+import { Loader2 } from "lucide-react";
 
 export default function CategoryForm({
   type = "Create",
@@ -45,10 +46,12 @@ export default function CategoryForm({
   const { toast } = useToast();
   const t = useTranslations("AdminCategories");
   const tCommon = useTranslations("Common");
+  const tV = useTranslations("Validation");
 
+  const localizedSchema = createInsertCategorySchema(tV);
   type FormValues = z.input<typeof insertCategorySchema>;
   const form = useForm<FormValues>({
-    resolver: zodResolver(insertCategorySchema) as never,
+    resolver: zodResolver(localizedSchema) as never,
     defaultValues:
       category && type === "Update"
         ? {
@@ -132,7 +135,9 @@ export default function CategoryForm({
                     <Input placeholder={t("enterSlug")} {...field} />
                     <Button
                       type="button"
-                      className="bg-gray-500 hover:bg-gray-600 text-white px-4 mt-2"
+                      variant="secondary"
+                      size="sm"
+                      className="mt-2"
                       onClick={() => {
                         form.setValue(
                           "slug",
@@ -224,7 +229,7 @@ export default function CategoryForm({
           control={form.control}
           name="isActive"
           render={({ field }) => (
-            <FormItem className="flex items-center space-x-2">
+            <FormItem className="flex items-center space-x-2 p-4 rounded-lg border border-border/60 bg-muted/20">
               <FormControl>
                 <Checkbox
                   checked={field.value}
@@ -238,15 +243,18 @@ export default function CategoryForm({
 
         <Button
           type="submit"
+          variant="accent"
           size="lg"
           disabled={form.formState.isSubmitting}
-          className="button w-full"
+          className="w-full"
         >
-          {form.formState.isSubmitting
-            ? tCommon("submitting")
-            : type === "Create"
-              ? t("createButton")
-              : t("updateButton")}
+          {form.formState.isSubmitting ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : type === "Create" ? (
+            t("createButton")
+          ) : (
+            t("updateButton")
+          )}
         </Button>
       </form>
     </Form>

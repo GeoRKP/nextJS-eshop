@@ -34,9 +34,9 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
                     "relative flex items-center justify-center rounded-full font-semibold text-sm",
                     "w-10 h-10 md:w-12 md:h-12",
                     isCompleted &&
-                      "bg-green-600 text-white shadow-md",
+                      "bg-brand-accent text-white shadow-md",
                     isCurrent &&
-                      "bg-brand-orange text-white ring-4 ring-brand-orange/20 shadow-md",
+                      "bg-brand-accent text-white ring-4 ring-brand-accent/20 shadow-md",
                     !isCompleted &&
                       !isCurrent &&
                       "bg-muted text-muted-foreground border-2 border-border"
@@ -44,7 +44,7 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
                   animate={{
                     scale: isCurrent ? 1.1 : 1,
                   }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 >
                   {isCompleted ? (
                     <motion.div
@@ -52,8 +52,8 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{
                         type: "spring",
-                        stiffness: 300,
-                        damping: 15,
+                        stiffness: 400,
+                        damping: 25,
                       }}
                     >
                       <Check className="w-5 h-5 md:w-6 md:h-6" strokeWidth={3} />
@@ -65,8 +65,8 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
                 <span
                   className={cn(
                     "hidden sm:block text-xs md:text-sm text-center whitespace-nowrap",
-                    isCompleted && "text-green-600 font-medium",
-                    isCurrent && "text-brand-orange font-semibold",
+                    isCompleted && "text-brand-accent font-medium",
+                    isCurrent && "text-brand-accent font-semibold",
                     !isCompleted &&
                       !isCurrent &&
                       "text-muted-foreground"
@@ -80,10 +80,7 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
               {index < steps.length - 1 && (
                 <div className="flex-1 mx-2 md:mx-4 h-0.5 rounded-full bg-muted overflow-hidden self-start mt-5 md:mt-6">
                   <motion.div
-                    className={cn(
-                      "h-full rounded-full",
-                      isCompleted ? "bg-green-600" : "bg-brand-orange"
-                    )}
+                    className="h-full rounded-full bg-brand-accent"
                     initial={{ width: 0 }}
                     animate={{
                       width: isCompleted ? "100%" : isCurrent ? "50%" : "0%",

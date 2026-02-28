@@ -11,6 +11,13 @@ import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { SERVER_URL } from "@/lib/constants";
+import { useTranslations } from "next-intl";
+import { Lock } from "lucide-react";
+
+// Module-level stripePromise — only loaded once
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY! as string
+);
 
 export default function StripePayment({
   priceInCents,
@@ -21,16 +28,12 @@ export default function StripePayment({
   orderId: string;
   clientSecret: string | null;
 }) {
-  const stripePromise = loadStripe(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY! as string
-  );
-
   const { theme, systemTheme } = useTheme();
-  
 
   const StripeForm = () => {
     const stripe = useStripe();
     const elements = useElements();
+    const t = useTranslations("Order");
 
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -70,8 +73,8 @@ export default function StripePayment({
 
     return (
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="text-xl"> Stripe Checkout </div>
-        {errorMessage && <div className="text-destructive">{errorMessage}</div>}
+        <div className="text-lg font-semibold">{t("stripeCheckout")}</div>
+        {errorMessage && <div className="text-destructive text-sm">{errorMessage}</div>}
         <PaymentElement />
         <div>
           <LinkAuthenticationElement
@@ -81,14 +84,14 @@ export default function StripePayment({
           />
         </div>
         <Button
-          className="w-full"
-          size="lg"
+          className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
           type="submit"
           disabled={isLoading || !stripe || !elements}
         >
+          <Lock className="w-4 h-4 mr-2" />
           {isLoading
-            ? "Purchasing..."
-            : `Purchase ${formatCurrency(priceInCents / 100)}`}
+            ? t("purchasing")
+            : t("purchaseAmount", { amount: formatCurrency(priceInCents / 100) })}
         </Button>
       </form>
     );

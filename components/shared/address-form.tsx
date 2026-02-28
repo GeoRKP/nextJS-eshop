@@ -13,13 +13,23 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { FormInput } from "@/components/shared/form-input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createAddress, updateAddress } from "@/lib/actions/address.actions";
-import { insertAddressSchema } from "@/lib/validators";
+import { createInsertAddressSchema } from "@/lib/validators";
 import { useTranslations } from "next-intl";
 import { Address } from "@/types";
+import {
+  Tag,
+  User,
+  Phone,
+  MapPin,
+  Building2,
+  Flag,
+  Hash,
+  Loader2,
+} from "lucide-react";
 
 export default function AddressForm({
   type = "Create",
@@ -34,10 +44,13 @@ export default function AddressForm({
   const { toast } = useToast();
   const t = useTranslations("AddressBook");
   const tCommon = useTranslations("Common");
+  const tV = useTranslations("Validation");
 
-  type FormValues = z.input<typeof insertAddressSchema>;
+  const schema = createInsertAddressSchema(tV);
+  type FormValues = z.input<typeof schema>;
+
   const form = useForm<FormValues>({
-    resolver: zodResolver(insertAddressSchema) as never,
+    resolver: zodResolver(schema) as never,
     defaultValues:
       address && type === "Update"
         ? {
@@ -108,12 +121,15 @@ export default function AddressForm({
         <FormField
           control={form.control}
           name="label"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{t("label")}</FormLabel>
               <FormControl>
-                <Input
+                <FormInput
+                  icon={Tag}
                   placeholder={t("enterLabel")}
+                  error={fieldState.error?.message}
+                  isValid={fieldState.isDirty && !fieldState.error}
                   {...field}
                   value={field.value ?? ""}
                 />
@@ -127,11 +143,17 @@ export default function AddressForm({
           <FormField
             control={form.control}
             name="fullName"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem className="w-full">
                 <FormLabel>{t("fullName")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enterFullName")} {...field} />
+                  <FormInput
+                    icon={User}
+                    placeholder={t("enterFullName")}
+                    error={fieldState.error?.message}
+                    isValid={fieldState.isDirty && !fieldState.error}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -140,12 +162,15 @@ export default function AddressForm({
           <FormField
             control={form.control}
             name="phone"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem className="w-full">
                 <FormLabel>{t("phone")}</FormLabel>
                 <FormControl>
-                  <Input
+                  <FormInput
+                    icon={Phone}
                     placeholder={t("enterPhone")}
+                    error={fieldState.error?.message}
+                    isValid={fieldState.isDirty && !fieldState.error}
                     {...field}
                     value={field.value ?? ""}
                   />
@@ -159,11 +184,17 @@ export default function AddressForm({
         <FormField
           control={form.control}
           name="address"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{t("address")}</FormLabel>
               <FormControl>
-                <Input placeholder={t("enterAddress")} {...field} />
+                <FormInput
+                  icon={MapPin}
+                  placeholder={t("enterAddress")}
+                  error={fieldState.error?.message}
+                  isValid={fieldState.isDirty && !fieldState.error}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -173,12 +204,15 @@ export default function AddressForm({
         <FormField
           control={form.control}
           name="address2"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>{t("address2")}</FormLabel>
               <FormControl>
-                <Input
+                <FormInput
+                  icon={Building2}
                   placeholder={t("enterAddress2")}
+                  error={fieldState.error?.message}
+                  isValid={fieldState.isDirty && !fieldState.error}
                   {...field}
                   value={field.value ?? ""}
                 />
@@ -192,11 +226,17 @@ export default function AddressForm({
           <FormField
             control={form.control}
             name="city"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem className="w-full">
                 <FormLabel>{t("city")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enterCity")} {...field} />
+                  <FormInput
+                    icon={Building2}
+                    placeholder={t("enterCity")}
+                    error={fieldState.error?.message}
+                    isValid={fieldState.isDirty && !fieldState.error}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -205,12 +245,15 @@ export default function AddressForm({
           <FormField
             control={form.control}
             name="state"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem className="w-full">
                 <FormLabel>{t("state")}</FormLabel>
                 <FormControl>
-                  <Input
+                  <FormInput
+                    icon={Flag}
                     placeholder={t("enterState")}
+                    error={fieldState.error?.message}
+                    isValid={fieldState.isDirty && !fieldState.error}
                     {...field}
                     value={field.value ?? ""}
                   />
@@ -225,11 +268,17 @@ export default function AddressForm({
           <FormField
             control={form.control}
             name="postalCode"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem className="w-full">
                 <FormLabel>{t("postalCode")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enterPostalCode")} {...field} />
+                  <FormInput
+                    icon={Hash}
+                    placeholder={t("enterPostalCode")}
+                    error={fieldState.error?.message}
+                    isValid={fieldState.isDirty && !fieldState.error}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -238,11 +287,17 @@ export default function AddressForm({
           <FormField
             control={form.control}
             name="country"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem className="w-full">
                 <FormLabel>{t("country")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enterCountry")} {...field} />
+                  <FormInput
+                    icon={Flag}
+                    placeholder={t("enterCountry")}
+                    error={fieldState.error?.message}
+                    isValid={fieldState.isDirty && !fieldState.error}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -254,24 +309,33 @@ export default function AddressForm({
           control={form.control}
           name="isDefault"
           render={({ field }) => (
-            <FormItem className="flex items-center space-x-2">
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-lg border border-border/60 bg-muted/20">
               <FormControl>
                 <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
-              <FormLabel>{t("isDefault")}</FormLabel>
+              <div className="space-y-1 leading-none">
+                <FormLabel>{t("isDefault")}</FormLabel>
+                <p className="text-xs text-muted-foreground">
+                  {t("isDefaultDescription")}
+                </p>
+              </div>
             </FormItem>
           )}
         />
 
         <Button
           type="submit"
+          variant="accent"
           size="lg"
           disabled={form.formState.isSubmitting}
-          className="button w-full"
+          className="w-full"
         >
+          {form.formState.isSubmitting ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : null}
           {form.formState.isSubmitting
             ? tCommon("submitting")
             : type === "Create"

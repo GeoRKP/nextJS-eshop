@@ -10,13 +10,13 @@ export default function AnimatedCard({
   return (
     <motion.div
       whileHover={{
-        y: -4,
+        y: -3,
         boxShadow: "var(--shadow-card-hover)",
       }}
       transition={{
         type: "spring",
-        stiffness: 300,
-        damping: 20,
+        stiffness: 400,
+        damping: 25,
       }}
     >
       {children}

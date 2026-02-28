@@ -10,6 +10,7 @@ import {
 import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 import SearchFilters from "./search-filters";
+import ViewToggle from "./view-toggle";
 import Pagination from "@/components/shared/pagination";
 import { SearchX } from "lucide-react";
 import { getWishlistProductIds } from "@/lib/actions/wishlist.actions";
@@ -72,6 +73,7 @@ export default async function SearchPage(props: {
     rating?: string;
     sort?: string;
     page?: string;
+    view?: string;
   }>;
 }) {
   const {
@@ -81,10 +83,12 @@ export default async function SearchPage(props: {
     rating = "all",
     sort = "newest",
     page = "1",
+    view = "grid",
   } = await props.searchParams;
 
   const t = await getTranslations("Search");
   const tCommon = await getTranslations("Common");
+  const tBreadcrumb = await getTranslations("Breadcrumb");
 
   // Construct filter url
   const getFilterUrl = ({
@@ -210,53 +214,97 @@ export default async function SearchPage(props: {
 
   return (
     <div className="wrapper">
-      {/* Search results banner */}
-      <div className="rounded-2xl bg-gradient-to-r from-muted/80 to-muted/30 border border-border/50 p-6 mb-6">
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight">
-          {hasQuery ? (
-            <>
-              {t("resultsFor")} &ldquo;<span className="text-brand-orange">{q}</span>&rdquo;
-            </>
-          ) : hasCategory ? (
-            <>
-              {t("browsing")}: <span className="text-brand-orange">{category}</span>
-            </>
-          ) : (
-            t("allProducts")
-          )}
-        </h1>
-        {products.data.length > 0 && (
-          <p className="text-sm text-muted-foreground mt-1">
-            {t("showingResults", { count: products.data.length, page: page, totalPages: products.totalPages.toString() })}
-          </p>
-        )}
-
-        {/* Active filter chips */}
-        {activeFilters.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mt-4">
-            {activeFilters.map((filter) => (
-              <Badge
-                key={filter.label}
-                variant="secondary"
-                className="gap-1 pr-1 rounded-full"
-              >
-                <span className="text-xs">{filter.label}</span>
-                <Link
-                  href={filter.clearUrl}
-                  className="ml-1 hover:text-destructive inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-destructive/10"
-                >
-                  &times;
-                </Link>
-              </Badge>
-            ))}
-            <Button variant="link" size="sm" asChild className="h-auto p-0 text-xs">
-              <Link href="/search">{tCommon("clearAll")}</Link>
-            </Button>
+      {/* Results banner */}
+      <div className="card-premium overflow-hidden mb-6">
+        <div className="industrial-stripe p-6">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+            <Link href="/" className="hover:text-foreground transition-colors">{tBreadcrumb("home")}</Link>
+            <span>/</span>
+            <span>{t("filters")}</span>
+            {hasQuery && (
+              <>
+                <span>/</span>
+                <span className="text-foreground">{q}</span>
+              </>
+            )}
           </div>
-        )}
+
+          <h1 className="h2-bold">
+            {hasQuery ? (
+              <>
+                {t("resultsFor")} &ldquo;<span className="text-brand-accent">{q}</span>&rdquo;
+              </>
+            ) : hasCategory ? (
+              <>
+                {t("browsing")}: <span className="text-brand-accent">{category}</span>
+              </>
+            ) : (
+              t("allProducts")
+            )}
+          </h1>
+          {products.data.length > 0 && (
+            <p className="text-sm text-muted-foreground mt-1">
+              {t("showingResults", { count: products.data.length, page: page, totalPages: products.totalPages.toString() })}
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-5 md:gap-8">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-5 mb-6 border-b border-border/50">
+        {/* Active filter chips */}
+        <div className="flex flex-wrap items-center gap-2">
+          {activeFilters.length > 0 && (
+            <>
+              {activeFilters.map((filter) => (
+                <Badge
+                  key={filter.label}
+                  className="gap-1.5 pr-1.5 rounded-md bg-brand-accent/10 text-brand-accent border border-brand-accent/20 hover:bg-brand-accent/15"
+                >
+                  <span className="text-xs">{filter.label}</span>
+                  <Link
+                    href={filter.clearUrl}
+                    className="ml-0.5 hover:text-destructive inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-destructive/10"
+                  >
+                    &times;
+                  </Link>
+                </Badge>
+              ))}
+              <Button variant="link" size="sm" asChild className="h-auto p-0 text-xs">
+                <Link href="/search">{tCommon("clearAll")}</Link>
+              </Button>
+            </>
+          )}
+        </div>
+
+        {/* Sort + View Toggle */}
+        <div className="flex items-center gap-3">
+          {/* Segmented sort */}
+          <div className="flex items-center bg-muted/50 rounded-lg p-1">
+            {sortOrders.map((s) => (
+              <Link
+                key={s}
+                className={`px-3 py-1.5 rounded-md text-xs transition-all ${
+                  sort === s
+                    ? "bg-card shadow-card-subtle text-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                href={getFilterUrl({ s })}
+              >
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                {t(sortKeyMap[s] as any)}
+              </Link>
+            ))}
+          </div>
+
+          {/* View toggle */}
+          <ViewToggle currentView={view} />
+        </div>
+      </div>
+
+      {/* Layout: Sidebar + Products */}
+      <div className="grid md:grid-cols-[280px_1fr] md:gap-10">
         {/* Sidebar filters */}
         <SearchFilters
           filterData={filterData}
@@ -264,54 +312,46 @@ export default async function SearchPage(props: {
         />
 
         {/* Results */}
-        <div className="md:col-span-4 space-y-6">
-          {/* Toolbar */}
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              {products.data.length > 0 &&
-                `${products.data.length} ${t("productsFound")}`}
-            </p>
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-muted-foreground mr-2">{t("sortBy")}</span>
-              {sortOrders.map((s) => (
-                <Link
-                  key={s}
-                  className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
-                    sort === s
-                      ? "bg-primary text-primary-foreground font-medium"
-                      : "text-muted-foreground hover:bg-muted"
-                  }`}
-                  href={getFilterUrl({ s })}
-                >
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {t(sortKeyMap[s] as any)}
-                </Link>
+        <div className="space-y-6">
+          {/* Product grid or list */}
+          {products.data.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center">
+                <SearchX className="w-10 h-10 text-muted-foreground/50" />
+              </div>
+              <h3 className="h3-bold text-center">{t("noResultsTitle")}</h3>
+              <p className="text-muted-foreground text-center text-sm max-w-md">
+                {t("noResultsSubtitle")}
+              </p>
+              {q !== "all" && q.trim() !== "" && <DidYouMean query={q} />}
+              <Button variant="accent" asChild className="mt-2">
+                <Link href="/search">{t("allProducts")}</Link>
+              </Button>
+            </div>
+          ) : view === "list" ? (
+            <div className="flex flex-col gap-4">
+              {products.data.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  searchQuery={q !== "all" ? q : undefined}
+                  isInWishlist={wishlistIds.has(product.id)}
+                  variant="list"
+                />
               ))}
             </div>
-          </div>
-
-          {/* Product grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {products.data.length === 0 && (
-              <div className="col-span-full flex flex-col items-center justify-center py-16 gap-4">
-                <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
-                  <SearchX className="w-8 h-8 text-muted-foreground/50" />
-                </div>
-                <p className="text-muted-foreground text-center">
-                  {t("noResults")} <strong>&ldquo;{q}&rdquo;</strong>
-                </p>
-                {q !== "all" && q.trim() !== "" && <DidYouMean query={q} />}
-              </div>
-            )}
-            {products.data.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                searchQuery={q !== "all" ? q : undefined}
-                isInWishlist={wishlistIds.has(product.id)}
-              />
-            ))}
-          </div>
+          ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+              {products.data.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  searchQuery={q !== "all" ? q : undefined}
+                  isInWishlist={wishlistIds.has(product.id)}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Pagination */}
           {products.totalPages > 1 && (
@@ -342,7 +382,7 @@ async function DidYouMean({ query }: { query: string }) {
           {i > 0 && ", "}
           <Link
             href={`/search?q=${encodeURIComponent(s)}`}
-            className="underline text-brand-orange hover:text-brand-orange-dark"
+            className="underline text-brand-accent hover:text-brand-accent-dark"
           >
             {s}
           </Link>

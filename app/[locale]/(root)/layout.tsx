@@ -21,7 +21,7 @@ export default function RootLayout({
         <Header />
       </StickyHeaderWrapper>
       <MobileCategoryChips />
-      <main className="flex-1 pb-16 md:pb-0">
+      <main className="flex-1 pb-20 md:pb-0 pt-1 md:pt-0">
         <PageTransition>{children}</PageTransition>
       </main>
       <Footer />

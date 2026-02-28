@@ -2,9 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, ArrowRight } from "lucide-react";
 import { useRecentSearches } from "@/hooks/use-recent-searches";
 import SearchDropdown, { getItemCount } from "./search-dropdown";
 import type {
@@ -36,7 +34,6 @@ export default function SearchAutocomplete({ placeholder }: Props) {
 
   // Fetch suggestions with debounce
   const fetchSuggestions = useCallback((q: string) => {
-    // Cancel previous in-flight request
     abortRef.current?.abort();
 
     if (!q.trim()) {
@@ -212,17 +209,18 @@ export default function SearchAutocomplete({ placeholder }: Props) {
     <div ref={containerRef} className="relative">
       <form onSubmit={handleSubmit}>
         <div
-          className="flex w-full items-center"
+          className="search-premium flex w-full items-center bg-muted/30"
           role="combobox"
           aria-expanded={open}
           aria-controls="search-dropdown"
           aria-haspopup="listbox"
         >
-          <Input
+          <SearchIcon className="h-4 w-4 text-muted-foreground/60 ml-4 shrink-0" />
+          <input
             ref={inputRef}
             type="text"
             placeholder={placeholder || "Search..."}
-            className="w-full h-11 rounded-l-full rounded-r-none border-2 border-r-0 border-muted bg-muted/30 pl-5 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-brand-orange"
+            className="w-full h-10 bg-transparent pl-3 pr-2 text-sm placeholder:italic placeholder:text-muted-foreground/60 focus:outline-none"
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => setOpen(true)}
@@ -231,9 +229,12 @@ export default function SearchAutocomplete({ placeholder }: Props) {
             aria-controls="search-dropdown"
             autoComplete="off"
           />
-          <Button type="submit" className="rounded-r-full rounded-l-none shrink-0 h-11 w-12 bg-brand-orange hover:bg-brand-orange-dark text-white border-0">
-            <SearchIcon className="h-5 w-5" />
-          </Button>
+          <button
+            type="submit"
+            className="h-8 w-8 rounded-full bg-brand-accent hover:bg-brand-accent-dark text-white flex items-center justify-center shrink-0 mr-1 transition-colors"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </button>
         </div>
       </form>
 

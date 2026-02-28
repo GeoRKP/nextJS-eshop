@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Roboto, Roboto_Condensed } from "next/font/google";
 import "../../assets/styles/globals.css";
 import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from "@/lib/constants";
 import { ThemeProvider } from "next-themes";
@@ -9,7 +9,19 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing, Locale } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 
-const inter = Inter({ subsets: ["latin", "greek"] });
+const roboto = Roboto({
+  subsets: ["latin", "greek"],
+  weight: ["400", "500", "700"],
+  variable: "--font-roboto",
+  display: "swap",
+});
+
+const robotoCondensed = Roboto_Condensed({
+  subsets: ["latin", "greek"],
+  weight: ["600", "700", "800"],
+  variable: "--font-roboto-condensed",
+  display: "swap",
+});
 
 const localeOgMap: Record<string, string> = {
   el: "el_GR",
@@ -91,11 +103,11 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${roboto.variable} ${robotoCondensed.variable} font-sans antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider
             attribute="class"
-            defaultTheme="light"
+            defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >

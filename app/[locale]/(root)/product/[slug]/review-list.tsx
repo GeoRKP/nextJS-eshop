@@ -1,22 +1,21 @@
 "use client";
 
-import {Review} from "@/types";
+import { Review } from "@/types";
 import { Link } from "@/i18n/navigation";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import ReviewForm from "./review-form";
 
-import {getReviews} from "@/lib/actions/review-actions";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {Calendar, User} from "lucide-react";
-import {formatDateTime} from "@/lib/utils";
+import { getReviews } from "@/lib/actions/review-actions";
+import { Calendar, Star } from "lucide-react";
+import { formatDateTime } from "@/lib/utils";
 import Rating from "@/components/shared/product/rating";
 import { useTranslations } from "next-intl";
 
 export default function ReviewList({
-                                     userId,
-                                     productId,
-                                     productSlug,
-                                   }: {
+  userId,
+  productId,
+  productSlug,
+}: {
   userId: string;
   productId: string;
   productSlug: string;
@@ -27,7 +26,7 @@ export default function ReviewList({
 
   useEffect(() => {
     const loadReviews = async () => {
-      const res = await getReviews({productId});
+      const res = await getReviews({ productId });
       setReviews(res.data);
     };
 
@@ -36,7 +35,7 @@ export default function ReviewList({
 
   //  Reload when updated or created
   const reload = async () => {
-    const res = await getReviews({productId});
+    const res = await getReviews({ productId });
     setReviews([...res.data]);
   };
 
@@ -46,9 +45,10 @@ export default function ReviewList({
     count: reviews.filter((r) => r.rating === star).length,
   }));
   const totalReviews = reviews.length;
-  const avgRating = totalReviews > 0
-    ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
-    : 0;
+  const avgRating =
+    totalReviews > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+      : 0;
 
   return (
     <div className="space-y-6">
@@ -60,11 +60,11 @@ export default function ReviewList({
           onReviewSubmitted={reload}
         />
       ) : (
-        <div className="text-sm text-muted-foreground p-4 rounded-xl bg-muted/50 border border-border/50">
+        <div className="text-sm text-muted-foreground p-4 rounded-lg bg-muted/50 border border-border/50">
           {t.rich("signInToReview", {
             signInLink: (chunks) => (
               <Link
-                className="text-brand-orange font-medium hover:underline"
+                className="text-brand-accent font-medium hover:underline"
                 href={`/sign-in?callbackUrl=/product/${productSlug}`}
               >
                 {chunks}
@@ -74,12 +74,12 @@ export default function ReviewList({
         </div>
       )}
 
-      {/* Rating summary bar */}
+      {/* Rating summary */}
       {totalReviews > 0 && (
-        <div className="flex flex-col sm:flex-row gap-8 p-6 rounded-2xl bg-muted/30 border border-border/50">
+        <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-8 p-6 bg-card rounded-lg border border-border/50 shadow-card-subtle">
           {/* Average rating */}
-          <div className="flex flex-col items-center justify-center gap-1 min-w-[120px]">
-            <span className="text-4xl font-black">{avgRating.toFixed(1)}</span>
+          <div className="flex flex-col items-center justify-center gap-1">
+            <span className="text-5xl font-black">{avgRating.toFixed(1)}</span>
             <Rating value={avgRating} />
             <span className="text-xs text-muted-foreground mt-1">
               {t("numReviews", { count: totalReviews })}
@@ -90,14 +90,24 @@ export default function ReviewList({
           <div className="flex-1 space-y-2">
             {ratingCounts.map(({ star, count }) => (
               <div key={star} className="flex items-center gap-3">
-                <span className="text-xs font-medium w-4 text-right">{star}</span>
-                <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                <span className="inline-flex items-center gap-1 text-xs font-medium w-8">
+                  {star}
+                  <Star className="h-3 w-3 fill-brand-accent text-brand-accent" />
+                </span>
+                <div className="flex-1 h-2.5 rounded-full bg-muted overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-yellow-400 transition-all duration-500"
-                    style={{ width: totalReviews > 0 ? `${(count / totalReviews) * 100}%` : "0%" }}
+                    className="h-full rounded-full bg-brand-accent transition-all duration-500"
+                    style={{
+                      width:
+                        totalReviews > 0
+                          ? `${(count / totalReviews) * 100}%`
+                          : "0%",
+                    }}
                   />
                 </div>
-                <span className="text-xs text-muted-foreground w-6">{count}</span>
+                <span className="text-xs text-muted-foreground w-6 tabular-nums">
+                  {count}
+                </span>
               </div>
             ))}
           </div>
@@ -110,35 +120,39 @@ export default function ReviewList({
       )}
       <div className="flex flex-col gap-4">
         {reviews.map((review) => (
-          <Card key={review.id} className="border-border/50 rounded-xl shadow-none">
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <CardTitle className="text-base">{review.title}</CardTitle>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Rating value={review.rating} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Calendar className="w-3 h-3" />
-                  {formatDateTime(review.createdAt).dateTime}
-                </div>
+          <div
+            key={review.id}
+            className="border border-border/50 rounded-lg p-5 hover:border-border transition-colors"
+          >
+            {/* Top: stars + date */}
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <Rating value={review.rating} />
+                <h4 className="font-semibold text-sm mt-2">{review.title}</h4>
               </div>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-sm leading-relaxed mb-3">
-                {review.description}
-              </CardDescription>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
-                  <User className="w-3 h-3" />
-                </div>
-                <span className="font-medium">
-                  {review.user ? review.user.name : tCommon("deletedUser")}
-                </span>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground flex-shrink-0">
+                <Calendar className="w-3 h-3" />
+                {formatDateTime(review.createdAt).dateTime}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Body */}
+            <p className="text-sm text-muted-foreground leading-relaxed mt-3">
+              {review.description}
+            </p>
+
+            {/* Author */}
+            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border/30">
+              <div className="w-7 h-7 rounded-full bg-brand-accent/10 text-brand-accent flex items-center justify-center text-xs font-bold">
+                {review.user
+                  ? review.user.name.charAt(0).toUpperCase()
+                  : "?"}
+              </div>
+              <span className="text-xs font-medium">
+                {review.user ? review.user.name : tCommon("deletedUser")}
+              </span>
+            </div>
+          </div>
         ))}
       </div>
     </div>

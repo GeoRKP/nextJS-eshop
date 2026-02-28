@@ -8,7 +8,7 @@ export async function generateMetadata() {
 
 export default async function CreateAddressPage() {
   return (
-    <div className="space-y-8 max-w-lg mx-auto">
+    <div className="space-y-8 max-w-2xl mx-auto">
       <AddressForm type="Create" />
     </div>
   );

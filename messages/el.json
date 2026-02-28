@@ -34,7 +34,8 @@
     "notDelivered": "Δεν παραδόθηκε",
     "deletedUser": "Διαγραμμένος Χρήστης",
     "user": "Χρήστης",
-    "admin": "Διαχειριστής"
+    "admin": "Διαχειριστής",
+    "noItems": "Δεν βρέθηκαν στοιχεία"
   },
   "Nav": {
     "cart": "Καλάθι",
@@ -49,9 +50,11 @@
     "profile": "Προφίλ",
     "orders": "Παραγγελίες",
     "wishlist": "Λίστα Επιθυμιών",
-    "addresses": "Διευθύνσεις"
+    "addresses": "Διευθύνσεις",
+    "myAccount": "Ο Λογαριασμός μου"
   },
   "AdminNav": {
+    "adminPanel": "Πίνακας Διαχείρισης",
     "overview": "Επισκόπηση",
     "products": "Προϊόντα",
     "orders": "Παραγγελίες",
@@ -106,7 +109,15 @@
     "categories": "Κατηγορίες",
     "relatedProducts": "Σχετικά Προϊόντα",
     "readMore": "Περισσότερα",
-    "readLess": "Λιγότερα"
+    "readLess": "Λιγότερα",
+    "specifications": "Προδιαγραφές",
+    "sku": "Κωδικός",
+    "brandLabel": "Μάρκα",
+    "categoryLabel": "Κατηγορία",
+    "stockLabel": "Απόθεμα",
+    "writeReview": "Γράψτε μια Αξιολόγηση",
+    "vatIncluded": "με ΦΠΑ",
+    "youMayAlsoLike": "Μπορεί Επίσης να σας Αρέσει"
   },
   "Cart": {
     "shoppingCart": "Καλάθι Αγορών",
@@ -129,7 +140,8 @@
     "free": "Δωρεάν",
     "estimatedTotal": "Εκτιμώμενο Σύνολο",
     "secureCheckout": "Ασφαλές Ταμείο",
-    "buyerProtection": "Προστασία Αγοραστή"
+    "buyerProtection": "Προστασία Αγοραστή",
+    "itemsInCart": "{count} προϊόντα στο καλάθι"
   },
   "Checkout": {
     "userLogin": "Σύνδεση Χρήστη",
@@ -153,7 +165,9 @@
     "continueToReview": "Συνέχεια στον Έλεγχο",
     "payWithCard": "Πληρωμή με πιστωτική ή χρεωστική κάρτα",
     "payWithPaypal": "Πληρωμή μέσω PayPal",
-    "payOnDelivery": "Πληρωμή κατά την παραλαβή"
+    "payOnDelivery": "Πληρωμή κατά την παραλαβή",
+    "confirmOrder": "Επιβεβαίωση & Υποβολή Παραγγελίας",
+    "orderProcessing": "Επεξεργασία παραγγελίας..."
   },
   "Order": {
     "orderDetails": "Παραγγελία {id}",
@@ -197,7 +211,12 @@
     "statusRefunded": "Επιστράφηκε",
     "statusTimeline": "Χρονολόγιο Παραγγελίας",
     "orderSummary": "Σύνοψη Παραγγελίας",
-    "noOrders": "Δεν έχετε κάνει ακόμα παραγγελίες."
+    "noOrders": "Δεν έχετε κάνει ακόμα παραγγελίες.",
+    "stripeCheckout": "Ασφαλής Πληρωμή με Κάρτα",
+    "purchasing": "Επεξεργασία...",
+    "purchaseAmount": "Πληρωμή {amount}",
+    "orderNumber": "Παραγγελία #{id}",
+    "orderConfirmed": "Η παραγγελία σας επιβεβαιώθηκε"
   },
   "Search": {
     "department": "Τμήμα",
@@ -236,7 +255,12 @@
     "browsing": "Περιήγηση",
     "allProducts": "Όλα τα Προϊόντα",
     "showingResults": "Εμφάνιση {count} προϊόντων (σελίδα {page} από {totalPages})",
-    "productsFound": "προϊόντα βρέθηκαν"
+    "productsFound": "προϊόντα βρέθηκαν",
+    "gridView": "Προβολή πλέγματος",
+    "listView": "Προβολή λίστας",
+    "activeFilters": "Ενεργά Φίλτρα",
+    "noResultsTitle": "Δεν βρέθηκαν αποτελέσματα",
+    "noResultsSubtitle": "Δοκιμάστε να προσαρμόσετε την αναζήτηση ή τα φίλτρα σας."
   },
   "AdminDashboard": {
     "dashboard": "Πίνακας Ελέγχου",
@@ -363,7 +387,8 @@
     "profile": "Προφίλ",
     "email": "Email",
     "name": "Όνομα",
-    "updateProfile": "Ενημέρωση Προφίλ"
+    "updateProfile": "Ενημέρωση Προφίλ",
+    "namePlaceholder": "Εισάγετε το ονοματεπώνυμό σας"
   },
   "DeleteDialog": {
     "areYouSure": "Είστε απολύτως σίγουροι;",
@@ -512,7 +537,9 @@
   "UtilityBar": {
     "helpCenter": "Κέντρο Βοήθειας",
     "orderTracking": "Παρακολούθηση Παραγγελίας",
-    "proAccount": "Επαγγελματικός Λογαριασμός"
+    "proAccount": "Επαγγελματικός Λογαριασμός",
+    "phoneNumber": "+30 210 1234567",
+    "businessHours": "Δευ-Παρ 8:00-18:00"
   },
   "MegaMenu": {
     "viewAll": "Προβολή Όλων",
@@ -543,15 +570,25 @@
   },
   "HomePage": {
     "trendingProducts": "Δημοφιλή Προϊόντα",
+    "trendingLabel": "ΔΗΜΟΦΙΛΗ ΤΩΡΑ",
     "shopByCategory": "Αγορές ανά Κατηγορία",
+    "categoryLabel": "ΠΕΡΙΗΓΗΘΕΙΤΕ",
     "latestProducts": "Τελευταία Προϊόντα",
+    "latestLabel": "ΜΟΛΙΣ ΕΦΤΑΣΑΝ",
     "promoTitle": "Premium Ανταλλακτικά. Ασυναγώνιστες Τιμές.",
+    "promoLabel": "ΓΙΑΤΙ ΕΜΑΣ",
     "promoSubtitle": "Αναβαθμίστε το φορτηγό σας με κορυφαία ανταλλακτικά σε προσφορές.",
     "shopDeals": "Δείτε Προσφορές",
     "shopByBrand": "Αγορά ανά Μάρκα",
-    "viewAll": "Προβολή Όλων"
+    "viewAll": "Προβολή Όλων",
+    "trustedBy": "Αξιόπιστες Μάρκες",
+    "viewAllCategories": "Όλες οι Κατηγορίες",
+    "statParts": "10K+ Ανταλλακτικά",
+    "statBrands": "500+ Μάρκες",
+    "statSupport": "24/7 Υποστήριξη"
   },
   "Hero": {
+    "label": "ΑΝΤΑΛΛΑΚΤΙΚΑ ΦΟΡΤΗΓΩΝ PREMIUM",
     "tagline": "Φτιαγμένα Για Τον Δρόμο Μπροστά",
     "subtitle": "Premium ανταλλακτικά φορτηγών και αξεσουάρ. Ποιότητα ειδικών. Εγγυημένη εφαρμογή.",
     "shopNow": "Αγοράστε Τώρα",
@@ -574,7 +611,9 @@
   "ProductCard": {
     "new": "Νέο",
     "featured": "Προτεινόμενο",
-    "lowStock": "Χαμηλό Απόθεμα"
+    "lowStock": "Χαμηλό Απόθεμα",
+    "quickView": "Γρήγορη Προβολή",
+    "addToCart": "Προσθήκη στο Καλάθι"
   },
   "Breadcrumb": {
     "home": "Αρχική",
@@ -604,7 +643,16 @@
     "myProfile": "Προφίλ",
     "myAddresses": "Διευθύνσεις",
     "privacyPolicy": "Πολιτική Απορρήτου",
-    "termsOfService": "Όροι Χρήσης"
+    "termsOfService": "Όροι Χρήσης",
+    "newsletterCTA": "Μείνετε μπροστά με τα τελευταία ανταλλακτικά & προσφορές",
+    "backToTop": "Πίσω στην κορυφή",
+    "contactTitle": "Επικοινωνία",
+    "categoriesTitle": "Κατηγορίες",
+    "allProducts": "Όλα τα Προϊόντα",
+    "newArrivals": "Νέες Αφίξεις",
+    "deals": "Προσφορές",
+    "cookies": "Cookies",
+    "businessHours": "Δευ-Παρ 8:00-18:00"
   },
   "Wishlist": {
     "wishlist": "Λίστα Επιθυμιών",
@@ -701,6 +749,25 @@
     "updateButton": "Ενημέρωση Διεύθυνσης",
     "default": "Προεπιλογή",
     "selectAddress": "Επιλέξτε διεύθυνση αποστολής",
-    "useNewAddress": "Χρήση νέας διεύθυνσης"
+    "useNewAddress": "Χρήση νέας διεύθυνσης",
+    "isDefaultDescription": "Αυτή η διεύθυνση θα χρησιμοποιηθεί ως προεπιλογή για αποστολή"
+  },
+  "Testimonials": {
+    "whatCustomersSay": "Τι Λένε οι Πελάτες μας",
+    "trustedByProfessionals": "ΕΜΠΙΣΤΟΣΥΝΗ ΑΠΟ ΕΠΑΓΓΕΛΜΑΤΙΕΣ",
+    "quote1": "Εξαιρετική ποιότητα ανταλλακτικών και αστραπιαία παράδοση. Ο στόλος μας δεν λειτούργησε ποτέ καλύτερα.",
+    "name1": "Δημήτρης Κ.",
+    "role1": "Διαχειριστής Στόλου",
+    "quote2": "Η καλύτερη επιλογή ανταλλακτικών φορτηγών online. Ανταγωνιστικές τιμές και γνήσια ποιότητα OEM κάθε φορά.",
+    "name2": "Γιάννης Μ.",
+    "role2": "Ανεξάρτητος Μηχανικός",
+    "quote3": "Υποστήριξη 24/7 και εύκολες επιστροφές κάνουν το Geo Store τον βασικό μας προμηθευτή. Συστήνεται ανεπιφύλακτα.",
+    "name3": "Μαρία Π.",
+    "role3": "Ιδιοκτήτρια-Οδηγός"
+  },
+  "Newsletter": {
+    "stayUpdated": "ΜΕΙΝΕΤΕ ΕΝΗΜΕΡΩΜΕΝΟΙ",
+    "newsletterTitle": "Λάβετε τα Τελευταία Ανταλλακτικά & Προσφορές",
+    "newsletterSubtitle": "Εγγραφείτε στο newsletter μας για αποκλειστικές προσφορές, νέες αφίξεις και συμβουλές ειδικών."
   }
 }

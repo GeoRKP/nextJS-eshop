@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import DeleteDialog from "@/components/shared/delete-dialog";
 import Pagination from "@/components/shared/pagination";
 import { requireAdmin } from "@/lib/auth-guard";
+import { Ticket } from "lucide-react";
 
 export async function generateMetadata() {
   const t = await getTranslations("AdminCoupons");
@@ -36,12 +37,12 @@ export default async function AdminCouponsPage(props: {
     query,
   });
 
-  const getStatusBadge = (coupon: typeof coupons[0]) => {
+  const getStatusBadge = (coupon: (typeof coupons)[0]) => {
     if (!coupon.isActive)
       return <Badge variant="secondary">{t("inactive")}</Badge>;
     if (coupon.validUntil && new Date(coupon.validUntil) < new Date())
       return <Badge variant="destructive">{t("expired")}</Badge>;
-    return <Badge className="bg-green-600">{t("active")}</Badge>;
+    return <Badge variant="success">{t("active")}</Badge>;
   };
 
   const getTypeLabel = (type: string) => {
@@ -58,64 +59,75 @@ export default async function AdminCouponsPage(props: {
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <div className="flex-between">
         <h1 className="h2-bold">{t("coupons")}</h1>
-        <Button asChild variant="default">
+        <Button asChild variant="accent">
           <Link href="/admin/coupons/create">{t("createCoupon")}</Link>
         </Button>
       </div>
-      <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>{t("code")}</TableHead>
-              <TableHead>{t("type")}</TableHead>
-              <TableHead>{t("value")}</TableHead>
-              <TableHead>{t("usedCount")}</TableHead>
-              <TableHead>{t("validUntil")}</TableHead>
-              <TableHead>{t("status")}</TableHead>
-              <TableHead className="w-[100px]">{t("actions")}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {coupons.map((coupon) => (
-              <TableRow key={coupon.id}>
-                <TableCell>{formatId(coupon.id)}</TableCell>
-                <TableCell className="font-mono font-bold">
-                  {coupon.code}
-                </TableCell>
-                <TableCell>{getTypeLabel(coupon.discountType)}</TableCell>
-                <TableCell>
-                  {coupon.discountType === "percentage"
-                    ? `${coupon.discountValue}%`
-                    : formatCurrency(coupon.discountValue)}
-                </TableCell>
-                <TableCell>
-                  {coupon.usedCount}
-                  {coupon.maxUses ? ` / ${coupon.maxUses}` : ""}
-                </TableCell>
-                <TableCell>
-                  {coupon.validUntil
-                    ? new Date(coupon.validUntil).toLocaleDateString()
-                    : "-"}
-                </TableCell>
-                <TableCell>{getStatusBadge(coupon)}</TableCell>
-                <TableCell className="flex gap-1">
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/admin/coupons/${coupon.id}`}>
-                      {tCommon("edit")}
-                    </Link>
-                  </Button>
-                  <DeleteDialog id={coupon.id} action={deleteCoupon} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {totalPages > 1 && <Pagination page={page} totalPages={totalPages} />}
+
+      <div className="card-premium overflow-hidden">
+        <div className="overflow-x-auto">
+          {coupons.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+              <Ticket className="h-10 w-10 mb-3 opacity-50" />
+              <p className="text-sm">{tCommon("noItems")}</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>{t("code")}</TableHead>
+                  <TableHead>{t("type")}</TableHead>
+                  <TableHead>{t("value")}</TableHead>
+                  <TableHead>{t("usedCount")}</TableHead>
+                  <TableHead>{t("validUntil")}</TableHead>
+                  <TableHead>{t("status")}</TableHead>
+                  <TableHead className="w-[100px]">{t("actions")}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {coupons.map((coupon) => (
+                  <TableRow key={coupon.id}>
+                    <TableCell>{formatId(coupon.id)}</TableCell>
+                    <TableCell className="font-mono font-bold">
+                      {coupon.code}
+                    </TableCell>
+                    <TableCell>{getTypeLabel(coupon.discountType)}</TableCell>
+                    <TableCell>
+                      {coupon.discountType === "percentage"
+                        ? `${coupon.discountValue}%`
+                        : formatCurrency(coupon.discountValue)}
+                    </TableCell>
+                    <TableCell>
+                      {coupon.usedCount}
+                      {coupon.maxUses ? ` / ${coupon.maxUses}` : ""}
+                    </TableCell>
+                    <TableCell>
+                      {coupon.validUntil
+                        ? new Date(coupon.validUntil).toLocaleDateString()
+                        : "-"}
+                    </TableCell>
+                    <TableCell>{getStatusBadge(coupon)}</TableCell>
+                    <TableCell className="flex gap-1">
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/admin/coupons/${coupon.id}`}>
+                          {tCommon("edit")}
+                        </Link>
+                      </Button>
+                      <DeleteDialog id={coupon.id} action={deleteCoupon} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
       </div>
+
+      {totalPages > 1 && <Pagination page={page} totalPages={totalPages} />}
     </div>
   );
 }

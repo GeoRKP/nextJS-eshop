@@ -50,7 +50,7 @@ export default function WishlistActions({
   return (
     <div className="flex gap-2">
       <Button
-        variant="default"
+        variant="accent"
         size="sm"
         className="flex-1"
         onClick={handleAddToCart}
@@ -62,6 +62,7 @@ export default function WishlistActions({
       <Button
         variant="outline"
         size="sm"
+        className="border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
         onClick={handleRemove}
         disabled={isPending}
       >

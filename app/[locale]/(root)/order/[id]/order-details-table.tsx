@@ -2,16 +2,7 @@
 
 import { Order } from "@/types";
 import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
@@ -31,6 +22,7 @@ import { useTransition } from "react";
 import StripePayment from "./stripe-payment";
 import { useTranslations } from "next-intl";
 import OrderStatusBadge from "@/components/shared/order-status-badge";
+import { CreditCard, MapPin, Package } from "lucide-react";
 
 const statusTranslationKey: Record<string, string> = {
   pending: "statusPending",
@@ -122,6 +114,7 @@ export default function OrderDetailsTable({
       <Button
         type="button"
         disabled={isPending}
+        className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
         onClick={() => startTransition(async () => {
           const res = await updateOrderToPaidCOD(order.id);
           toast({
@@ -144,6 +137,7 @@ export default function OrderDetailsTable({
       <Button
         type="button"
         disabled={isPending}
+        className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
         onClick={() => startTransition(async () => {
           const res = await deliverOrder(order.id);
           toast({
@@ -160,7 +154,7 @@ export default function OrderDetailsTable({
   return (
     <>
       <div className="py-4 flex items-center gap-3">
-        <h1 className="text-2xl">{t("orderDetails", { id: formatId(id) })}</h1>
+        <h1 className="h2-bold">{t("orderDetails", { id: formatId(id) })}</h1>
         {status && (
           <OrderStatusBadge
             status={status}
@@ -168,140 +162,159 @@ export default function OrderDetailsTable({
           />
         )}
       </div>
-      <div className="grid  md:grid-cols-3 md:gap-5">
-        <div className="col-span-2 space-y-4 overflow-x-auto">
-          <Card>
-            <CardContent className="p-4 gap-4">
-              <h2 className="text-xl pb-4">{tCheckout("paymentMethod")}</h2>
-              <p className="mb-2">{paymentMethod}</p>
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-4">
+          {/* Payment Method */}
+          <div className="card-premium p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <CreditCard className="w-4 h-4 text-brand-accent" />
+              <h2 className="font-semibold">{tCheckout("paymentMethod")}</h2>
+            </div>
+            <div className="pl-6 space-y-2">
+              <p className="text-sm">{paymentMethod}</p>
               {isPaid ? (
-                <Badge variant="secondary">
+                <Badge className="bg-brand-accent/10 text-brand-accent border-brand-accent/20">
                   {t("paidAt", { date: formatDateTime(paidAt!).dateTime })}
                 </Badge>
               ) : (
                 <Badge variant="destructive">{t("notPaid")}</Badge>
               )}
-            </CardContent>
-          </Card>
-          <Card className="my-2">
-            <CardContent className="p-4 gap-4">
-              <h2 className="text-xl pb-4">{tCheckout("shippingAddress")}</h2>
-              <p>{shippingAddress.fullName}</p>
-              <p className="mb-2">
-                {shippingAddress.address}, {shippingAddress.city}
-                {shippingAddress.postalCode}, {shippingAddress.country}
+            </div>
+          </div>
+
+          {/* Shipping Address */}
+          <div className="card-premium p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <MapPin className="w-4 h-4 text-brand-accent" />
+              <h2 className="font-semibold">{tCheckout("shippingAddress")}</h2>
+            </div>
+            <div className="text-sm text-muted-foreground space-y-0.5 pl-6">
+              <p className="font-medium text-foreground">{shippingAddress.fullName}</p>
+              <p>{shippingAddress.address}</p>
+              <p>
+                {shippingAddress.city}, {shippingAddress.postalCode}
               </p>
+              <p>{shippingAddress.country}</p>
+            </div>
+            <div className="pl-6 mt-2">
               {isDelivered ? (
-                <Badge variant="secondary">
+                <Badge className="bg-brand-accent/10 text-brand-accent border-brand-accent/20">
                   {t("deliveredAt", { date: formatDateTime(deliveredAt!).dateTime })}
                 </Badge>
               ) : (
                 <Badge variant="destructive">{t("notDelivered")}</Badge>
               )}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 gap-4">
-              <h2 className="text-xl pb-4">{t("orderItems")}</h2>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t("item")}</TableHead>
-                    <TableHead>{t("quantity")}</TableHead>
-                    <TableHead>{t("price")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {orderitems.map((item) => (
-                    <TableRow key={item.slug}>
-                      <TableCell>
-                        <Link
-                          href={`/products/${item.slug}`}
-                          className="flex items-center"
-                        >
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            width={50}
-                            height={50}
-                          />
-                          <span className="px-2">{item.name}</span>
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        <span className="px-2">{item.qty}</span>
-                      </TableCell>
-                      <TableCell className="text-right ">
-                        ${item.price}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
+          {/* Order Items */}
+          <div className="card-premium p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Package className="w-4 h-4 text-brand-accent" />
+              <h2 className="font-semibold">{t("orderItems")}</h2>
+            </div>
+            <div className="space-y-3">
+              {orderitems.map((item) => (
+                <div key={item.slug} className="flex items-center gap-4">
+                  <Link href={`/product/${item.slug}`} className="flex-shrink-0">
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-muted/30">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={80}
+                        height={80}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                  </Link>
+                  <div className="flex-1 min-w-0">
+                    <Link href={`/product/${item.slug}`}>
+                      <p className="text-sm font-medium line-clamp-1 hover:text-brand-accent transition-colors">
+                        {item.name}
+                      </p>
+                    </Link>
+                    <p className="text-xs text-muted-foreground">
+                      {t("quantity")}: {item.qty} &times; {formatCurrency(item.price)}
+                    </p>
+                  </div>
+                  <p className="font-semibold text-sm">
+                    {formatCurrency(Number(item.price) * item.qty)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <div>
-          <Card>
-            <CardContent className="p-4 gap-4 space-y-4">
+
+        {/* Sidebar */}
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <div className="card-premium p-6 space-y-4">
+            <h2 className="font-bold text-lg">{t("orderSummary")}</h2>
+
+            <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <div>{t("items")}</div>
-                <div>{formatCurrency(itemsPrice)}</div>
+                <span className="text-muted-foreground">{t("items")}</span>
+                <span>{formatCurrency(itemsPrice)}</span>
               </div>
               <div className="flex justify-between">
-                <div>{t("tax")}</div>
-                <div>{formatCurrency(taxPrice)}</div>
+                <span className="text-muted-foreground">{t("tax")}</span>
+                <span>{formatCurrency(taxPrice)}</span>
               </div>
               <div className="flex justify-between">
-                <div>{t("shipping")}</div>
-                <div>{formatCurrency(shippingPrice)}</div>
+                <span className="text-muted-foreground">{t("shipping")}</span>
+                <span>{formatCurrency(shippingPrice)}</span>
               </div>
               {Number(discountAmount) > 0 && (
                 <div className="flex justify-between text-green-600">
-                  <div>
+                  <span>
                     {t("discount")}
                     {couponCode && (
                       <span className="text-xs ml-1 font-mono">({couponCode})</span>
                     )}
-                  </div>
-                  <div>-{formatCurrency(discountAmount)}</div>
+                  </span>
+                  <span>-{formatCurrency(discountAmount)}</span>
                 </div>
               )}
-              <div className="flex justify-between">
-                <div>{t("total")}</div>
-                <div>{formatCurrency(totalPrice)}</div>
+            </div>
+
+            <div className="divider-gradient" />
+
+            <div className="flex justify-between items-baseline">
+              <span className="font-semibold">{t("total")}</span>
+              <span className="text-2xl font-black">{formatCurrency(totalPrice)}</span>
+            </div>
+
+            {/* Payment actions */}
+            {!isPaid && paymentMethod === "Paypal" && (
+              <div>
+                <PayPalScriptProvider
+                  options={{
+                    clientId: paypalClientId,
+                  }}
+                >
+                  <PrintLoadingState />
+                  <PayPalButtons
+                    createOrder={handleCreatePaypalOrder}
+                    onApprove={handleApprovePaypalOrder}
+                  />
+                </PayPalScriptProvider>
               </div>
-              {!isPaid && paymentMethod === "Paypal" && (
-                <div>
-                  <PayPalScriptProvider
-                    options={{
-                      clientId: paypalClientId,
-                    }}
-                  >
-                    <PrintLoadingState />
-                    <PayPalButtons
-                      createOrder={handleCreatePaypalOrder}
-                      onApprove={handleApprovePaypalOrder}
-                    />
-                  </PayPalScriptProvider>
-                </div>
-              )}
-              {!isPaid && paymentMethod === "Stripe" && stripeClientSecret && (
-                <StripePayment
-                  priceInCents={Number(order.totalPrice) * 100}
-                  orderId={id}
-                  clientSecret={stripeClientSecret}
-                />
-              )}
-              {/* COD */}
-              {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
-                <MarkAsPaidButton />
-              )}
-              {isAdmin && isPaid && !isDelivered && (
-                <MarkAsDeliveredButton />
-              )}
-            </CardContent>
-          </Card>
+            )}
+            {!isPaid && paymentMethod === "Stripe" && stripeClientSecret && (
+              <StripePayment
+                priceInCents={Number(order.totalPrice) * 100}
+                orderId={id}
+                clientSecret={stripeClientSecret}
+              />
+            )}
+            {/* COD */}
+            {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
+              <MarkAsPaidButton />
+            )}
+            {isAdmin && isPaid && !isDelivered && (
+              <MarkAsDeliveredButton />
+            )}
+          </div>
         </div>
       </div>
     </>

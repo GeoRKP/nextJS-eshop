@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BadgeDollarSign,
   CreditCard,
@@ -58,16 +57,21 @@ export default function KpiCards({
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {cards.map((card) => (
-        <Card key={card.title}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-            <card.icon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{card.value}</div>
-            <ChangeIndicator change={card.change} label={t("fromPreviousPeriod")} />
-          </CardContent>
-        </Card>
+        <div key={card.title} className="card-premium p-6">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-medium text-muted-foreground">
+              {card.title}
+            </p>
+            <div className="h-10 w-10 rounded-lg bg-brand-accent/10 flex items-center justify-center">
+              <card.icon className="h-5 w-5 text-brand-accent" />
+            </div>
+          </div>
+          <div className="text-2xl font-heading font-bold">{card.value}</div>
+          <ChangeIndicator
+            change={card.change}
+            label={t("fromPreviousPeriod")}
+          />
+        </div>
       ))}
     </div>
   );
@@ -90,7 +94,7 @@ function ChangeIndicator({
     <p
       className={cn(
         "text-xs mt-1 flex items-center gap-1",
-        isPositive ? "text-green-600" : "text-red-600"
+        isPositive ? "text-success" : "text-destructive"
       )}
     >
       {isPositive ? (

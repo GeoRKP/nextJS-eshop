@@ -45,20 +45,19 @@ export default function CouponInput({
   if (appliedCode) {
     return (
       <div className="flex items-center gap-2 text-sm">
-        <Tag className="w-4 h-4 text-green-600" />
-        <span className="font-mono font-medium text-green-600">
-          {appliedCode}
-        </span>
-        <Button
-          variant="ghost"
-          size="sm"
+        <div className="flex items-center gap-1.5 bg-brand-accent/10 text-brand-accent rounded-full px-3 py-1">
+          <Tag className="w-3.5 h-3.5" />
+          <span className="font-mono font-medium">
+            {appliedCode}
+          </span>
+        </div>
+        <button
           onClick={handleRemove}
           disabled={isPending}
-          className="h-6 px-2"
+          className="text-muted-foreground hover:text-destructive transition-colors p-1"
         >
-          <X className="w-3 h-3" />
-          {t("removeCoupon")}
-        </Button>
+          <X className="w-3.5 h-3.5" />
+        </button>
       </div>
     );
   }
@@ -69,7 +68,7 @@ export default function CouponInput({
         placeholder={t("enterCouponCode")}
         value={code}
         onChange={(e) => setCode(e.target.value.toUpperCase())}
-        className="font-mono uppercase"
+        className="font-mono uppercase rounded-lg"
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
@@ -81,6 +80,7 @@ export default function CouponInput({
         variant="outline"
         onClick={handleApply}
         disabled={isPending || !code.trim()}
+        className="rounded-lg"
       >
         {t("applyCoupon")}
       </Button>

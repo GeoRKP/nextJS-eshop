@@ -8,7 +8,7 @@ import MobileMenuWrapper from "./mobile-menu-wrapper";
 
 const Header = () => {
   return (
-    <header className="w-full border-b">
+    <header className="w-full">
       {/* Main Header */}
       <div className="wrapper flex items-center gap-4 header-row !py-0">
         {/* Left: Hamburger (mobile) + Logo */}
@@ -18,18 +18,27 @@ const Header = () => {
             <Image
               src="/images/logo.svg"
               alt={`${APP_NAME} logo`}
-              width={48}
-              height={48}
+              width={52}
+              height={52}
               priority={true}
+              className="hidden md:block"
             />
-            <span className="hidden md:block font-black text-2xl ml-2 tracking-tight uppercase">
+            <Image
+              src="/images/logo.svg"
+              alt={`${APP_NAME} logo`}
+              width={44}
+              height={44}
+              priority={true}
+              className="md:hidden"
+            />
+            <span className="hidden md:block font-heading font-extrabold text-xl ml-2 tracking-[0.15em] uppercase">
               {APP_NAME}
             </span>
           </Link>
         </div>
 
         {/* Center: Full-width search bar */}
-        <div className="flex-1 max-w-3xl hidden md:block">
+        <div className="flex-1 max-w-2xl mx-auto hidden md:block">
           <SearchWrapper />
         </div>
 

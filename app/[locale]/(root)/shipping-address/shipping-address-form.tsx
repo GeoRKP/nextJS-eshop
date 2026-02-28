@@ -169,7 +169,7 @@ export default function ShippingAddressForm({
               <Button
                 type="submit"
                 disabled={isPending}
-                className="w-full h-12 rounded-xl bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold text-base"
+                className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
               >
                 {isPending ? (
                   <Loader2 className="w-5 h-5 animate-spin mr-2" />

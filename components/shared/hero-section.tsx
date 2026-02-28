@@ -17,6 +17,7 @@ export default async function HeroSection({
     <HeroCarousel
       products={items}
       translations={{
+        label: t("label"),
         tagline: t("tagline"),
         subtitle: t("subtitle"),
         shopNow: t("shopNow"),

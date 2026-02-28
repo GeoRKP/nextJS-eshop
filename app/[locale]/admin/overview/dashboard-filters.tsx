@@ -76,7 +76,7 @@ export default function DashboardFilters({
     currentCategory !== "all";
 
   return (
-    <div className="flex flex-wrap items-end gap-3">
+    <div className="card-premium p-4 flex flex-wrap items-end gap-3">
       {/* Period preset */}
       <div className="space-y-1">
         <label className="text-xs text-muted-foreground font-medium">

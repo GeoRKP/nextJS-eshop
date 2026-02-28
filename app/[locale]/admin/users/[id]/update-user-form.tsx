@@ -14,7 +14,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -24,9 +23,10 @@ import {
 } from "@/components/ui/select";
 import { USER_ROLES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, User } from "lucide-react";
 import { updateUser } from "@/lib/actions/user.actions";
 import { useTranslations } from "next-intl";
+import { FormInput } from "@/components/shared/form-input";
 
 export default function UpdateUserForm({
   user,
@@ -56,6 +56,7 @@ export default function UpdateUserForm({
           variant: "destructive",
           description: res.message,
         });
+        return;
       }
 
       toast({
@@ -75,27 +76,19 @@ export default function UpdateUserForm({
   return (
     <Form {...form}>
       <form method="POST" onSubmit={form.handleSubmit(onSubmit)}>
-        <div>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({
-              field,
-            }: {
-              field: ControllerRenderProps<
-                z.infer<typeof updateUserSchema>,
-                "email"
-              >;
-            }) => (
-              <FormItem className="w-full">
-                <FormLabel>{t("email")}</FormLabel>
-                <FormControl>
-                  <Input disabled {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <div className="space-y-4">
+          {/* Email — static display */}
+          <div>
+            <label className="text-sm font-medium">{t("email")}</label>
+            <div className="mt-1.5 flex items-center gap-3 px-3 py-2.5 rounded-lg bg-muted/30 border border-border/60">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                {user.email}
+              </span>
+            </div>
+          </div>
+
+          {/* Name — with FormInput */}
           <FormField
             control={form.control}
             name="name"
@@ -107,15 +100,21 @@ export default function UpdateUserForm({
                 "name"
               >;
             }) => (
-              <FormItem className="w-full mt-4">
+              <FormItem className="w-full">
                 <FormLabel>{t("name")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enterUserName")} {...field} />
+                  <FormInput
+                    icon={User}
+                    placeholder={t("enterUserName")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          {/* Role */}
           <FormField
             control={form.control}
             name="role"
@@ -127,9 +126,8 @@ export default function UpdateUserForm({
                 "role"
               >;
             }) => (
-              <FormItem className="w-full mt-4">
+              <FormItem className="w-full">
                 <FormLabel>{t("role")}</FormLabel>
-
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value.toString()}
@@ -147,15 +145,17 @@ export default function UpdateUserForm({
                     ))}
                   </SelectContent>
                 </Select>
-
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <div className="flex-between mt-4">
+
+        <div className="mt-6">
           <Button
             type="submit"
+            variant="accent"
+            size="lg"
             className="w-full"
             disabled={form.formState.isSubmitting}
           >

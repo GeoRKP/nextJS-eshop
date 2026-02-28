@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, SearchIcon, X, Clock } from "lucide-react";
+import { ArrowLeft, SearchIcon, X, Clock, ArrowRight } from "lucide-react";
 import { useRecentSearches } from "@/hooks/use-recent-searches";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -100,39 +99,41 @@ export default function MobileSearch({ onClose }: Props) {
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[60] bg-background flex flex-col"
     >
-      {/* Search header */}
-      <div className="flex items-center gap-2 px-3 py-2 border-b">
-        <Button variant="ghost" size="icon" onClick={onClose}>
+      {/* Search header — dark themed */}
+      <div className="flex items-center gap-2 px-3 py-2 bg-primary text-primary-foreground">
+        <Button variant="ghost" size="icon" onClick={onClose} className="text-primary-foreground hover:bg-white/10">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <form onSubmit={handleSubmit} className="flex-1 flex items-center gap-2">
-          <Input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => handleInputChange(e.target.value)}
-            placeholder="Search..."
-            className="flex-1 rounded-full"
-            autoComplete="off"
-          />
-          {query && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                setQuery("");
-                setProducts([]);
-                setCategoryResults([]);
-                inputRef.current?.focus();
-              }}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-          <Button type="submit" size="icon" className="bg-brand-orange hover:bg-brand-orange-dark text-white rounded-full shrink-0">
+          <div className="flex-1 flex items-center bg-white/10 rounded-full border border-white/20 px-3">
+            <SearchIcon className="h-4 w-4 text-primary-foreground/60 shrink-0" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => handleInputChange(e.target.value)}
+              placeholder="Search..."
+              className="flex-1 h-10 bg-transparent pl-2 text-sm text-primary-foreground placeholder:text-primary-foreground/50 focus:outline-none"
+              autoComplete="off"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setProducts([]);
+                  setCategoryResults([]);
+                  inputRef.current?.focus();
+                }}
+                className="text-primary-foreground/60 hover:text-primary-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          <button type="submit" className="h-9 w-9 rounded-full bg-brand-accent text-white flex items-center justify-center shrink-0">
             <SearchIcon className="h-4 w-4" />
-          </Button>
+          </button>
         </form>
       </div>
 
@@ -142,12 +143,12 @@ export default function MobileSearch({ onClose }: Props) {
         {showRecents && (
           <div className="p-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-bold text-muted-foreground uppercase tracking-wide">
+              <span className="text-label text-muted-foreground">
                 Recent Searches
               </span>
               <button
                 onClick={clearAll}
-                className="text-xs text-brand-orange hover:underline"
+                className="text-xs text-brand-accent hover:underline"
               >
                 Clear all
               </button>
@@ -178,7 +179,7 @@ export default function MobileSearch({ onClose }: Props) {
         {/* Product suggestions */}
         {showProducts && (
           <div className="p-3">
-            <span className="text-xs font-bold text-brand-orange uppercase tracking-wide">
+            <span className="text-label text-muted-foreground">
               Products
             </span>
             {products.map((product) => (
@@ -190,13 +191,13 @@ export default function MobileSearch({ onClose }: Props) {
                 <Image
                   src={product.image}
                   alt={product.name}
-                  width={44}
-                  height={44}
-                  className="rounded-lg object-cover"
+                  width={52}
+                  height={52}
+                  className="rounded-lg object-cover border"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{product.name}</p>
-                  <p className="text-[10px] text-brand-orange font-bold uppercase tracking-wide">{product.brand}</p>
+                  <p className="text-label text-brand-accent">{product.brand}</p>
                 </div>
                 <span className="text-sm font-black">
                   {formatCurrency(product.price)}
@@ -209,14 +210,14 @@ export default function MobileSearch({ onClose }: Props) {
         {/* Category suggestions */}
         {showCategories && (
           <div className="p-3 border-t">
-            <span className="text-xs font-bold text-brand-orange uppercase tracking-wide">
+            <span className="text-label text-muted-foreground">
               Categories
             </span>
             {categoryResults.map((cat) => (
               <button
                 key={cat.category}
                 onClick={() => navigateToCategory(cat.category)}
-                className="flex items-center gap-2 w-full py-2.5 text-sm text-left hover:text-brand-orange transition-colors"
+                className="flex items-center gap-2 w-full py-2.5 text-sm text-left hover:text-brand-accent transition-colors"
               >
                 {cat.category}
                 <span className="text-xs text-muted-foreground">
@@ -227,15 +228,16 @@ export default function MobileSearch({ onClose }: Props) {
           </div>
         )}
 
-        {/* Search for query */}
+        {/* Search for query — more prominent with amber arrow */}
         {query && (
           <div className="p-3 border-t">
             <button
               onClick={() => navigateToSearch(query)}
-              className="flex items-center gap-2 w-full py-2 text-sm hover:text-brand-orange transition-colors"
+              className="flex items-center gap-2 w-full py-3 px-3 text-sm bg-brand-accent/10 hover:bg-brand-accent/20 rounded-lg transition-colors font-medium"
             >
-              <SearchIcon className="h-3.5 w-3.5 text-muted-foreground" />
+              <SearchIcon className="h-4 w-4 text-brand-accent" />
               Search for &quot;{query}&quot;
+              <ArrowRight className="h-4 w-4 ml-auto text-brand-accent" />
             </button>
           </div>
         )}

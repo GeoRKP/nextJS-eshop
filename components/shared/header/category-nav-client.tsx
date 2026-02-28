@@ -68,34 +68,35 @@ export default function CategoryNavClient({
   return (
     <div ref={navRef} className="relative">
       <nav className="hidden md:block bg-primary text-primary-foreground">
-        <div className="wrapper flex items-center gap-0 h-12 !py-0">
+        <div className="wrapper flex items-center gap-0 h-11 !py-0">
           {/* All Categories button */}
           <button
-            className={`flex items-center gap-1.5 px-4 h-full text-sm font-medium transition-all rounded-sm ${
+            className={`flex items-center gap-1.5 px-4 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all ${
               activeCategory === "__all__"
-                ? "bg-brand-orange text-white"
-                : "hover:bg-white/10"
+                ? "bg-brand-accent/15 border-b-2 border-brand-accent text-white"
+                : "hover:border-b-2 hover:border-brand-accent/50"
             }`}
             onMouseEnter={() => handleMouseEnter("__all__")}
             onMouseLeave={handleMouseLeave}
           >
             <Grid3X3 className="h-4 w-4" />
             {translations.allCategories}
-            <ChevronDown className="h-3 w-3" />
+            <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${activeCategory === "__all__" ? "rotate-180" : ""}`} />
           </button>
 
-          <div className="w-px h-5 bg-primary-foreground/20 mx-1" />
+          <div className="h-4 w-px bg-primary-foreground/10 mx-1" />
 
           {/* Root category items with icons */}
           {categories.map((category) => {
             const Icon = getCategoryIcon(category.name);
+            const isActive = activeCategory === category.id;
             return (
               <button
                 key={category.id}
-                className={`flex items-center gap-1.5 px-3 h-full text-sm transition-all rounded-sm ${
-                  activeCategory === category.id
-                    ? "bg-brand-orange text-white"
-                    : "hover:bg-white/10"
+                className={`flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all ${
+                  isActive
+                    ? "bg-brand-accent/15 border-b-2 border-brand-accent text-white"
+                    : "hover:border-b-2 hover:border-brand-accent/50"
                 }`}
                 onMouseEnter={() => handleMouseEnter(category.id)}
                 onMouseLeave={handleMouseLeave}
@@ -104,7 +105,7 @@ export default function CategoryNavClient({
                 <span className="hidden lg:inline">{category.name}</span>
                 <span className="lg:hidden">{category.name}</span>
                 {category.children && category.children.length > 0 && (
-                  <ChevronDown className="h-3 w-3 hidden lg:block" />
+                  <ChevronDown className={`h-3 w-3 hidden lg:block transition-transform duration-200 ${isActive ? "rotate-180" : ""}`} />
                 )}
               </button>
             );
@@ -113,19 +114,19 @@ export default function CategoryNavClient({
           {/* Shop by Brand button */}
           {brands.length > 0 && (
             <>
-              <div className="w-px h-5 bg-primary-foreground/20 mx-1" />
+              <div className="h-4 w-px bg-primary-foreground/10 mx-1" />
               <button
-                className={`flex items-center gap-1.5 px-3 h-full text-sm transition-all rounded-sm ${
+                className={`flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all ${
                   activeCategory === "__brands__"
-                    ? "bg-brand-orange text-white"
-                    : "hover:bg-white/10"
+                    ? "bg-brand-accent/15 border-b-2 border-brand-accent text-white"
+                    : "hover:border-b-2 hover:border-brand-accent/50"
                 }`}
                 onMouseEnter={() => handleMouseEnter("__brands__")}
                 onMouseLeave={handleMouseLeave}
               >
                 <Layers className="h-3.5 w-3.5" />
                 {translations.shopByBrand}
-                <ChevronDown className="h-3 w-3" />
+                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${activeCategory === "__brands__" ? "rotate-180" : ""}`} />
               </button>
             </>
           )}
@@ -136,21 +137,21 @@ export default function CategoryNavClient({
           {/* Quick links */}
           <Link
             href="/search?sort=newest"
-            className="flex items-center gap-1.5 px-3 h-full text-sm hover:bg-white/10 transition-all rounded-sm"
+            className="flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide hover:border-b-2 hover:border-brand-accent/50 transition-all"
           >
             <Sparkles className="h-3.5 w-3.5" />
             <span className="hidden lg:inline">{translations.newArrivals}</span>
-            <span className="bg-brand-orange text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none hidden lg:inline">
+            <span className="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none hidden lg:inline">
               NEW
             </span>
           </Link>
           <Link
             href="/search?price=1-50"
-            className="flex items-center gap-1.5 px-3 h-full text-sm font-bold text-brand-orange hover:bg-white/10 transition-all rounded-sm"
+            className="flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-bold uppercase tracking-wide text-brand-accent hover:border-b-2 hover:border-brand-accent/50 transition-all"
           >
             <Tag className="h-3.5 w-3.5" />
             <span className="hidden lg:inline">{translations.deals}</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-orange animate-pulse-dot" />
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-accent animate-pulse-dot" />
           </Link>
         </div>
       </nav>

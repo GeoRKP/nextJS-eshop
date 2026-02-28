@@ -54,12 +54,13 @@ export default function MobileBottomNav() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card/95 backdrop-blur-xl border-t border-brand-orange/10 safe-area-bottom">
-        <div className="grid grid-cols-5 h-16">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card/95 backdrop-blur-xl safe-area-bottom">
+        <div className="divider-gradient" />
+        <div className="grid grid-cols-5 h-[68px]">
           {tabs.map((tab) => {
             const Icon = tab.icon;
 
-            // Center search button - raised circular orange
+            // Center search button - raised circular with ring + glow
             if (tab.action && "isCenter" in tab && tab.isCenter) {
               return (
                 <button
@@ -67,8 +68,8 @@ export default function MobileBottomNav() {
                   onClick={tab.action}
                   className="flex flex-col items-center justify-center"
                 >
-                  <div className="bg-brand-orange text-white rounded-full h-12 w-12 flex items-center justify-center -mt-4 shadow-lg hover:bg-brand-orange-dark transition-colors">
-                    <Icon className="h-5 w-5" />
+                  <div className="bg-brand-accent text-white rounded-full h-14 w-14 flex items-center justify-center -mt-5 ring-4 ring-background shadow-card-glow hover:bg-brand-accent-dark transition-colors">
+                    <Icon className="h-[22px] w-[22px]" />
                   </div>
                 </button>
               );
@@ -81,8 +82,8 @@ export default function MobileBottomNav() {
                   onClick={tab.action}
                   className="flex flex-col items-center justify-center gap-0.5 text-muted-foreground"
                 >
-                  <Icon className="h-5 w-5" />
-                  <span className="text-[10px]">{tab.label}</span>
+                  <Icon className="h-[22px] w-[22px]" />
+                  <span className="text-[11px] font-heading">{tab.label}</span>
                 </button>
               );
             }
@@ -91,14 +92,18 @@ export default function MobileBottomNav() {
               <Link
                 key={tab.key}
                 href={tab.href}
-                className={`flex flex-col items-center justify-center gap-0.5 transition-colors ${
+                className={`flex flex-col items-center justify-center gap-0.5 transition-colors relative ${
                   tab.isActive
-                    ? "text-brand-orange"
+                    ? "text-brand-accent"
                     : "text-muted-foreground"
                 }`}
               >
-                <Icon className="h-5 w-5" />
-                <span className="text-[10px] font-medium">{tab.label}</span>
+                {/* Active indicator dot bar */}
+                {tab.isActive && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-5 bg-brand-accent rounded-full" />
+                )}
+                <Icon className="h-[22px] w-[22px]" />
+                <span className="text-[11px] font-heading font-medium">{tab.label}</span>
               </Link>
             );
           })}

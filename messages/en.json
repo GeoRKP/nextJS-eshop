@@ -34,7 +34,8 @@
     "notDelivered": "Not delivered",
     "deletedUser": "Deleted User",
     "user": "User",
-    "admin": "Admin"
+    "admin": "Admin",
+    "noItems": "No items found"
   },
   "Nav": {
     "cart": "Cart",
@@ -49,9 +50,11 @@
     "profile": "Profile",
     "orders": "Orders",
     "wishlist": "Wishlist",
-    "addresses": "Addresses"
+    "addresses": "Addresses",
+    "myAccount": "My Account"
   },
   "AdminNav": {
+    "adminPanel": "Admin Panel",
     "overview": "Overview",
     "products": "Products",
     "orders": "Orders",
@@ -106,7 +109,15 @@
     "categories": "Categories",
     "relatedProducts": "Related Products",
     "readMore": "Read More",
-    "readLess": "Read Less"
+    "readLess": "Read Less",
+    "specifications": "Specifications",
+    "sku": "SKU",
+    "brandLabel": "Brand",
+    "categoryLabel": "Category",
+    "stockLabel": "Stock",
+    "writeReview": "Write a Review",
+    "vatIncluded": "incl. VAT",
+    "youMayAlsoLike": "You May Also Like"
   },
   "Cart": {
     "shoppingCart": "Shopping Cart",
@@ -129,7 +140,8 @@
     "free": "Free",
     "estimatedTotal": "Estimated Total",
     "secureCheckout": "Secure Checkout",
-    "buyerProtection": "Buyer Protection"
+    "buyerProtection": "Buyer Protection",
+    "itemsInCart": "{count} items in cart"
   },
   "Checkout": {
     "userLogin": "User Login",
@@ -153,7 +165,9 @@
     "continueToReview": "Continue to Review",
     "payWithCard": "Pay securely with credit or debit card",
     "payWithPaypal": "Pay with your PayPal account",
-    "payOnDelivery": "Pay when your order arrives"
+    "payOnDelivery": "Pay when your order arrives",
+    "confirmOrder": "Confirm & Place Order",
+    "orderProcessing": "Processing your order..."
   },
   "Order": {
     "orderDetails": "Order {id}",
@@ -197,7 +211,12 @@
     "statusRefunded": "Refunded",
     "statusTimeline": "Order Timeline",
     "orderSummary": "Order Summary",
-    "noOrders": "You haven't placed any orders yet."
+    "noOrders": "You haven't placed any orders yet.",
+    "stripeCheckout": "Secure Card Payment",
+    "purchasing": "Processing...",
+    "purchaseAmount": "Pay {amount}",
+    "orderNumber": "Order #{id}",
+    "orderConfirmed": "Your order has been confirmed"
   },
   "Search": {
     "department": "Department",
@@ -236,7 +255,12 @@
     "browsing": "Browsing",
     "allProducts": "All Products",
     "showingResults": "Showing {count} products (page {page} of {totalPages})",
-    "productsFound": "products found"
+    "productsFound": "products found",
+    "gridView": "Grid view",
+    "listView": "List view",
+    "activeFilters": "Active Filters",
+    "noResultsTitle": "No results found",
+    "noResultsSubtitle": "Try adjusting your search or filters to find what you're looking for."
   },
   "AdminDashboard": {
     "dashboard": "Dashboard",
@@ -363,7 +387,8 @@
     "profile": "Profile",
     "email": "Email",
     "name": "Name",
-    "updateProfile": "Update Profile"
+    "updateProfile": "Update Profile",
+    "namePlaceholder": "Enter your full name"
   },
   "DeleteDialog": {
     "areYouSure": "Are you absolutely sure?",
@@ -512,7 +537,9 @@
   "UtilityBar": {
     "helpCenter": "Help Center",
     "orderTracking": "Track Your Order",
-    "proAccount": "Pro Account"
+    "proAccount": "Pro Account",
+    "phoneNumber": "+30 210 1234567",
+    "businessHours": "Mon-Fri 8:00-18:00"
   },
   "MegaMenu": {
     "viewAll": "View All",
@@ -543,15 +570,25 @@
   },
   "HomePage": {
     "trendingProducts": "Trending Products",
+    "trendingLabel": "POPULAR RIGHT NOW",
     "shopByCategory": "Shop by Category",
+    "categoryLabel": "BROWSE OUR RANGE",
     "latestProducts": "Latest Products",
+    "latestLabel": "JUST ARRIVED",
     "promoTitle": "Premium Parts. Unbeatable Prices.",
+    "promoLabel": "WHY CHOOSE US",
     "promoSubtitle": "Upgrade your truck with top-quality parts at limited-time deals.",
     "shopDeals": "Shop Deals Now",
     "shopByBrand": "Shop by Brand",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "trustedBy": "Trusted Brands",
+    "viewAllCategories": "View All Categories",
+    "statParts": "10K+ Parts",
+    "statBrands": "500+ Brands",
+    "statSupport": "24/7 Support"
   },
   "Hero": {
+    "label": "PREMIUM TRUCK PARTS",
     "tagline": "Built For The Road Ahead",
     "subtitle": "Premium truck parts and accessories. Expert quality. Guaranteed fit.",
     "shopNow": "Shop Now",
@@ -574,7 +611,9 @@
   "ProductCard": {
     "new": "New",
     "featured": "Featured",
-    "lowStock": "Low Stock"
+    "lowStock": "Low Stock",
+    "quickView": "Quick View",
+    "addToCart": "Add to Cart"
   },
   "Breadcrumb": {
     "home": "Home",
@@ -604,7 +643,16 @@
     "myProfile": "Profile",
     "myAddresses": "Addresses",
     "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service"
+    "termsOfService": "Terms of Service",
+    "newsletterCTA": "Stay ahead with the latest parts & deals",
+    "backToTop": "Back to top",
+    "contactTitle": "Contact Us",
+    "categoriesTitle": "Categories",
+    "allProducts": "All Products",
+    "newArrivals": "New Arrivals",
+    "deals": "Deals",
+    "cookies": "Cookies",
+    "businessHours": "Mon-Fri 8:00-18:00"
   },
   "Wishlist": {
     "wishlist": "Wishlist",
@@ -701,6 +749,25 @@
     "updateButton": "Update Address",
     "default": "Default",
     "selectAddress": "Select a shipping address",
-    "useNewAddress": "Use a new address"
+    "useNewAddress": "Use a new address",
+    "isDefaultDescription": "This address will be used as default for shipping"
+  },
+  "Testimonials": {
+    "whatCustomersSay": "What Our Customers Say",
+    "trustedByProfessionals": "TRUSTED BY PROFESSIONALS",
+    "quote1": "Outstanding quality parts and lightning-fast delivery. Our fleet has never run better since we switched to Geo Store.",
+    "name1": "Dimitris K.",
+    "role1": "Fleet Manager",
+    "quote2": "The best selection of truck parts I've found online. Competitive prices and genuine OEM quality every time.",
+    "name2": "Yannis M.",
+    "role2": "Independent Mechanic",
+    "quote3": "24/7 support and hassle-free returns make Geo Store our go-to supplier. Highly recommended for professionals.",
+    "name3": "Maria P.",
+    "role3": "Owner-Operator"
+  },
+  "Newsletter": {
+    "stayUpdated": "STAY UPDATED",
+    "newsletterTitle": "Get the Latest Parts & Deals",
+    "newsletterSubtitle": "Subscribe to our newsletter for exclusive offers, new arrivals, and expert tips delivered to your inbox."
   }
 }

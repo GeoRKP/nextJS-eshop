@@ -17,20 +17,21 @@ import {
   ComposedChart,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // -- Color palette --
 
 const CHART_COLORS = [
-  "hsl(210, 70%, 55%)", // blue
+  "hsl(var(--brand-accent))", // brand accent (amber gold)
+  "hsl(var(--primary))", // primary (deep navy)
   "hsl(150, 60%, 45%)", // green
-  "hsl(45, 90%, 55%)", // amber
   "hsl(0, 70%, 55%)", // red
   "hsl(270, 60%, 55%)", // purple
   "hsl(190, 70%, 50%)", // cyan
   "hsl(330, 60%, 55%)", // pink
   "hsl(90, 60%, 45%)", // lime
 ];
+
+const AXIS_STROKE = "hsl(var(--muted-foreground))";
 
 // -- Types --
 
@@ -41,6 +42,7 @@ type ChartsProps = {
   topProducts: { name: string; unitsSold: number; revenue: number }[];
   salesByCategory: { category: string; revenue: number }[];
   noDataLabel: string;
+  t: (key: string) => string;
 };
 
 // -- Main component --
@@ -52,59 +54,70 @@ export default function Charts({
   topProducts,
   salesByCategory,
   noDataLabel,
+  t,
 }: ChartsProps) {
   return (
     <>
       {/* Row 1: Revenue chart + Order status donut */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle className="text-base">Revenue & Orders Over Time</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RevenueChart data={salesTimeSeries} noDataLabel={noDataLabel} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle className="text-base">Orders by Status</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="card-premium col-span-4">
+          <div className="px-5 py-3 border-b border-border/40">
+            <h3 className="font-heading font-bold text-sm uppercase">
+              {t("revenueOverTime")}
+            </h3>
+          </div>
+          <div className="p-5">
+            <RevenueChart data={salesTimeSeries} noDataLabel={noDataLabel} t={t} />
+          </div>
+        </div>
+        <div className="card-premium col-span-3">
+          <div className="px-5 py-3 border-b border-border/40">
+            <h3 className="font-heading font-bold text-sm uppercase">
+              {t("ordersByStatus")}
+            </h3>
+          </div>
+          <div className="p-5">
             <StatusDonut data={ordersByStatus} noDataLabel={noDataLabel} />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Row 2: Top products + Revenue by payment */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle className="text-base">Top Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TopProductsChart data={topProducts} noDataLabel={noDataLabel} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle className="text-base">Revenue by Payment Method</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PaymentDonut data={revenueByPaymentMethod} noDataLabel={noDataLabel} />
-          </CardContent>
-        </Card>
+        <div className="card-premium col-span-4">
+          <div className="px-5 py-3 border-b border-border/40">
+            <h3 className="font-heading font-bold text-sm uppercase">
+              {t("topProducts")}
+            </h3>
+          </div>
+          <div className="p-5">
+            <TopProductsChart data={topProducts} noDataLabel={noDataLabel} t={t} />
+          </div>
+        </div>
+        <div className="card-premium col-span-3">
+          <div className="px-5 py-3 border-b border-border/40">
+            <h3 className="font-heading font-bold text-sm uppercase">
+              {t("revenueByPayment")}
+            </h3>
+          </div>
+          <div className="p-5">
+            <PaymentDonut data={revenueByPaymentMethod} noDataLabel={noDataLabel} t={t} />
+          </div>
+        </div>
       </div>
 
       {/* Row 3: Sales by category */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle className="text-base">Sales by Category</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CategoryPie data={salesByCategory} noDataLabel={noDataLabel} />
-          </CardContent>
-        </Card>
+        <div className="card-premium col-span-4">
+          <div className="px-5 py-3 border-b border-border/40">
+            <h3 className="font-heading font-bold text-sm uppercase">
+              {t("salesByCategory")}
+            </h3>
+          </div>
+          <div className="p-5">
+            <CategoryPie data={salesByCategory} noDataLabel={noDataLabel} t={t} />
+          </div>
+        </div>
       </div>
     </>
   );
@@ -133,9 +146,11 @@ const tooltipStyle = {
 function RevenueChart({
   data,
   noDataLabel,
+  t,
 }: {
   data: ChartsProps["salesTimeSeries"];
   noDataLabel: string;
+  t: (key: string) => string;
 }) {
   if (data.length === 0) return <NoData label={noDataLabel} />;
 
@@ -151,14 +166,14 @@ function RevenueChart({
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis
           dataKey="date"
-          stroke="#888888"
+          stroke={AXIS_STROKE}
           fontSize={12}
           tickLine={false}
           axisLine={false}
         />
         <YAxis
           yAxisId="revenue"
-          stroke="#888888"
+          stroke={AXIS_STROKE}
           fontSize={12}
           tickLine={false}
           axisLine={false}
@@ -169,7 +184,7 @@ function RevenueChart({
         <YAxis
           yAxisId="orders"
           orientation="right"
-          stroke="#888888"
+          stroke={AXIS_STROKE}
           fontSize={12}
           tickLine={false}
           axisLine={false}
@@ -177,7 +192,7 @@ function RevenueChart({
         <Tooltip
           formatter={(value: number, name: string) => [
             name === "revenue" ? formatCurrency(value) : value,
-            name === "revenue" ? "Revenue" : "Orders",
+            name === "revenue" ? t("revenue") : t("sales"),
           ]}
           labelFormatter={(label) => label}
           contentStyle={tooltipStyle}
@@ -187,7 +202,7 @@ function RevenueChart({
           yAxisId="revenue"
           type="monotone"
           dataKey="revenue"
-          name="Revenue"
+          name={t("revenue")}
           stroke={CHART_COLORS[0]}
           fill="url(#revenueGradient)"
           strokeWidth={2}
@@ -196,7 +211,7 @@ function RevenueChart({
           yAxisId="orders"
           type="monotone"
           dataKey="orders"
-          name="Orders"
+          name={t("sales")}
           stroke={CHART_COLORS[1]}
           strokeWidth={2}
           strokeDasharray="5 5"
@@ -255,9 +270,11 @@ function StatusDonut({
 function PaymentDonut({
   data,
   noDataLabel,
+  t,
 }: {
   data: ChartsProps["revenueByPaymentMethod"];
   noDataLabel: string;
+  t: (key: string) => string;
 }) {
   if (data.length === 0) return <NoData label={noDataLabel} />;
 
@@ -279,7 +296,7 @@ function PaymentDonut({
           ))}
         </Pie>
         <Tooltip
-          formatter={(value: number) => [formatCurrency(value), "Revenue"]}
+          formatter={(value: number) => [formatCurrency(value), t("revenue")]}
           contentStyle={tooltipStyle}
         />
         <Legend />
@@ -293,9 +310,11 @@ function PaymentDonut({
 function TopProductsChart({
   data,
   noDataLabel,
+  t,
 }: {
   data: ChartsProps["topProducts"];
   noDataLabel: string;
+  t: (key: string) => string;
 }) {
   if (data.length === 0) return <NoData label={noDataLabel} />;
 
@@ -313,7 +332,7 @@ function TopProductsChart({
           tickFormatter={(v) =>
             `\u20AC${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`
           }
-          stroke="#888888"
+          stroke={AXIS_STROKE}
           fontSize={12}
         />
         <YAxis
@@ -321,19 +340,19 @@ function TopProductsChart({
           dataKey="shortName"
           width={150}
           fontSize={12}
-          stroke="#888888"
+          stroke={AXIS_STROKE}
           tickLine={false}
         />
         <Tooltip
           formatter={(value: number, name: string) => [
             name === "revenue" ? formatCurrency(value) : value,
-            name === "revenue" ? "Revenue" : "Units Sold",
+            name === "revenue" ? t("revenue") : t("unitsSold"),
           ]}
           contentStyle={tooltipStyle}
         />
         <Bar
           dataKey="revenue"
-          name="Revenue"
+          name={t("revenue")}
           fill={CHART_COLORS[0]}
           radius={[0, 4, 4, 0]}
         />
@@ -347,9 +366,11 @@ function TopProductsChart({
 function CategoryPie({
   data,
   noDataLabel,
+  t,
 }: {
   data: ChartsProps["salesByCategory"];
   noDataLabel: string;
+  t: (key: string) => string;
 }) {
   if (data.length === 0) return <NoData label={noDataLabel} />;
 
@@ -374,7 +395,7 @@ function CategoryPie({
           ))}
         </Pie>
         <Tooltip
-          formatter={(value: number) => [formatCurrency(value), "Revenue"]}
+          formatter={(value: number) => [formatCurrency(value), t("revenue")]}
           contentStyle={tooltipStyle}
         />
         <Legend />

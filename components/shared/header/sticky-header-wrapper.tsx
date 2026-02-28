@@ -25,8 +25,6 @@ export default function StickyHeaderWrapper({
         const next =
           prev && y < 40 ? false : !prev && y > 100 ? true : prev;
         if (next !== prev) {
-          // Ignore scroll events while the CSS transition settles
-          // to prevent layout-shift feedback loops
           cooldown.current = true;
           setTimeout(() => {
             cooldown.current = false;
@@ -55,7 +53,14 @@ export default function StickyHeaderWrapper({
         {announcementBar}
       </div>
       {/* Main header + category nav */}
-      <div className={`bg-background transition-all duration-300 ${scrolled ? "shadow-lg border-b border-brand-orange/20" : ""}`}>
+      <div
+        data-compact={scrolled ? "" : undefined}
+        className={`transition-all duration-300 ${
+          scrolled
+            ? "header-frosted shadow-elevated"
+            : "bg-background"
+        }`}
+      >
         {children}
       </div>
     </div>

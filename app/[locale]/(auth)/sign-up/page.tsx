@@ -36,7 +36,7 @@ export default async function SignUpPage(props: {
             priority={true}
           />
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight">{t("createAccount")}</h1>
+        <h1 className="h2-bold">{t("createAccount")}</h1>
         <p className="text-muted-foreground text-sm mt-1">
           {t("signUpDescription")}
         </p>

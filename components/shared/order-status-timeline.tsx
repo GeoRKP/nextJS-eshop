@@ -22,32 +22,32 @@ const statusConfig: Record<
     icon: any;
   }
 > = {
-  pending: { color: "text-yellow-600", bgColor: "bg-yellow-100", icon: Clock },
+  pending: { color: "text-yellow-600 dark:text-yellow-400", bgColor: "bg-yellow-500/10", icon: Clock },
   confirmed: {
-    color: "text-blue-600",
-    bgColor: "bg-blue-100",
+    color: "text-blue-600 dark:text-blue-400",
+    bgColor: "bg-blue-500/10",
     icon: CheckCircle2,
   },
   processing: {
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-100",
+    color: "text-indigo-600 dark:text-indigo-400",
+    bgColor: "bg-indigo-500/10",
     icon: Package,
   },
-  shipped: { color: "text-purple-600", bgColor: "bg-purple-100", icon: Truck },
+  shipped: { color: "text-purple-600 dark:text-purple-400", bgColor: "bg-purple-500/10", icon: Truck },
   delivered: {
-    color: "text-green-600",
-    bgColor: "bg-green-100",
+    color: "text-green-600 dark:text-green-400",
+    bgColor: "bg-green-500/10",
     icon: MapPin,
   },
-  cancelled: { color: "text-red-600", bgColor: "bg-red-100", icon: XCircle },
+  cancelled: { color: "text-red-600 dark:text-red-400", bgColor: "bg-red-500/10", icon: XCircle },
   refund_requested: {
-    color: "text-orange-600",
-    bgColor: "bg-orange-100",
+    color: "text-orange-600 dark:text-orange-400",
+    bgColor: "bg-orange-500/10",
     icon: RotateCcw,
   },
   refunded: {
-    color: "text-gray-600",
-    bgColor: "bg-gray-100",
+    color: "text-gray-600 dark:text-gray-400",
+    bgColor: "bg-gray-500/10",
     icon: DollarSign,
   },
 };
@@ -73,7 +73,7 @@ export default async function OrderStatusTimeline({
   if (!history || history.length === 0) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="card-premium p-5 space-y-4">
       <h3 className="font-semibold">{t("statusTimeline")}</h3>
       <div className="relative">
         {history.map((entry, index) => {

@@ -16,6 +16,7 @@ import { Product } from "@/types";
 type Props = {
   products: Product[];
   translations: {
+    label: string;
     tagline: string;
     subtitle: string;
     shopNow: string;
@@ -26,10 +27,12 @@ type Props = {
 export default function HeroCarousel({ products, translations }: Props) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  const [slideKey, setSlideKey] = useState(0);
 
   const onSelect = useCallback(() => {
     if (!api) return;
     setCurrent(api.selectedScrollSnap());
+    setSlideKey((k) => k + 1);
   }, [api]);
 
   useEffect(() => {
@@ -41,6 +44,8 @@ export default function HeroCarousel({ products, translations }: Props) {
     };
   }, [api, onSelect]);
 
+  const total = products.length;
+
   return (
     <section className="relative w-full">
       <Carousel
@@ -49,53 +54,77 @@ export default function HeroCarousel({ products, translations }: Props) {
         plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
       >
         <CarouselContent>
-          {products.map((product) => (
+          {products.map((product, index) => (
             <CarouselItem key={product.id}>
-              <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden">
+              <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
                 {product.banner ? (
                   <Image
                     src={product.banner}
                     alt={product.name}
                     fill
-                    priority
+                    priority={index === 0}
                     className="object-cover"
                   />
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-primary/40" />
                 )}
-                {/* Dramatic overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
-                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/40 to-transparent" />
+                {/* Multi-layer overlay: directional gradient + bottom fade */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent" />
 
-                <div className="relative h-full wrapper flex flex-col justify-center gap-4 md:gap-6">
-                  {/* Orange accent bar */}
-                  <div className="w-16 h-1 bg-brand-orange rounded-full" />
+                {/* Content anchored at bottom */}
+                <div className="relative h-full wrapper flex flex-col justify-end pb-20 md:pb-24">
+                  {current === index && (
+                    <div key={slideKey}>
+                      {/* Label badge */}
+                      <span
+                        className="inline-block text-label text-brand-accent mb-4 opacity-0 animate-fade-up"
+                        style={{ animationDelay: "0ms", animationFillMode: "forwards" }}
+                      >
+                        {translations.label}
+                      </span>
 
-                  <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white max-w-2xl leading-[0.95] tracking-tight uppercase">
-                    {translations.tagline}
-                  </h1>
-                  <p className="text-lg md:text-xl text-white/80 max-w-xl font-light">
-                    {translations.subtitle}
-                  </p>
-                  <div className="flex gap-3 mt-2">
-                    <Button
-                      size="lg"
-                      asChild
-                      className="bg-brand-orange hover:bg-brand-orange-dark text-white font-bold text-base md:text-lg px-8 py-5 rounded-md uppercase tracking-wide border-0"
-                    >
-                      <Link href="/search">{translations.shopNow}</Link>
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      asChild
-                      className="text-base md:text-lg bg-white/10 backdrop-blur-sm text-white border-2 border-white/40 hover:bg-white/20 font-semibold px-8 py-5 rounded-md"
-                    >
-                      <Link href={`/product/${product.slug}`}>
-                        {translations.browseCollection}
-                      </Link>
-                    </Button>
-                  </div>
+                      {/* Main heading */}
+                      <h1
+                        className="text-5xl md:text-7xl lg:text-8xl font-black text-white max-w-3xl leading-[0.92] tracking-tight uppercase opacity-0 animate-fade-up"
+                        style={{ animationDelay: "100ms", animationFillMode: "forwards" }}
+                      >
+                        {translations.tagline}
+                      </h1>
+
+                      {/* Subtitle */}
+                      <p
+                        className="text-lg md:text-xl text-white/80 max-w-xl font-light mt-4 opacity-0 animate-fade-up"
+                        style={{ animationDelay: "200ms", animationFillMode: "forwards" }}
+                      >
+                        {translations.subtitle}
+                      </p>
+
+                      {/* CTAs */}
+                      <div
+                        className="flex gap-3 mt-6 opacity-0 animate-fade-up"
+                        style={{ animationDelay: "300ms", animationFillMode: "forwards" }}
+                      >
+                        <Button
+                          size="lg"
+                          asChild
+                          className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold text-base md:text-lg px-8 py-5 rounded-md uppercase tracking-wide border-0"
+                        >
+                          <Link href="/search">{translations.shopNow}</Link>
+                        </Button>
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          asChild
+                          className="text-base md:text-lg bg-white/10 backdrop-blur-sm text-white border-2 border-white/40 hover:bg-white/20 font-semibold px-8 py-5 rounded-md"
+                        >
+                          <Link href={`/product/${product.slug}`}>
+                            {translations.browseCollection}
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </CarouselItem>
@@ -103,21 +132,32 @@ export default function HeroCarousel({ products, translations }: Props) {
         </CarouselContent>
       </Carousel>
 
-      {/* Bar-style dot indicators - bottom left */}
-      {products.length > 1 && (
-        <div className="absolute bottom-6 left-5 md:left-10 flex gap-2">
+      {/* Slide indicators — centered pills with progress bar */}
+      {total > 1 && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
           {products.map((_, index) => (
             <button
               key={index}
               onClick={() => api?.scrollTo(index)}
-              className={`h-1 rounded-full transition-all duration-300 ${
+              className={`h-1.5 rounded-full transition-all duration-300 ${
                 current === index
-                  ? "w-8 bg-brand-orange"
-                  : "w-4 bg-white/30 hover:bg-white/50"
+                  ? "w-10 bg-brand-accent"
+                  : "w-2.5 bg-white/30 hover:bg-white/50"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
+        </div>
+      )}
+
+      {/* Slide counter — bottom right */}
+      {total > 1 && (
+        <div className="absolute bottom-6 right-5 md:right-10 text-white/60 text-sm font-heading tracking-wider">
+          <span className="text-white font-bold">
+            {String(current + 1).padStart(2, "0")}
+          </span>
+          {" / "}
+          {String(total).padStart(2, "0")}
         </div>
       )}
     </section>

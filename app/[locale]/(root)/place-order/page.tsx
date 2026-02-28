@@ -9,7 +9,7 @@ import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import PlaceOrderForm from "./place-order-form";
 import { getTranslations } from "next-intl/server";
-import { MapPin, CreditCard, Pencil } from "lucide-react";
+import { MapPin, CreditCard, Pencil, Lock, Shield } from "lucide-react";
 
 export async function generateMetadata() {
   const t = await getTranslations("Metadata");
@@ -22,6 +22,7 @@ export default async function PlaceOrderPage() {
   const t = await getTranslations("Checkout");
   const tOrder = await getTranslations("Order");
   const tCommon = await getTranslations("Common");
+  const tCart = await getTranslations("Cart");
 
   const cart = await getMyCart();
   const session = await auth();
@@ -49,12 +50,12 @@ export default async function PlaceOrderPage() {
           <div className="card-premium p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-brand-orange" />
+                <MapPin className="w-4 h-4 text-brand-accent" />
                 <h2 className="font-semibold">{t("shippingAddress")}</h2>
               </div>
               <Link
                 href="/shipping-address"
-                className="flex items-center gap-1 text-xs text-brand-orange hover:text-brand-orange-dark transition-colors"
+                className="flex items-center gap-1 text-xs text-brand-accent hover:text-brand-accent-dark transition-colors"
               >
                 <Pencil className="w-3 h-3" />
                 {tCommon("edit")}
@@ -72,12 +73,12 @@ export default async function PlaceOrderPage() {
           <div className="card-premium p-5">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-brand-orange" />
+                <CreditCard className="w-4 h-4 text-brand-accent" />
                 <h2 className="font-semibold">{t("paymentMethod")}</h2>
               </div>
               <Link
                 href="/payment-method"
-                className="flex items-center gap-1 text-xs text-brand-orange hover:text-brand-orange-dark transition-colors"
+                className="flex items-center gap-1 text-xs text-brand-accent hover:text-brand-accent-dark transition-colors"
               >
                 <Pencil className="w-3 h-3" />
                 {tCommon("edit")}
@@ -93,19 +94,19 @@ export default async function PlaceOrderPage() {
               {cart.items.map((item) => (
                 <div key={item.slug} className="flex items-center gap-4">
                   <Link href={`/product/${item.slug}`} className="flex-shrink-0">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted/30">
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden bg-muted/30">
                       <Image
                         src={item.image}
                         alt={item.name}
-                        width={64}
-                        height={64}
+                        width={96}
+                        height={96}
                         className="object-cover w-full h-full"
                       />
                     </div>
                   </Link>
                   <div className="flex-1 min-w-0">
                     <Link href={`/product/${item.slug}`}>
-                      <p className="text-sm font-medium line-clamp-1 hover:text-brand-orange transition-colors">{item.name}</p>
+                      <p className="text-sm font-medium line-clamp-1 hover:text-brand-accent transition-colors">{item.name}</p>
                     </Link>
                     <p className="text-xs text-muted-foreground">
                       {tOrder("quantity")}: {item.qty} &times; {formatCurrency(item.price)}
@@ -152,6 +153,18 @@ export default async function PlaceOrderPage() {
             </div>
 
             <PlaceOrderForm />
+
+            {/* Trust badges */}
+            <div className="flex items-center justify-center gap-4 pt-2">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Lock className="w-3.5 h-3.5" />
+                <span>{tCart("secureCheckout")}</span>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Shield className="w-3.5 h-3.5" />
+                <span>{tCart("buyerProtection")}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

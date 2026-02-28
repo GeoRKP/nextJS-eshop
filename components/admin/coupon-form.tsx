@@ -25,8 +25,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createCoupon, updateCoupon } from "@/lib/actions/coupon.actions";
-import { insertCouponSchema } from "@/lib/validators";
+import { insertCouponSchema, createInsertCouponSchema } from "@/lib/validators";
 import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
 
 type CouponFormData = z.infer<typeof insertCouponSchema>;
 
@@ -43,10 +44,11 @@ export default function CouponForm({
   const router = useRouter();
   const { toast } = useToast();
   const t = useTranslations("AdminCoupons");
-  const tCommon = useTranslations("Common");
+  const tV = useTranslations("Validation");
 
+  const localizedSchema = createInsertCouponSchema(tV);
   const form = useForm<CouponFormData>({
-    resolver: zodResolver(insertCouponSchema) as never,
+    resolver: zodResolver(localizedSchema) as never,
     defaultValues:
       coupon && type === "Update"
         ? {
@@ -343,7 +345,7 @@ export default function CouponForm({
             control={form.control}
             name="isActive"
             render={({ field }) => (
-              <FormItem className="flex items-center space-x-2">
+              <FormItem className="flex items-center space-x-2 p-4 rounded-lg border border-border/60 bg-muted/20">
                 <FormControl>
                   <Checkbox
                     checked={field.value}
@@ -358,7 +360,7 @@ export default function CouponForm({
             control={form.control}
             name="appliesToAll"
             render={({ field }) => (
-              <FormItem className="flex items-center space-x-2">
+              <FormItem className="flex items-center space-x-2 p-4 rounded-lg border border-border/60 bg-muted/20">
                 <FormControl>
                   <Checkbox
                     checked={field.value}
@@ -373,15 +375,18 @@ export default function CouponForm({
 
         <Button
           type="submit"
+          variant="accent"
           size="lg"
           disabled={form.formState.isSubmitting}
-          className="button w-full"
+          className="w-full"
         >
-          {form.formState.isSubmitting
-            ? tCommon("submitting")
-            : type === "Create"
-              ? t("createButton")
-              : t("updateButton")}
+          {form.formState.isSubmitting ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : type === "Create" ? (
+            t("createButton")
+          ) : (
+            t("updateButton")
+          )}
         </Button>
       </form>
     </Form>

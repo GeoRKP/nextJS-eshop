@@ -24,7 +24,7 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
             Icon && "pl-10",
             (error || isValid) && "pr-10",
             error && "border-destructive focus-visible:ring-destructive",
-            isValid && "border-green-500 focus-visible:ring-green-500",
+            isValid && "border-success focus-visible:ring-success",
             className
           )}
           {...props}
@@ -33,7 +33,7 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-destructive pointer-events-none" />
         )}
         {isValid && !error && (
-          <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500 pointer-events-none" />
+          <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-success pointer-events-none" />
         )}
       </div>
     );
