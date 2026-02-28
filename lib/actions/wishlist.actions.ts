@@ -64,6 +64,20 @@ export async function isInWishlist(productId: string) {
   return !!item;
 }
 
+// Get all product IDs in the user's wishlist (batch query to avoid N+1)
+export async function getWishlistProductIds(): Promise<Set<string>> {
+  const session = await auth();
+  if (!session?.user?.id) return new Set();
+
+  const wishlist = await prisma.wishlist.findUnique({
+    where: { userId: session.user.id },
+    include: { items: { select: { productId: true } } },
+  });
+
+  if (!wishlist) return new Set();
+  return new Set(wishlist.items.map((item) => item.productId));
+}
+
 // Add product to wishlist
 export async function addToWishlist(productId: string) {
   try {

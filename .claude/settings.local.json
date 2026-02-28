@@ -38,7 +38,8 @@
       "WebFetch(domain:www.raney.com)",
       "WebFetch(domain:www.truckid.com)",
       "WebFetch(domain:www.truckspring.com)",
-      "WebFetch(domain:halothemes.net)"
+      "WebFetch(domain:halothemes.net)",
+      "Bash(grep:*)"
     ]
   }
 }

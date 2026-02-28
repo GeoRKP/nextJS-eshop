@@ -16,12 +16,14 @@ import CategoryCards from "@/components/shared/category-cards";
 import PromoBanner from "@/components/shared/promo-banner";
 import BrandShowcase from "@/components/shared/brand-showcase";
 import ScrollFadeIn from "@/components/shared/scroll-fade-in";
+import { getWishlistProductIds } from "@/lib/actions/wishlist.actions";
 
 const HomePage = async () => {
-  const [latestProducts, featuredProducts, brands] = await Promise.all([
+  const [latestProducts, featuredProducts, brands, wishlistIds] = await Promise.all([
     getLatestProducts(8),
     getFeaturedProducts(),
     getAllBrands(),
+    getWishlistProductIds(),
   ]);
   const tHome = await getTranslations("HomePage");
 
@@ -54,7 +56,7 @@ const HomePage = async () => {
             >
               {featuredProducts.map((product) => (
                 <ProductScrollItem key={product.id}>
-                  <ProductCard product={product} />
+                  <ProductCard product={product} isInWishlist={wishlistIds.has(product.id)} />
                 </ProductScrollItem>
               ))}
             </ProductScrollSection>

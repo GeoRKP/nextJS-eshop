@@ -2,7 +2,8 @@
 import { prisma } from "@/db/prisma";
 import { formatError, toPlainObject } from "../utils";
 import { LATEST_PRODUCTS_LIMIT, PAGE_SIZE } from "../constants";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { unstable_cache } from "next/cache";
 import { insertProductSchema, updateProductSchema, createInsertProductSchema, createUpdateProductSchema } from "../validators";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
@@ -219,6 +220,8 @@ export async function deleteProduct(id: string) {
 
     revalidatePath("/admin/products");
     revalidatePath("/products");
+    revalidateTag("products");
+    revalidateTag("categories");
 
     return { success: true, message: t("productDeletedSuccessfully") };
   } catch (error) {
@@ -239,6 +242,8 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
 
     revalidatePath("/admin/products");
     revalidatePath("/products");
+    revalidateTag("products");
+    revalidateTag("categories");
 
     return { success: true, message: t("productCreatedSuccessfully") };
   } catch (error) {
@@ -271,6 +276,8 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
 
     revalidatePath("/admin/products");
     revalidatePath("/products");
+    revalidateTag("products");
+    revalidateTag("categories");
 
     return { success: true, message: t("productUpdatedSuccessfully") };
   } catch (error) {
@@ -279,16 +286,19 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
 }
 
 // Get all categories (legacy — from distinct text field)
-export async function getAllCategories() {
+export const getAllCategories = unstable_cache(
+  async () => {
+    const data = await prisma.product.groupBy({
+      by: ["category"],
+      where: { deletedAt: null },
+      _count: true,
+    });
 
-  const data = await prisma.product.groupBy({
-    by: ["category"],
-    where: { deletedAt: null },
-    _count: true,
-  });
-
-  return data;
-}
+    return data;
+  },
+  ["getAllCategories"],
+  { revalidate: 3600, tags: ["categories"] }
+);
 
 // Get "Did you mean?" suggestions using pg_trgm similarity
 export async function getDidYouMean(query: string): Promise<string[]> {
@@ -307,18 +317,22 @@ export async function getDidYouMean(query: string): Promise<string[]> {
 }
 
 // Get product price range (min/max) for slider filter
-export async function getProductPriceRange(): Promise<{ min: number; max: number }> {
-  const result = await prisma.$queryRaw<[{ min: string; max: string }]>`
-    SELECT MIN(price)::text AS min, MAX(price)::text AS max
-    FROM "Product"
-    WHERE "deletedAt" IS NULL
-  `;
+export const getProductPriceRange = unstable_cache(
+  async (): Promise<{ min: number; max: number }> => {
+    const result = await prisma.$queryRaw<[{ min: string; max: string }]>`
+      SELECT MIN(price)::text AS min, MAX(price)::text AS max
+      FROM "Product"
+      WHERE "deletedAt" IS NULL
+    `;
 
-  return {
-    min: Math.floor(Number(result[0]?.min ?? 0)),
-    max: Math.ceil(Number(result[0]?.max ?? 2000)),
-  };
-}
+    return {
+      min: Math.floor(Number(result[0]?.min ?? 0)),
+      max: Math.ceil(Number(result[0]?.max ?? 2000)),
+    };
+  },
+  ["getProductPriceRange"],
+  { revalidate: 3600, tags: ["products"] }
+);
 
 // Get related products by category
 export async function getRelatedProducts(
@@ -340,17 +354,21 @@ export async function getRelatedProducts(
 }
 
 // Get featured products
-export async function getFeaturedProducts() {
-  const data = await prisma.product.findMany({
-    where: {
-      isFeatured: true,
-      deletedAt: null,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: 4,
-  });
+export const getFeaturedProducts = unstable_cache(
+  async () => {
+    const data = await prisma.product.findMany({
+      where: {
+        isFeatured: true,
+        deletedAt: null,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 4,
+    });
 
-  return toPlainObject(data);
-}
+    return toPlainObject(data);
+  },
+  ["getFeaturedProducts"],
+  { revalidate: 300, tags: ["products"] }
+);

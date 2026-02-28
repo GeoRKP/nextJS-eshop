@@ -145,8 +145,8 @@ export async function getDashboardData(
     prisma.user.count({
       where: prevDateFilter ? { createdAt: prevDateFilter } : undefined,
     }),
-    // 5. Total products
-    prisma.product.count(),
+    // 5. Total products (exclude soft-deleted)
+    prisma.product.count({ where: { deletedAt: null } }),
     // 6. Sales time series
     getSalesTimeSeries(range, paymentMethod, category, paidStatus),
     // 7. Orders by status (derived from isPaid/isDelivered)
@@ -165,10 +165,10 @@ export async function getDashboardData(
       include: { user: { select: { name: true } } },
       take: 8,
     }),
-    // 13. Categories for filter dropdown
-    prisma.product.findMany({
-      distinct: ["category"],
-      select: { category: true },
+    // 13. Categories for filter dropdown (exclude soft-deleted)
+    prisma.product.groupBy({
+      by: ["category"],
+      where: { deletedAt: null },
       orderBy: { category: "asc" },
     }),
   ]);
@@ -205,7 +205,7 @@ export async function getDashboardData(
       paymentMethod: o.paymentMethod,
     })),
     productsCount,
-    categories: categoriesRaw.map((c) => c.category),
+    categories: categoriesRaw.map((c: { category: string }) => c.category),
   };
 }
 
@@ -464,7 +464,7 @@ async function getLowStockProducts(): Promise<
   }[]
 > {
   const products = await prisma.product.findMany({
-    where: { stock: { lte: 5 } },
+    where: { stock: { lte: 5 }, deletedAt: null },
     select: { id: true, name: true, slug: true, stock: true, price: true },
     orderBy: { stock: "asc" },
     take: 10,

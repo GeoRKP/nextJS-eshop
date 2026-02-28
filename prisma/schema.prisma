@@ -60,6 +60,18 @@ model Product {
   couponProducts  CouponProduct[]
 
   @@index([categoryId])
+  @@index([deletedAt])
+  @@index([isFeatured])
+  @@index([createdAt])
+  @@index([price])
+  @@index([stock])
+  @@index([rating])
+  @@index([deletedAt, createdAt])
+  @@index([deletedAt, isFeatured])
+  @@index([deletedAt, category])
+  @@index([deletedAt, price])
+  @@index([deletedAt, rating])
+  @@index([deletedAt, category, createdAt])
 }
 
 // ─── User ──────────────────────────────────────────────────────

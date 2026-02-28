@@ -14,13 +14,15 @@ import { isInWishlist } from "@/lib/actions/wishlist.actions";
 export default async function ProductCard({
   product,
   searchQuery,
+  isInWishlist: isInWishlistProp,
 }: {
   product: Product;
   searchQuery?: string;
+  isInWishlist?: boolean;
 }) {
   const t = await getTranslations("Product");
   const tBadge = await getTranslations("ProductCard");
-  const inWishlist = await isInWishlist(product.id);
+  const inWishlist = isInWishlistProp ?? (await isInWishlist(product.id));
 
   const isNew =
     new Date().getTime() - new Date(product.createdAt).getTime() <
@@ -38,7 +40,6 @@ export default async function ProductCard({
                 alt={product.name}
                 width={300}
                 height={300}
-                priority={true}
                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
               />
               {/* Subtle gradient overlay at bottom */}

@@ -2,6 +2,7 @@ import { Product } from "@/types";
 import ProductCard from "./product-card";
 import { getTranslations } from "next-intl/server";
 import { AnimatedGrid, AnimatedGridItem } from "./animated-grid";
+import { getWishlistProductIds } from "@/lib/actions/wishlist.actions";
 
 export default async function ProductList({
   data,
@@ -13,7 +14,10 @@ export default async function ProductList({
   limit?: number;
 }) {
   const limitedData = limit ? data.slice(0, limit) : data;
-  const t = await getTranslations("Product");
+  const [t, wishlistIds] = await Promise.all([
+    getTranslations("Product"),
+    getWishlistProductIds(),
+  ]);
 
   return (
     <div className="my-10">
@@ -22,7 +26,7 @@ export default async function ProductList({
         <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {limitedData.map((product: Product) => (
             <AnimatedGridItem key={product.slug}>
-              <ProductCard product={product} />
+              <ProductCard product={product} isInWishlist={wishlistIds.has(product.id)} />
             </AnimatedGridItem>
           ))}
         </AnimatedGrid>
