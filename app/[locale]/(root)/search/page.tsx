@@ -1,43 +1,17 @@
 import ProductCard from "@/components/shared/product/product-card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   getAllProducts,
   getAllCategories,
   getDidYouMean,
+  getProductPriceRange,
 } from "@/lib/actions/product.actions";
 import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
-
-const prices = [
-  {
-    key: "priceRange1",
-    value: "1-50",
-  },
-  {
-    key: "priceRange2",
-    value: "51-100",
-  },
-  {
-    key: "priceRange3",
-    value: "101-150",
-  },
-  {
-    key: "priceRange4",
-    value: "151-200",
-  },
-  {
-    key: "priceRange5",
-    value: "201-500",
-  },
-  {
-    key: "priceRange6",
-    value: "501-1000",
-  },
-  {
-    key: "priceRange7",
-    value: "1001-2000",
-  },
-];
+import SearchFilters from "./search-filters";
+import Pagination from "@/components/shared/pagination";
+import { SearchX } from "lucide-react";
 
 const ratings = [4, 3, 2, 1];
 
@@ -144,130 +118,207 @@ export default async function SearchPage(props: {
     page: parseInt(page),
   });
 
-  const categories = await getAllCategories();
+  const [categories, priceRange] = await Promise.all([
+    getAllCategories(),
+    getProductPriceRange(),
+  ]);
+
+  // Parse current price filter values for the slider
+  const currentMin =
+    price !== "all" ? Number(price.split("-")[0]) : priceRange.min;
+  const currentMax =
+    price !== "all" ? Number(price.split("-")[1]) : priceRange.max;
+
+  // Count active filters
+  const activeFilters: { label: string; clearUrl: string }[] = [];
+  if (q !== "all" && q !== "") {
+    activeFilters.push({
+      label: `${t("query")} ${q}`,
+      clearUrl: getFilterUrl({
+        c: category,
+        p: price,
+        r: rating,
+        s: sort,
+      }).replace(`q=${encodeURIComponent(q)}`, "q=all"),
+    });
+  }
+  if (category !== "all" && category !== "") {
+    activeFilters.push({
+      label: `${t("category")} ${category}`,
+      clearUrl: getFilterUrl({ c: "all" }),
+    });
+  }
+  if (price !== "all") {
+    activeFilters.push({
+      label: `${t("priceLabel")} ${price}`,
+      clearUrl: getFilterUrl({ p: "all" }),
+    });
+  }
+  if (rating !== "all") {
+    activeFilters.push({
+      label: `${t("ratingLabel")} ${rating} ${t("starsAndUp", { count: Number(rating) })}`,
+      clearUrl: getFilterUrl({ r: "all" }),
+    });
+  }
+
+  // Build filter data for client component
+  const filterData = {
+    categories: categories.map((c) => ({
+      name: c.category,
+      count: c._count,
+      href: getFilterUrl({ c: c.category }),
+      isActive: category === c.category,
+    })),
+    priceRange: {
+      min: priceRange.min,
+      max: priceRange.max,
+      currentMin,
+      currentMax,
+    },
+    ratings: ratings.map((r) => ({
+      value: r,
+      label: t("starsAndUp", { count: r }),
+      href: getFilterUrl({ r: `${r}` }),
+      isActive: rating === r.toString(),
+    })),
+    anyHref: {
+      category: getFilterUrl({ c: "all" }),
+      price: getFilterUrl({ p: "all" }),
+      rating: getFilterUrl({ r: "all" }),
+    },
+    activeCategory: category,
+    activePrice: price,
+    activeRating: rating,
+    translations: {
+      department: t("department"),
+      price: t("price"),
+      rating: t("rating"),
+      any: tCommon("any"),
+      filters: t("filters"),
+      clearFilters: t("clearFilters"),
+      priceRange: t("priceRange"),
+      applyPrice: t("applyPrice"),
+    },
+    clearAllHref: "/search",
+    searchParams: { q, category, price, rating, sort, page },
+  };
+
+  const hasQuery = q !== "all" && q.trim() !== "";
+  const hasCategory = category !== "all" && category.trim() !== "";
 
   return (
-    <div className="wrapper grid md:grid-cols-5 md:gap-5">
-      <div className="filter-links">
-        {/* Category links */}
-        <div className="text-xl mb-2 mt-3">{t("department")}</div>
-        <div>
-          <ul className="space-y-1">
-            <li>
-              <Link
-                className={`${
-                  category === "all" || category === "" ? "font-bold" : ""
-                }`}
-                href={getFilterUrl({ c: "all" })}
+    <div className="wrapper">
+      {/* Search results banner */}
+      <div className="rounded-2xl bg-gradient-to-r from-muted/80 to-muted/30 border border-border/50 p-6 mb-6">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight">
+          {hasQuery ? (
+            <>
+              {t("resultsFor")} &ldquo;<span className="text-brand-orange">{q}</span>&rdquo;
+            </>
+          ) : hasCategory ? (
+            <>
+              {t("browsing")}: <span className="text-brand-orange">{category}</span>
+            </>
+          ) : (
+            t("allProducts")
+          )}
+        </h1>
+        {products.data.length > 0 && (
+          <p className="text-sm text-muted-foreground mt-1">
+            {t("showingResults", { count: products.data.length, page: page, totalPages: products.totalPages.toString() })}
+          </p>
+        )}
+
+        {/* Active filter chips */}
+        {activeFilters.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mt-4">
+            {activeFilters.map((filter) => (
+              <Badge
+                key={filter.label}
+                variant="secondary"
+                className="gap-1 pr-1 rounded-full"
               >
-                {tCommon("any")}
-              </Link>
-            </li>
-            {categories.map((x) => (
-              <li key={x.category}>
+                <span className="text-xs">{filter.label}</span>
                 <Link
-                  className={`${category === x.category ? "font-bold" : ""}`}
-                  href={getFilterUrl({ c: x.category })}
+                  href={filter.clearUrl}
+                  className="ml-1 hover:text-destructive inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-destructive/10"
                 >
-                  {x.category}
+                  &times;
                 </Link>
-              </li>
+              </Badge>
             ))}
-          </ul>
-        </div>
-        {/* Price links */}
-        <div className="text-xl mb-2 mt-8">{t("price")}</div>
-        <div>
-          <ul className="space-y-1">
-            <li>
-              <Link
-                className={`${price === "all" ? "font-bold" : ""}`}
-                href={getFilterUrl({ p: "all" })}
-              >
-                {tCommon("any")}
-              </Link>
-            </li>
-            {prices.map((p) => (
-              <li key={p.value}>
+            <Button variant="link" size="sm" asChild className="h-auto p-0 text-xs">
+              <Link href="/search">{tCommon("clearAll")}</Link>
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <div className="grid md:grid-cols-5 md:gap-8">
+        {/* Sidebar filters */}
+        <SearchFilters
+          filterData={filterData}
+          filterCount={activeFilters.length}
+        />
+
+        {/* Results */}
+        <div className="md:col-span-4 space-y-6">
+          {/* Toolbar */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {products.data.length > 0 &&
+                `${products.data.length} ${t("productsFound")}`}
+            </p>
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-muted-foreground mr-2">{t("sortBy")}</span>
+              {sortOrders.map((s) => (
                 <Link
-                  className={`${price === p.value ? "font-bold" : ""}`}
-                  href={getFilterUrl({ p: p.value })}
+                  key={s}
+                  className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
+                    sort === s
+                      ? "bg-primary text-primary-foreground font-medium"
+                      : "text-muted-foreground hover:bg-muted"
+                  }`}
+                  href={getFilterUrl({ s })}
                 >
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {t(p.key as any)}
+                  {t(sortKeyMap[s] as any)}
                 </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        {/* Rating links */}
-        <div className="text-xl mb-2 mt-8">{t("rating")}</div>
-        <div>
-          <ul className="space-y-1">
-            <li>
-              <Link
-                className={`${rating === "all" ? "font-bold" : ""}`}
-                href={getFilterUrl({ r: "all" })}
-              >
-                {tCommon("any")}
-              </Link>
-            </li>
-            {ratings.map((r) => (
-              <li key={r}>
-                <Link
-                  className={`${rating === r.toString() ? "font-bold" : ""}`}
-                  href={getFilterUrl({ r: `${r}` })}
-                >
-                  {t("starsAndUp", { count: r })}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <div className="md:col-span-4 space-y-4">
-        <div className="flex-between flex-col md:flex-row my-4">
-          <div className="flex items-center">
-            {q !== "all" && q !== "" && ` ${t("query")} ${q}`}
-            {category !== "all" && category !== "" && ` ${t("category")} ${category}`}
-            {price !== "all" && ` ${t("priceLabel")} ${price}`}
-            {rating !== "all" && ` ${t("ratingLabel")} ${rating} ${t("starsAndUp", { count: Number(rating) })}`}
-            &nbsp;
-            {(q !== "all" && q !== "") ||
-            (category !== "all" && category !== "") ||
-            price !== "all" ||
-            rating !== "all" ? (
-              <Button variant={"link"} asChild>
-                <Link href="/search">{tCommon("clear")}</Link>
-              </Button>
-            ) : null}
+              ))}
+            </div>
           </div>
-          <div>
-            {t("sortBy")}{" "}
-            {sortOrders.map((s) => (
-              <Link
-                key={s}
-                className={`${sort === s ? "font-bold" : ""} mx-2`}
-                href={getFilterUrl({ s })}
-              >
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {t(sortKeyMap[s] as any)}
-              </Link>
+
+          {/* Product grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {products.data.length === 0 && (
+              <div className="col-span-full flex flex-col items-center justify-center py-16 gap-4">
+                <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
+                  <SearchX className="w-8 h-8 text-muted-foreground/50" />
+                </div>
+                <p className="text-muted-foreground text-center">
+                  {t("noResults")} <strong>&ldquo;{q}&rdquo;</strong>
+                </p>
+                {q !== "all" && q.trim() !== "" && <DidYouMean query={q} />}
+              </div>
+            )}
+            {products.data.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                searchQuery={q !== "all" ? q : undefined}
+              />
             ))}
           </div>
-        </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {products.data.length === 0 && (
-            <div className="col-span-full text-center space-y-2">
-              <p>{t("noResults")} <strong>&ldquo;{q}&rdquo;</strong></p>
-              {q !== "all" && q.trim() !== "" && (
-                <DidYouMean query={q} />
-              )}
+
+          {/* Pagination */}
+          {products.totalPages > 1 && (
+            <div className="flex justify-center pt-4">
+              <Pagination
+                page={Number(page) || 1}
+                totalPages={products.totalPages}
+              />
             </div>
           )}
-          {products.data.map((product) => (
-            <ProductCard key={product.id} product={product} searchQuery={q !== "all" ? q : undefined} />
-          ))}
         </div>
       </div>
     </div>
@@ -281,12 +332,15 @@ async function DidYouMean({ query }: { query: string }) {
   if (suggestions.length === 0) return null;
 
   return (
-    <p className="text-muted-foreground">
+    <p className="text-muted-foreground text-sm">
       {t("didYouMean")}{" "}
       {suggestions.map((s, i) => (
         <span key={s}>
           {i > 0 && ", "}
-          <Link href={`/search?q=${encodeURIComponent(s)}`} className="underline text-primary hover:text-primary/80">
+          <Link
+            href={`/search?q=${encodeURIComponent(s)}`}
+            className="underline text-brand-orange hover:text-brand-orange-dark"
+          >
             {s}
           </Link>
         </span>

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 import { formUrlQuery } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type PaginationProps = {
   page: number | string;
@@ -20,36 +21,80 @@ export default function Pagination({
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("Common");
+  const currentPage = Number(page);
 
-  const handleClick = (btnType: string) => {
-    const pageValue = btnType === "prev" ? Number(page) - 1 : Number(page) + 1;
+  const handleClick = (pageNum: number) => {
     const newUrl = formUrlQuery({
       params: searchParams.toString(),
       key: urlParamName || "page",
-      value: pageValue.toString(),
+      value: pageNum.toString(),
     });
     router.push(newUrl);
   };
 
+  // Generate page numbers to show
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("...");
+      for (
+        let i = Math.max(2, currentPage - 1);
+        i <= Math.min(totalPages - 1, currentPage + 1);
+        i++
+      ) {
+        pages.push(i);
+      }
+      if (currentPage < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
   return (
-    <div className="flex gap-2">
+    <div className="flex items-center gap-1">
       <Button
-        size="lg"
-        variant="outline"
-        className="w-28"
-        disabled={Number(page) === 1}
-        onClick={() => handleClick('prev')}
+        variant="ghost"
+        size="icon"
+        className="w-9 h-9 rounded-full"
+        disabled={currentPage === 1}
+        onClick={() => handleClick(currentPage - 1)}
       >
-        {t("previous")}
+        <ChevronLeft className="w-4 h-4" />
+        <span className="sr-only">{t("previous")}</span>
       </Button>
+
+      {getPageNumbers().map((p, i) =>
+        typeof p === "string" ? (
+          <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-xs text-muted-foreground">
+            ...
+          </span>
+        ) : (
+          <Button
+            key={p}
+            variant={p === currentPage ? "default" : "ghost"}
+            size="icon"
+            className={`w-9 h-9 rounded-full text-xs font-medium ${
+              p === currentPage ? "bg-brand-orange text-white hover:bg-brand-orange-dark" : ""
+            }`}
+            onClick={() => handleClick(p)}
+          >
+            {p}
+          </Button>
+        )
+      )}
+
       <Button
-        size="lg"
-        variant="outline"
-        className="w-28"
-        disabled={Number(page) >= totalPages}
-        onClick={() => handleClick("next")}
+        variant="ghost"
+        size="icon"
+        className="w-9 h-9 rounded-full"
+        disabled={currentPage >= totalPages}
+        onClick={() => handleClick(currentPage + 1)}
       >
-        {t("next")}
+        <ChevronRight className="w-4 h-4" />
+        <span className="sr-only">{t("next")}</span>
       </Button>
     </div>
   );

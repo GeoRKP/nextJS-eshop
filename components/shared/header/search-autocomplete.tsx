@@ -4,13 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { SearchIcon } from "lucide-react";
 import { useRecentSearches } from "@/hooks/use-recent-searches";
 import SearchDropdown, { getItemCount } from "./search-dropdown";
@@ -21,15 +14,14 @@ import type {
 } from "@/types/search";
 
 type Props = {
-  categories: string[];
+  placeholder?: string;
 };
 
-export default function SearchAutocomplete({ categories }: Props) {
+export default function SearchAutocomplete({ placeholder }: Props) {
   const router = useRouter();
   const { searches, addSearch, removeSearch, clearAll } = useRecentSearches();
 
   const [query, setQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [products, setProducts] = useState<ProductSuggestion[]>([]);
@@ -111,11 +103,9 @@ export default function SearchAutocomplete({ categories }: Props) {
     (term: string) => {
       addSearch(term);
       setOpen(false);
-      const catParam =
-        selectedCategory !== "all" ? `&category=${selectedCategory}` : "";
-      router.push(`/search?q=${encodeURIComponent(term)}${catParam}`);
+      router.push(`/search?q=${encodeURIComponent(term)}`);
     },
-    [router, selectedCategory, addSearch]
+    [router, addSearch]
   );
 
   const navigateToProduct = useCallback(
@@ -222,35 +212,17 @@ export default function SearchAutocomplete({ categories }: Props) {
     <div ref={containerRef} className="relative">
       <form onSubmit={handleSubmit}>
         <div
-          className="flex w-full max-w-sm items-center space-x-2"
+          className="flex w-full items-center"
           role="combobox"
           aria-expanded={open}
           aria-controls="search-dropdown"
           aria-haspopup="listbox"
         >
-          <Select
-            value={selectedCategory}
-            onValueChange={setSelectedCategory}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem key="All" value="all">
-                All
-              </SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <Input
             ref={inputRef}
             type="text"
-            placeholder="Search..."
-            className="md:w-[100px] lg:w-[300px]"
+            placeholder={placeholder || "Search..."}
+            className="w-full h-11 rounded-l-full rounded-r-none border-2 border-r-0 border-muted bg-muted/30 pl-5 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-brand-orange"
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => setOpen(true)}
@@ -259,8 +231,8 @@ export default function SearchAutocomplete({ categories }: Props) {
             aria-controls="search-dropdown"
             autoComplete="off"
           />
-          <Button type="submit">
-            <SearchIcon />
+          <Button type="submit" className="rounded-r-full rounded-l-none shrink-0 h-11 w-12 bg-brand-orange hover:bg-brand-orange-dark text-white border-0">
+            <SearchIcon className="h-5 w-5" />
           </Button>
         </div>
       </form>

@@ -29,49 +29,61 @@ export default async function ProductCard({
 
   return (
     <AnimatedCard>
-      <Card className="w-full max-w-sm group overflow-hidden hover:shadow-card-hover transition-shadow duration-200">
+      <Card className="w-full max-w-sm group overflow-hidden rounded-2xl border-0 bg-card shadow-card hover:shadow-card-glow transition-all duration-300 relative">
         <CardHeader className="p-0 items-center">
           <Link href={`/product/${product.slug}`}>
-            <div className="aspect-square overflow-hidden">
+            <div className="aspect-square overflow-hidden bg-muted/30 relative">
               <Image
                 src={product.images[0]}
                 alt={product.name}
                 width={300}
                 height={300}
                 priority={true}
-                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
               />
+              {/* Subtle gradient overlay at bottom */}
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </Link>
           {/* Wishlist button */}
-          <div className="absolute top-2 right-2 z-10">
-            <WishlistButton productId={product.id} isInWishlist={inWishlist} />
+          <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5 shadow-sm">
+              <WishlistButton productId={product.id} isInWishlist={inWishlist} />
+            </div>
           </div>
+          {/* Always show if in wishlist */}
+          {inWishlist && (
+            <div className="absolute top-3 right-3 z-10 group-hover:opacity-0 transition-opacity duration-200">
+              <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5 shadow-sm">
+                <WishlistButton productId={product.id} isInWishlist={inWishlist} />
+              </div>
+            </div>
+          )}
           {/* Badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {isNew && (
-              <Badge className="bg-green-600 hover:bg-green-700 text-white">
+              <Badge className="bg-brand-orange hover:bg-brand-orange-dark text-white text-[10px] px-2.5 py-0.5 rounded-full font-bold">
                 {tBadge("new")}
               </Badge>
             )}
             {product.isFeatured && (
-              <Badge className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Badge className="bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] px-2.5 py-0.5 rounded-full font-bold">
                 {tBadge("featured")}
               </Badge>
             )}
             {isLowStock && (
-              <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
+              <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-[10px] px-2.5 py-0.5 rounded-full font-bold">
                 {tBadge("lowStock")}
               </Badge>
             )}
           </div>
         </CardHeader>
         <CardContent className="p-4 grid gap-2">
-          <div className="text-xs uppercase text-muted-foreground tracking-wide">
+          <div className="text-brand-orange text-[10px] font-bold uppercase tracking-[0.15em]">
             <HighlightText text={product.brand} query={searchQuery} />
           </div>
           <Link href={`/product/${product.slug}`}>
-            <h2 className="text-sm font-semibold line-clamp-2 group-hover:text-primary transition-colors">
+            <h2 className="text-sm font-semibold line-clamp-2 group-hover:text-brand-orange transition-colors duration-200">
               <HighlightText text={product.name} query={searchQuery} />
             </h2>
           </Link>
@@ -83,9 +95,11 @@ export default async function ProductCard({
               </span>
             </div>
             {product.stock > 0 ? (
-              <ProductPrice value={Number(product.price)} />
+              <div className="text-lg font-black tracking-tight">
+                <ProductPrice value={Number(product.price)} />
+              </div>
             ) : (
-              <p className="text-destructive font-medium">{t("outOfStock")}</p>
+              <p className="text-destructive text-sm font-medium">{t("outOfStock")}</p>
             )}
           </div>
         </CardContent>

@@ -70,7 +70,13 @@
     "confirmPassword": "Επιβεβαίωση Κωδικού",
     "name": "Όνομα",
     "noAccount": "Δεν έχετε λογαριασμό;",
-    "hasAccount": "Έχετε ήδη λογαριασμό;"
+    "hasAccount": "Έχετε ήδη λογαριασμό;",
+    "welcomeBack": "Καλώς Ήρθατε Ξανά",
+    "authTagline": "Κορυφαία ανταλλακτικά και αξεσουάρ φορτηγών για επαγγελματίες. Ποιότητα που εμπιστεύεστε.",
+    "statParts": "10.000+ Ανταλλακτικά",
+    "statShipping": "Δωρεάν Αποστολή",
+    "statWarranty": "2 Χρόνια Εγγύηση",
+    "statRating": "4.8/5 Βαθμολογία"
   },
   "Product": {
     "featuredProducts": "Προτεινόμενα Προϊόντα",
@@ -80,9 +86,10 @@
     "status": "Κατάσταση",
     "inStock": "Διαθέσιμο",
     "outOfStock": "Εξαντλημένο",
+    "lowStock": "Μόνο {count} απομένουν",
     "addToCart": "Προσθήκη στο Καλάθι",
     "goToCart": "Μετάβαση στο καλάθι",
-    "reviews": "Αξιολογήσεις",
+    "reviews": "Αξιολογήσεις Πελατών",
     "noReviews": "Δεν υπάρχουν αξιολογήσεις ακόμα",
     "addReview": "Προσθήκη αξιολόγησης",
     "shareThoughts": "Μοιραστείτε τη γνώμη σας με άλλους πελάτες",
@@ -97,14 +104,18 @@
     "numReviews": "{count} αξιολογήσεις",
     "products": "Προϊόντα",
     "categories": "Κατηγορίες",
-    "relatedProducts": "Σχετικά Προϊόντα"
+    "relatedProducts": "Σχετικά Προϊόντα",
+    "readMore": "Περισσότερα",
+    "readLess": "Λιγότερα"
   },
   "Cart": {
     "shoppingCart": "Καλάθι Αγορών",
-    "cartEmpty": "Το καλάθι είναι άδειο.",
+    "cartEmpty": "Το καλάθι σας είναι άδειο",
+    "cartEmptyDesc": "Δεν έχετε προσθέσει ακόμα κάτι στο καλάθι σας.",
     "item": "Προϊόν",
     "quantity": "Ποσότητα",
     "price": "Τιμή",
+    "each": "τεμ.",
     "subtotal": "Υποσύνολο ({count})",
     "proceedToCheckout": "Συνέχεια στην Πληρωμή",
     "couponCode": "Κωδικός Κουπονιού",
@@ -112,13 +123,20 @@
     "applyCoupon": "Εφαρμογή",
     "removeCoupon": "Αφαίρεση",
     "discount": "Έκπτωση",
-    "couponApplied": "Το κουπόνι \"{code}\" εφαρμόστηκε"
+    "couponApplied": "Το κουπόνι \"{code}\" εφαρμόστηκε",
+    "orderSummary": "Σύνοψη Παραγγελίας",
+    "estimatedShipping": "Αποστολή",
+    "free": "Δωρεάν",
+    "estimatedTotal": "Εκτιμώμενο Σύνολο",
+    "secureCheckout": "Ασφαλές Ταμείο",
+    "buyerProtection": "Προστασία Αγοραστή"
   },
   "Checkout": {
     "userLogin": "Σύνδεση Χρήστη",
     "shippingAddress": "Διεύθυνση Αποστολής",
     "paymentMethod": "Τρόπος Πληρωμής",
     "placeOrder": "Υποβολή Παραγγελίας",
+    "reviewOrder": "Ελέγξτε την Παραγγελία σας",
     "shippingAddressDescription": "Εισάγετε τη διεύθυνση αποστολής σας παρακάτω.",
     "paymentMethodDescription": "Επιλέξτε τρόπο πληρωμής.",
     "fullName": "Ονοματεπώνυμο",
@@ -130,7 +148,12 @@
     "enterAddress": "Εισάγετε διεύθυνση",
     "enterCity": "Εισάγετε πόλη",
     "enterPostalCode": "Εισάγετε ταχυδρομικό κώδικα",
-    "enterCountry": "Εισάγετε χώρα"
+    "enterCountry": "Εισάγετε χώρα",
+    "continueToPayment": "Συνέχεια στην Πληρωμή",
+    "continueToReview": "Συνέχεια στον Έλεγχο",
+    "payWithCard": "Πληρωμή με πιστωτική ή χρεωστική κάρτα",
+    "payWithPaypal": "Πληρωμή μέσω PayPal",
+    "payOnDelivery": "Πληρωμή κατά την παραλαβή"
   },
   "Order": {
     "orderDetails": "Παραγγελία {id}",
@@ -172,7 +195,9 @@
     "statusCancelled": "Ακυρωμένη",
     "statusRefundRequested": "Αίτηση Επιστροφής",
     "statusRefunded": "Επιστράφηκε",
-    "statusTimeline": "Χρονολόγιο Παραγγελίας"
+    "statusTimeline": "Χρονολόγιο Παραγγελίας",
+    "orderSummary": "Σύνοψη Παραγγελίας",
+    "noOrders": "Δεν έχετε κάνει ακόμα παραγγελίες."
   },
   "Search": {
     "department": "Τμήμα",
@@ -199,7 +224,19 @@
     "priceRange4": "151€ έως 200€",
     "priceRange5": "201€ έως 500€",
     "priceRange6": "501€ έως 1000€",
-    "priceRange7": "1001€ έως 2000€"
+    "priceRange7": "1001€ έως 2000€",
+    "searchPlaceholder": "Αναζήτηση ανταλλακτικών, μαρκών ή κωδικών...",
+    "filters": "Φίλτρα",
+    "clearFilters": "Καθαρισμός Φίλτρων",
+    "priceRange": "Εύρος Τιμής",
+    "applyPrice": "Εφαρμογή",
+    "minPrice": "Ελάχ.",
+    "maxPrice": "Μέγ.",
+    "resultsFor": "Αποτελέσματα για",
+    "browsing": "Περιήγηση",
+    "allProducts": "Όλα τα Προϊόντα",
+    "showingResults": "Εμφάνιση {count} προϊόντων (σελίδα {page} από {totalPages})",
+    "productsFound": "προϊόντα βρέθηκαν"
   },
   "AdminDashboard": {
     "dashboard": "Πίνακας Ελέγχου",
@@ -467,11 +504,58 @@
   "CategoryDrawer": {
     "selectCategory": "Επιλέξτε κατηγορία"
   },
+  "Announcement": {
+    "freeShipping": "Δωρεάν αποστολή σε παραγγελίες άνω των 50€",
+    "newArrivals": "Νέα ανταλλακτικά φορτηγών κάθε εβδομάδα",
+    "returns": "Εύκολες επιστροφές 30 ημερών σε όλες τις παραγγελίες"
+  },
+  "UtilityBar": {
+    "helpCenter": "Κέντρο Βοήθειας",
+    "orderTracking": "Παρακολούθηση Παραγγελίας",
+    "proAccount": "Επαγγελματικός Λογαριασμός"
+  },
+  "MegaMenu": {
+    "viewAll": "Προβολή Όλων",
+    "featured": "Προτεινόμενα",
+    "allCategories": "Όλες οι Κατηγορίες",
+    "deals": "Προσφορές",
+    "newArrivals": "Νέες Αφίξεις",
+    "shopByBrand": "Αγορές ανά Μάρκα",
+    "popularBrands": "Δημοφιλείς Μάρκες",
+    "allBrands": "Όλες οι Μάρκες",
+    "viewAllIn": "Προβολή Όλων σε {category}",
+    "products": "{count} προϊόντα",
+    "subcategories": "{count} υποκατηγορίες"
+  },
+  "MobileNav": {
+    "home": "Αρχική",
+    "categories": "Κατηγορίες",
+    "search": "Αναζήτηση",
+    "cart": "Καλάθι",
+    "account": "Λογαριασμός",
+    "signIn": "Σύνδεση",
+    "quickLinks": "Γρήγοροι Σύνδεσμοι",
+    "myOrders": "Οι Παραγγελίες μου",
+    "wishlist": "Λίστα Επιθυμιών",
+    "closeMenu": "Κλείσιμο μενού",
+    "brands": "Μάρκες",
+    "popularBrands": "Δημοφιλείς Μάρκες"
+  },
+  "HomePage": {
+    "trendingProducts": "Δημοφιλή Προϊόντα",
+    "shopByCategory": "Αγορές ανά Κατηγορία",
+    "latestProducts": "Τελευταία Προϊόντα",
+    "promoTitle": "Premium Ανταλλακτικά. Ασυναγώνιστες Τιμές.",
+    "promoSubtitle": "Αναβαθμίστε το φορτηγό σας με κορυφαία ανταλλακτικά σε προσφορές.",
+    "shopDeals": "Δείτε Προσφορές",
+    "shopByBrand": "Αγορά ανά Μάρκα",
+    "viewAll": "Προβολή Όλων"
+  },
   "Hero": {
-    "tagline": "Ανακαλύψτε το Στυλ σας",
-    "subtitle": "Ψωνίστε τις τελευταίες τάσεις με προϊόντα κορυφαίας ποιότητας σε ασυναγώνιστες τιμές.",
+    "tagline": "Φτιαγμένα Για Τον Δρόμο Μπροστά",
+    "subtitle": "Premium ανταλλακτικά φορτηγών και αξεσουάρ. Ποιότητα ειδικών. Εγγυημένη εφαρμογή.",
     "shopNow": "Αγοράστε Τώρα",
-    "browseCollection": "Περιηγηθείτε στη Συλλογή"
+    "browseCollection": "Λεπτομέρειες"
   },
   "ValueProps": {
     "freeShipping": "Δωρεάν Αποστολή",
@@ -481,7 +565,7 @@
     "easyReturns": "Εύκολες Επιστροφές",
     "easyReturnsDesc": "Πολιτική επιστροφής 30 ημερών",
     "support": "Υποστήριξη 24/7",
-    "supportDesc": "Αφοσιωμένη εξυπηρέτηση πελατών"
+    "supportDesc": "Εξειδικευμένη βοήθεια πάντα διαθέσιμη"
   },
   "Categories": {
     "shopByCategory": "Αγορές ανά Κατηγορία",
@@ -513,7 +597,14 @@
     "emailPlaceholder": "Εισάγετε το email σας",
     "subscribe": "Εγγραφή",
     "followUs": "Ακολουθήστε μας",
-    "paymentMethods": "Μέθοδοι Πληρωμής"
+    "paymentMethods": "Μέθοδοι Πληρωμής",
+    "myAccount": "Ο Λογαριασμός μου",
+    "myOrders": "Οι Παραγγελίες μου",
+    "myWishlist": "Λίστα Επιθυμιών",
+    "myProfile": "Προφίλ",
+    "myAddresses": "Διευθύνσεις",
+    "privacyPolicy": "Πολιτική Απορρήτου",
+    "termsOfService": "Όροι Χρήσης"
   },
   "Wishlist": {
     "wishlist": "Λίστα Επιθυμιών",

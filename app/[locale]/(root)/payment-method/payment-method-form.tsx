@@ -6,17 +6,21 @@ import { useTransition } from "react";
 import { paymentMethodSchema, createPaymentMethodSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form, FormControl, FormItem, FormField, FormLabel } from "@/components/ui/form";
-import { Loader2 } from "lucide-react";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { Loader2, ArrowRight, CreditCard, Wallet, Banknote, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PAYMENT_METHODS } from "@/lib/constants";
 import { updateUserPaymentMethod } from "@/lib/actions/user.actions";
 import { useTranslations } from "next-intl";
-
+import { cn } from "@/lib/utils";
 
 const DEFAULT_PAYMENT_METHOD = "card";
+
+const paymentIcons: Record<string, typeof CreditCard> = {
+  Stripe: CreditCard,
+  PayPal: Wallet,
+  CashOnDelivery: Banknote,
+};
 
 export default function PaymentMethodForm({
   preferredPaymentMethod,
@@ -27,7 +31,6 @@ export default function PaymentMethodForm({
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const t = useTranslations("Checkout");
-  const tCommon = useTranslations("Common");
   const tV = useTranslations("Validation");
 
   const form = useForm<z.infer<typeof paymentMethodSchema>>({
@@ -53,63 +56,80 @@ export default function PaymentMethodForm({
   };
 
   return (
-    <>
-      <div className="max-w-md mx-auto space-y-4">
-        <h1 className="h2-bold mt-4">{t("paymentMethod")}</h1>
-        <p className="text-sm text-muted-foreground">
+    <div className="wrapper-narrow">
+      <div className="card-premium p-6 md:p-8 max-w-2xl mx-auto">
+        <h1 className="h2-bold mb-2">{t("paymentMethod")}</h1>
+        <p className="text-sm text-muted-foreground mb-6">
           {t("paymentMethodDescription")}
         </p>
         <Form {...form}>
           <form
             method="post"
-            className="space-y-4"
+            className="space-y-6"
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            <div className=" flex flex-col md:flex-row gap-5">
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="grid gap-3">
+                      {PAYMENT_METHODS.map((paymentMethod) => {
+                        const Icon = paymentIcons[paymentMethod] || CreditCard;
+                        const isSelected = field.value === paymentMethod;
 
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormItem>
-                          <FormControl>
-                            <RadioGroup onValueChange={field.onChange} className="flex flex-col space-y-2">
-                              {PAYMENT_METHODS.map((paymentMethod) => (
-                                <FormItem key={paymentMethod} className="flex items-center space-x-3 space-y-0">
-                                  <FormControl>
-                                    <RadioGroupItem value={paymentMethod} checked={field.value === paymentMethod} />
-                                  </FormControl>
-                                  <FormLabel className="font-normal">{paymentMethod}</FormLabel>
-                                </FormItem>
-                              ))}
-                            </RadioGroup>
-                          </FormControl>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className=" flex  gap-2">
-              <Button type="submit" disabled={isPending}>
+                        return (
+                          <button
+                            type="button"
+                            key={paymentMethod}
+                            onClick={() => field.onChange(paymentMethod)}
+                            className={cn(
+                              "relative flex items-center gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left",
+                              isSelected
+                                ? "border-brand-orange bg-brand-orange/5 shadow-card-glow"
+                                : "border-border hover:border-muted-foreground/30 hover:bg-muted/30"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-12 h-12 rounded-xl flex items-center justify-center",
+                              isSelected ? "bg-brand-orange/10 text-brand-orange" : "bg-muted text-muted-foreground"
+                            )}>
+                              <Icon className="w-6 h-6" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-semibold">{paymentMethod}</p>
+                            </div>
+                            {isSelected && (
+                              <div className="w-6 h-6 rounded-full bg-brand-orange text-white flex items-center justify-center">
+                                <Check className="w-4 h-4" strokeWidth={3} />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <div className="pt-2">
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="w-full h-12 rounded-xl bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold text-base"
+              >
                 {isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
                 ) : (
-                  <ArrowRight className="w-4 h-4" />
-                )}{" "}
-                {tCommon("continue")}
+                  <ArrowRight className="w-5 h-5 mr-2" />
+                )}
+                {t("continueToReview")}
               </Button>
             </div>
           </form>
         </Form>
       </div>
-    </>
+    </div>
   );
 }

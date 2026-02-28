@@ -40,9 +40,19 @@ export default function ReviewList({
     setReviews([...res.data]);
   };
 
+  // Calculate rating distribution
+  const ratingCounts = [5, 4, 3, 2, 1].map((star) => ({
+    star,
+    count: reviews.filter((r) => r.rating === star).length,
+  }));
+  const totalReviews = reviews.length;
+  const avgRating = totalReviews > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+    : 0;
+
   return (
-    <div className="space-y-4">
-      {reviews.length === 0 && <div>{t("noReviews")}</div>}
+    <div className="space-y-6">
+      {/* Review form or sign-in prompt */}
       {userId ? (
         <ReviewForm
           userId={userId}
@@ -50,11 +60,11 @@ export default function ReviewList({
           onReviewSubmitted={reload}
         />
       ) : (
-        <div>
+        <div className="text-sm text-muted-foreground p-4 rounded-xl bg-muted/50 border border-border/50">
           {t.rich("signInToReview", {
             signInLink: (chunks) => (
               <Link
-                className="text-blue-700 "
+                className="text-brand-orange font-medium hover:underline"
                 href={`/sign-in?callbackUrl=/product/${productSlug}`}
               >
                 {chunks}
@@ -63,26 +73,69 @@ export default function ReviewList({
           })}
         </div>
       )}
-      <div className="flex flex-col gap-3">
-        {reviews.map((review) => (
-          <Card key={review.id}>
-            <CardHeader>
-              <div className="flex-between">
-                <CardTitle>{review.title}</CardTitle>
-              </div>
-              <CardDescription>{review.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex space-x-4 text-sm text-muted-foreground">
-                <Rating value={review.rating} />
-                <div className="flex items-center">
-                  <User className="mr-1 h-3 w-3"/>
-                  {review.user ? review.user.name : tCommon("deletedUser")}
+
+      {/* Rating summary bar */}
+      {totalReviews > 0 && (
+        <div className="flex flex-col sm:flex-row gap-8 p-6 rounded-2xl bg-muted/30 border border-border/50">
+          {/* Average rating */}
+          <div className="flex flex-col items-center justify-center gap-1 min-w-[120px]">
+            <span className="text-4xl font-black">{avgRating.toFixed(1)}</span>
+            <Rating value={avgRating} />
+            <span className="text-xs text-muted-foreground mt-1">
+              {t("numReviews", { count: totalReviews })}
+            </span>
+          </div>
+
+          {/* Distribution bars */}
+          <div className="flex-1 space-y-2">
+            {ratingCounts.map(({ star, count }) => (
+              <div key={star} className="flex items-center gap-3">
+                <span className="text-xs font-medium w-4 text-right">{star}</span>
+                <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-yellow-400 transition-all duration-500"
+                    style={{ width: totalReviews > 0 ? `${(count / totalReviews) * 100}%` : "0%" }}
+                  />
                 </div>
-                <div className="flex items-center">
-                  <Calendar className="mr-1 h-3 w-3"/>
+                <span className="text-xs text-muted-foreground w-6">{count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Review list */}
+      {reviews.length === 0 && (
+        <p className="text-sm text-muted-foreground">{t("noReviews")}</p>
+      )}
+      <div className="flex flex-col gap-4">
+        {reviews.map((review) => (
+          <Card key={review.id} className="border-border/50 rounded-xl shadow-none">
+            <CardHeader className="pb-2">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <CardTitle className="text-base">{review.title}</CardTitle>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Rating value={review.rating} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Calendar className="w-3 h-3" />
                   {formatDateTime(review.createdAt).dateTime}
                 </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-sm leading-relaxed mb-3">
+                {review.description}
+              </CardDescription>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
+                  <User className="w-3 h-3" />
+                </div>
+                <span className="font-medium">
+                  {review.user ? review.user.name : tCommon("deletedUser")}
+                </span>
               </div>
             </CardContent>
           </Card>

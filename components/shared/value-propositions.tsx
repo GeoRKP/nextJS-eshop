@@ -8,25 +8,28 @@ export default async function ValuePropositions() {
   const t = await getTranslations("ValueProps");
 
   return (
-    <div className="border-y py-8 my-8">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        {keys.map((key, i) => {
-          const Icon = icons[i];
-          return (
-            <div key={key} className="flex items-center gap-3">
-              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Icon className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-sm">{t(key)}</p>
-                <p className="text-xs text-muted-foreground">
+    <section className="bg-primary text-primary-foreground">
+      <div className="wrapper">
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-primary-foreground/10">
+          {keys.map((key, i) => {
+            const Icon = icons[i];
+            return (
+              <div
+                key={key}
+                className="flex flex-col items-center text-center py-6 px-3 hover:bg-white/5 transition-colors"
+              >
+                <Icon className="h-8 w-8 text-brand-orange mb-3" />
+                <p className="font-bold text-sm uppercase tracking-wide">
+                  {t(key)}
+                </p>
+                <p className="text-xs text-primary-foreground/60 mt-1">
                   {t(`${key}Desc`)}
                 </p>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

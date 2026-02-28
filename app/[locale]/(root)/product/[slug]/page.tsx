@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import ProductPrice from "@/components/shared/product/product-price";
 import { getProductBySlug } from "@/lib/actions/product.actions";
 import { notFound } from "next/navigation";
@@ -16,6 +15,7 @@ import ScrollFadeIn from "@/components/shared/scroll-fade-in";
 import RelatedProducts from "@/components/shared/product/related-products";
 import WishlistButton from "@/components/shared/product/wishlist-button";
 import { isInWishlist } from "@/lib/actions/wishlist.actions";
+import { CheckCircle2, AlertTriangle, XCircle, Truck, Shield, RotateCcw } from "lucide-react";
 
 export default async function ProductDetailsPage(props: {
   params: Promise<{ slug: string }>;
@@ -33,6 +33,9 @@ export default async function ProductDetailsPage(props: {
   const inWishlist = await isInWishlist(product.id);
 
   const t = await getTranslations("Product");
+  const tv = await getTranslations("ValueProps");
+
+  const isLongDescription = product.description && product.description.length > 200;
 
   return (
     <div className="wrapper">
@@ -44,80 +47,124 @@ export default async function ProductDetailsPage(props: {
       />
       <ScrollFadeIn>
         <section>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-            {/* Image Column */}
-            <div className="md:col-span-2 ">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+            {/* Image Column - Sticky */}
+            <div className="lg:sticky lg:top-24 lg:self-start">
               <ProductImages images={product.images} />
             </div>
-            {/* Details Column */}
-            <div className="col-span-2 p-5">
-              <div className="flex flex-col gap-6">
-                <p>
-                  {product.brand} {product.category}
-                </p>
-                <div className="flex items-center gap-2">
-                  <h1 className="h3-bold">{product.name}</h1>
+
+            {/* Product Info Column */}
+            <div className="flex flex-col gap-6">
+              {/* Brand label */}
+              <div className="text-label text-brand-orange">
+                {product.brand}
+              </div>
+
+              {/* Product name + wishlist */}
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">
+                  {product.name}
+                </h1>
+                <div className="flex-shrink-0 mt-1">
                   <WishlistButton productId={product.id} isInWishlist={inWishlist} />
                 </div>
+              </div>
+
+              {/* Rating */}
+              <div className="flex items-center gap-3">
                 <Rating value={Number(product.rating)} />
-                <p>{t("numReviews", { count: product.numReviews })}</p>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <ProductPrice
-                    value={Number(product.price)}
-                    className="w-24 rounded-full bg-green-100 text-green-700 px-5 py-2"
-                  />
-                </div>
+                <a href="#reviews" className="text-sm text-muted-foreground hover:text-brand-orange transition-colors">
+                  {t("numReviews", { count: product.numReviews })}
+                </a>
               </div>
-              <div className="mt-10">
-                <p className="font-semibold">{t("description")}</p>
-                <p>{product.description}</p>
+
+              {/* Price section */}
+              <div className="flex items-baseline gap-3">
+                <ProductPrice
+                  value={Number(product.price)}
+                  className="text-3xl font-black"
+                />
               </div>
-            </div>
-            {/* Actions Column */}
-            <div>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="mb-2 flex justify-between">
-                    <div>{t("price")}</div>
-                    <div>
-                      <ProductPrice value={Number(product.price)} />
-                    </div>
+
+              {/* Stock status */}
+              <div>
+                {product.stock > 5 ? (
+                  <Badge variant="outline" className="gap-1.5 text-green-600 border-green-200 bg-green-50 dark:bg-green-950/30 dark:border-green-800 py-1 px-3">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    {t("inStock")}
+                  </Badge>
+                ) : product.stock > 0 ? (
+                  <Badge variant="outline" className="gap-1.5 text-orange-600 border-orange-200 bg-orange-50 dark:bg-orange-950/30 dark:border-orange-800 py-1 px-3">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {t("lowStock", { count: product.stock })}
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="gap-1.5 text-destructive border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-800 py-1 px-3">
+                    <XCircle className="w-3.5 h-3.5" />
+                    {t("outOfStock")}
+                  </Badge>
+                )}
+              </div>
+
+              {/* Divider */}
+              <div className="divider-gradient" />
+
+              {/* Description */}
+              <div>
+                <p className="text-sm font-semibold mb-2">{t("description")}</p>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {isLongDescription ? product.description.slice(0, 200) + "..." : product.description}
+                </p>
+              </div>
+
+              {/* Divider */}
+              <div className="divider-gradient" />
+
+              {/* Add to Cart */}
+              {product.stock > 0 && (
+                <AddToCart
+                  cart={cart as Cart}
+                  item={{
+                    productId: product.id,
+                    name: product.name,
+                    price: product.price,
+                    slug: product.slug,
+                    qty: 1,
+                    image: product.images[0],
+                  }}
+                />
+              )}
+
+              {/* Trust signals */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { icon: Truck, label: tv("freeShipping"), desc: tv("freeShippingDesc") },
+                  { icon: Shield, label: tv("securePayment"), desc: tv("securePaymentDesc") },
+                  { icon: RotateCcw, label: tv("easyReturns"), desc: tv("easyReturnsDesc") },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex flex-col items-center text-center gap-1.5 p-3 rounded-xl bg-muted/50 border border-border/50"
+                  >
+                    <item.icon className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-[11px] font-medium leading-tight">{item.label}</span>
                   </div>
-                  <div className="mb-2 flex justify-between">
-                    <div>{t("status")}</div>
-                    {product.stock > 0 ? (
-                      <Badge variant="outline">{t("inStock")}</Badge>
-                    ) : (
-                      <Badge variant="destructive">{t("outOfStock")}</Badge>
-                    )}
-                  </div>
-                  {product.stock > 0 && (
-                    <div className="flex-center">
-                      <AddToCart
-                        cart={cart as Cart}
-                        item={{
-                          productId: product.id,
-                          name: product.name,
-                          price: product.price,
-                          slug: product.slug,
-                          qty: 1,
-                          image: product.images[0],
-                        }}
-                      />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                ))}
+              </div>
             </div>
           </div>
         </section>
       </ScrollFadeIn>
+
+      {/* Reviews Section */}
       <ScrollFadeIn>
-        <section className="mt-10">
-          <h2 className="h2-bold">{t("reviews")}</h2>
+        <section id="reviews" className="mt-16 scroll-mt-24">
+          <div className="divider-gradient mb-8" />
+          <h2 className="section-header">{t("reviews")}</h2>
           <ReviewList userId={userId || ""} productId={product.id} productSlug={product.slug} />
         </section>
       </ScrollFadeIn>
+
       <RelatedProducts category={product.category} excludeId={product.id} />
     </div>
   );

@@ -3,23 +3,13 @@ import { useRouter } from "@/i18n/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useTransition } from "react";
 import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart.actions";
-import { Loader, ArrowRight, Minus, Plus } from "lucide-react";
+import { Loader, ArrowRight, Minus, Plus, ShoppingCart, Lock, Shield, Trash2 } from "lucide-react";
 import { Cart, CartItem } from "@/types";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { formatCurrency } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
-import AnimatedButton from "@/components/shared/animated-button";
 import CouponInput from "@/components/shared/coupon-input";
 
 function QuantityControls({
@@ -34,13 +24,13 @@ function QuantityControls({
   onAdd: () => void;
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center border border-border rounded-xl overflow-hidden">
       <Button
         disabled={isPending}
-        variant="outline"
+        variant="ghost"
         size="icon"
         type="button"
-        className="w-8 h-8"
+        className="w-9 h-9 rounded-none"
         onClick={onRemove}
       >
         {isPending ? (
@@ -49,13 +39,13 @@ function QuantityControls({
           <Minus className="w-4 h-4" />
         )}
       </Button>
-      <span className="w-6 text-center font-medium">{item.qty}</span>
+      <span className="w-10 text-center font-semibold">{item.qty}</span>
       <Button
         disabled={isPending}
-        variant="outline"
+        variant="ghost"
         size="icon"
         type="button"
-        className="w-8 h-8"
+        className="w-9 h-9 rounded-none"
         onClick={onAdd}
       >
         {isPending ? (
@@ -93,139 +83,153 @@ export default function CartTable({ cart }: { cart?: Cart }) {
     });
   };
 
+  const itemCount = cart ? cart.items.reduce((a, c) => a + c.qty, 0) : 0;
+
   return (
     <>
-      <h1 className="py-4 h2-bold">{t("shoppingCart")}</h1>
+      {/* Page header */}
+      <div className="flex items-center gap-3 py-6">
+        <ShoppingCart className="w-7 h-7" />
+        <h1 className="h2-bold">{t("shoppingCart")}</h1>
+        {cart && cart.items.length > 0 && (
+          <span className="bg-brand-orange text-white text-sm font-bold px-2.5 py-0.5 rounded-full">
+            {itemCount}
+          </span>
+        )}
+      </div>
+
       {!cart || cart.items.length === 0 ? (
-        <div>
-          {t("cartEmpty")} <Link href="/">{tc("goShopping")}</Link>
+        <div className="flex flex-col items-center justify-center py-20 gap-6">
+          <div className="w-24 h-24 rounded-full bg-muted/50 flex items-center justify-center">
+            <ShoppingCart className="w-12 h-12 text-muted-foreground/50" />
+          </div>
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-2">{t("cartEmpty")}</h2>
+            <p className="text-muted-foreground text-sm mb-6">
+              {t("cartEmptyDesc")}
+            </p>
+            <Button asChild className="bg-brand-orange hover:bg-brand-orange-dark text-white rounded-xl px-8">
+              <Link href="/">{tc("goShopping")}</Link>
+            </Button>
+          </div>
         </div>
       ) : (
-        <div className="grid md:grid-cols-4 md:gap-5">
-          <div className="md:col-span-3">
-            {/* Desktop table */}
-            <div className="hidden md:block overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-left">{t("item")}</TableHead>
-                    <TableHead className="text-center">{t("quantity")}</TableHead>
-                    <TableHead className="text-right">{t("price")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {cart.items.map((item) => (
-                    <TableRow key={item.slug}>
-                      <TableCell>
-                        <Link
-                          href={`/product/${item.slug}`}
-                          className="flex items-center"
-                        >
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            width={50}
-                            height={50}
-                          />
-                          <span className="px-2">{item.name}</span>
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex justify-center">
-                          <QuantityControls
-                            item={item}
-                            isPending={isPending}
-                            onRemove={() => handleRemove(item.productId)}
-                            onAdd={() => handleAdd(item)}
-                          />
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatCurrency(item.price)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Mobile card list */}
-            <div className="md:hidden space-y-3">
-              {cart.items.map((item) => (
-                <Card key={item.slug}>
-                  <CardContent className="p-4">
-                    <div className="flex gap-4">
-                      <Link href={`/product/${item.slug}`} className="shrink-0">
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          width={80}
-                          height={80}
-                          className="rounded-md object-cover"
-                        />
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Cart items */}
+          <div className="lg:col-span-2 space-y-4">
+            {cart.items.map((item) => (
+              <div
+                key={item.slug}
+                className="card-premium p-4 flex gap-4 group/item"
+              >
+                <Link href={`/product/${item.slug}`} className="flex-shrink-0">
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-muted/30">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      width={96}
+                      height={96}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                </Link>
+                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <Link href={`/product/${item.slug}`}>
+                        <h3 className="font-semibold text-sm md:text-base line-clamp-2 hover:text-brand-orange transition-colors">
+                          {item.name}
+                        </h3>
                       </Link>
-                      <div className="flex-1 min-w-0">
-                        <Link href={`/product/${item.slug}`}>
-                          <h3 className="font-medium text-sm line-clamp-2">
-                            {item.name}
-                          </h3>
-                        </Link>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {formatCurrency(item.price)}
-                        </p>
-                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        {formatCurrency(item.price)} {t("each")}
+                      </p>
                     </div>
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t">
-                      <QuantityControls
-                        item={item}
-                        isPending={isPending}
-                        onRemove={() => handleRemove(item.productId)}
-                        onAdd={() => handleAdd(item)}
-                      />
-                      <span className="font-semibold text-sm">
-                        {formatCurrency(Number(item.price) * item.qty)}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    <button
+                      onClick={() => handleRemove(item.productId)}
+                      className="text-muted-foreground/50 hover:text-destructive transition-colors p-1"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between mt-3">
+                    <QuantityControls
+                      item={item}
+                      isPending={isPending}
+                      onRemove={() => handleRemove(item.productId)}
+                      onAdd={() => handleAdd(item)}
+                    />
+                    <span className="font-bold text-lg">
+                      {formatCurrency(Number(item.price) * item.qty)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
-          <Card>
-            <CardContent className="p-4 gap-4 space-y-3">
-              <div className="pb-3 text-xl">
-                {t("subtotal", { count: cart.items.reduce((a, c) => a + c.qty, 0) })} :
-                <span className="font-bold">
-                  {formatCurrency(cart.itemsPrice)}
-                </span>
-              </div>
-              {Number(cart.discountAmount) > 0 && (
-                <div className="flex justify-between text-sm text-green-600">
-                  <span>{t("discount")}</span>
-                  <span>-{formatCurrency(cart.discountAmount)}</span>
+          {/* Order summary sidebar */}
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <div className="card-premium p-6 space-y-5">
+              <h2 className="font-bold text-lg">{t("orderSummary")}</h2>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {t("subtotal", { count: itemCount })}
+                  </span>
+                  <span className="font-semibold">{formatCurrency(cart.itemsPrice)}</span>
                 </div>
-              )}
+                {Number(cart.discountAmount) > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>{t("discount")}</span>
+                    <span>-{formatCurrency(cart.discountAmount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t("estimatedShipping")}</span>
+                  <span className="text-green-600 font-medium">{t("free")}</span>
+                </div>
+              </div>
+
               <CouponInput appliedCode={cart.couponCode} />
-              <AnimatedButton>
-                <Button
-                  className="w-full"
-                  disabled={isPending}
-                  onClick={() => {
-                    startTransition(async () => {
-                      router.push("/shipping-address");
-                    });
-                  }}
-                >
-                  {isPending ? (
-                    <Loader className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <ArrowRight className="w-4 h-4" />
-                  )} {t("proceedToCheckout")}
-                </Button>
-              </AnimatedButton>
-            </CardContent>
-          </Card>
+
+              <div className="divider-gradient" />
+
+              <div className="flex justify-between items-baseline">
+                <span className="font-semibold">{t("estimatedTotal")}</span>
+                <span className="text-2xl font-black">{formatCurrency(cart.itemsPrice)}</span>
+              </div>
+
+              <Button
+                className="w-full h-12 rounded-xl bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold text-base"
+                disabled={isPending}
+                onClick={() => {
+                  startTransition(async () => {
+                    router.push("/shipping-address");
+                  });
+                }}
+              >
+                {isPending ? (
+                  <Loader className="w-5 h-5 animate-spin mr-2" />
+                ) : (
+                  <ArrowRight className="w-5 h-5 mr-2" />
+                )} {t("proceedToCheckout")}
+              </Button>
+
+              {/* Trust badges */}
+              <div className="flex items-center justify-center gap-4 pt-2">
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>{t("secureCheckout")}</span>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>{t("buyerProtection")}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </>

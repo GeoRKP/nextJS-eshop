@@ -10,10 +10,14 @@ export default async function ViewAllProductsButton() {
   return (
     <div className="flex justify-center items-center my-8">
       <AnimatedButton>
-        <Button size="lg" className="px-8 py-4 text-lg font-semibold gap-2" asChild>
+        <Button
+          size="lg"
+          className="px-10 py-5 text-lg font-bold gap-2 bg-brand-orange hover:bg-brand-orange-dark text-white uppercase tracking-wide rounded-md hover:translate-y-[-2px] hover:shadow-lg transition-all border-0 group"
+          asChild
+        >
           <Link href="/search">
             {t("viewAllProducts")}
-            <ArrowRight className="h-5 w-5" />
+            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </Button>
       </AnimatedButton>

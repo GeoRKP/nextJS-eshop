@@ -70,7 +70,13 @@
     "confirmPassword": "Confirm Password",
     "name": "Name",
     "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?"
+    "hasAccount": "Already have an account?",
+    "welcomeBack": "Welcome Back",
+    "authTagline": "Premium truck parts and accessories for professionals. Quality you can trust.",
+    "statParts": "10,000+ Parts",
+    "statShipping": "Free Shipping",
+    "statWarranty": "2-Year Warranty",
+    "statRating": "4.8/5 Rating"
   },
   "Product": {
     "featuredProducts": "Featured Products",
@@ -80,9 +86,10 @@
     "status": "Status",
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
+    "lowStock": "Only {count} left",
     "addToCart": "Add to Cart",
     "goToCart": "Go to cart",
-    "reviews": "Reviews",
+    "reviews": "Customer Reviews",
     "noReviews": "No reviews yet",
     "addReview": "Add a review",
     "shareThoughts": "Share your thoughts with other customers",
@@ -97,14 +104,18 @@
     "numReviews": "{count} reviews",
     "products": "Products",
     "categories": "Categories",
-    "relatedProducts": "Related Products"
+    "relatedProducts": "Related Products",
+    "readMore": "Read More",
+    "readLess": "Read Less"
   },
   "Cart": {
     "shoppingCart": "Shopping Cart",
-    "cartEmpty": "Cart is empty.",
+    "cartEmpty": "Your cart is empty",
+    "cartEmptyDesc": "Looks like you haven't added anything to your cart yet.",
     "item": "Item",
     "quantity": "Quantity",
     "price": "Price",
+    "each": "each",
     "subtotal": "Subtotal ({count})",
     "proceedToCheckout": "Proceed to Checkout",
     "couponCode": "Coupon Code",
@@ -112,13 +123,20 @@
     "applyCoupon": "Apply",
     "removeCoupon": "Remove",
     "discount": "Discount",
-    "couponApplied": "Coupon \"{code}\" applied"
+    "couponApplied": "Coupon \"{code}\" applied",
+    "orderSummary": "Order Summary",
+    "estimatedShipping": "Shipping",
+    "free": "Free",
+    "estimatedTotal": "Estimated Total",
+    "secureCheckout": "Secure Checkout",
+    "buyerProtection": "Buyer Protection"
   },
   "Checkout": {
     "userLogin": "User Login",
     "shippingAddress": "Shipping Address",
     "paymentMethod": "Payment Method",
     "placeOrder": "Place Order",
+    "reviewOrder": "Review Your Order",
     "shippingAddressDescription": "Please enter your shipping address below.",
     "paymentMethodDescription": "Please select a payment method.",
     "fullName": "Full Name",
@@ -130,7 +148,12 @@
     "enterAddress": "Enter street address",
     "enterCity": "Enter city",
     "enterPostalCode": "Enter postal code",
-    "enterCountry": "Enter country"
+    "enterCountry": "Enter country",
+    "continueToPayment": "Continue to Payment",
+    "continueToReview": "Continue to Review",
+    "payWithCard": "Pay securely with credit or debit card",
+    "payWithPaypal": "Pay with your PayPal account",
+    "payOnDelivery": "Pay when your order arrives"
   },
   "Order": {
     "orderDetails": "Order {id}",
@@ -172,7 +195,9 @@
     "statusCancelled": "Cancelled",
     "statusRefundRequested": "Refund Requested",
     "statusRefunded": "Refunded",
-    "statusTimeline": "Order Timeline"
+    "statusTimeline": "Order Timeline",
+    "orderSummary": "Order Summary",
+    "noOrders": "You haven't placed any orders yet."
   },
   "Search": {
     "department": "Department",
@@ -199,7 +224,19 @@
     "priceRange4": "$151 to $200",
     "priceRange5": "$201 to $500",
     "priceRange6": "$501 to $1000",
-    "priceRange7": "$1001 to $2000"
+    "priceRange7": "$1001 to $2000",
+    "searchPlaceholder": "Search parts, brands, or part numbers...",
+    "filters": "Filters",
+    "clearFilters": "Clear Filters",
+    "priceRange": "Price Range",
+    "applyPrice": "Apply",
+    "minPrice": "Min",
+    "maxPrice": "Max",
+    "resultsFor": "Results for",
+    "browsing": "Browsing",
+    "allProducts": "All Products",
+    "showingResults": "Showing {count} products (page {page} of {totalPages})",
+    "productsFound": "products found"
   },
   "AdminDashboard": {
     "dashboard": "Dashboard",
@@ -467,11 +504,58 @@
   "CategoryDrawer": {
     "selectCategory": "Select the category"
   },
+  "Announcement": {
+    "freeShipping": "Free shipping on orders over $50",
+    "newArrivals": "New truck parts arriving weekly",
+    "returns": "Hassle-free 30-day returns on all orders"
+  },
+  "UtilityBar": {
+    "helpCenter": "Help Center",
+    "orderTracking": "Track Your Order",
+    "proAccount": "Pro Account"
+  },
+  "MegaMenu": {
+    "viewAll": "View All",
+    "featured": "Featured",
+    "allCategories": "All Categories",
+    "deals": "Deals",
+    "newArrivals": "New Arrivals",
+    "shopByBrand": "Shop by Brand",
+    "popularBrands": "Popular Brands",
+    "allBrands": "All Brands",
+    "viewAllIn": "View All in {category}",
+    "products": "{count} products",
+    "subcategories": "{count} subcategories"
+  },
+  "MobileNav": {
+    "home": "Home",
+    "categories": "Categories",
+    "search": "Search",
+    "cart": "Cart",
+    "account": "Account",
+    "signIn": "Sign In",
+    "quickLinks": "Quick Links",
+    "myOrders": "My Orders",
+    "wishlist": "Wishlist",
+    "closeMenu": "Close menu",
+    "brands": "Brands",
+    "popularBrands": "Popular Brands"
+  },
+  "HomePage": {
+    "trendingProducts": "Trending Products",
+    "shopByCategory": "Shop by Category",
+    "latestProducts": "Latest Products",
+    "promoTitle": "Premium Parts. Unbeatable Prices.",
+    "promoSubtitle": "Upgrade your truck with top-quality parts at limited-time deals.",
+    "shopDeals": "Shop Deals Now",
+    "shopByBrand": "Shop by Brand",
+    "viewAll": "View All"
+  },
   "Hero": {
-    "tagline": "Discover Your Style",
-    "subtitle": "Shop the latest trends with premium quality products at unbeatable prices.",
+    "tagline": "Built For The Road Ahead",
+    "subtitle": "Premium truck parts and accessories. Expert quality. Guaranteed fit.",
     "shopNow": "Shop Now",
-    "browseCollection": "Browse Collection"
+    "browseCollection": "View Details"
   },
   "ValueProps": {
     "freeShipping": "Free Shipping",
@@ -481,7 +565,7 @@
     "easyReturns": "Easy Returns",
     "easyReturnsDesc": "30-day return policy",
     "support": "24/7 Support",
-    "supportDesc": "Dedicated customer service"
+    "supportDesc": "Expert help always available"
   },
   "Categories": {
     "shopByCategory": "Shop by Category",
@@ -513,7 +597,14 @@
     "emailPlaceholder": "Enter your email",
     "subscribe": "Subscribe",
     "followUs": "Follow Us",
-    "paymentMethods": "Payment Methods"
+    "paymentMethods": "Payment Methods",
+    "myAccount": "My Account",
+    "myOrders": "My Orders",
+    "myWishlist": "Wishlist",
+    "myProfile": "Profile",
+    "myAddresses": "Addresses",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
   },
   "Wishlist": {
     "wishlist": "Wishlist",

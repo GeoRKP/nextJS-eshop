@@ -30,7 +30,6 @@ export default function ShippingAddressForm({
   const router = useRouter();
   const { toast } = useToast();
   const t = useTranslations("Checkout");
-  const tCommon = useTranslations("Common");
   const tV = useTranslations("Validation");
 
   const form = useForm<ShippingAddress>({
@@ -57,61 +56,57 @@ export default function ShippingAddressForm({
   };
 
   return (
-    <>
-      <div className="max-w-md mx-auto space-y-4">
-        <h1 className="h2-bold mt-4">{t("shippingAddress")}</h1>
-        <p className="text-sm text-muted-foreground">
+    <div className="wrapper-narrow">
+      <div className="card-premium p-6 md:p-8 max-w-2xl mx-auto">
+        <h1 className="h2-bold mb-2">{t("shippingAddress")}</h1>
+        <p className="text-sm text-muted-foreground mb-6">
           {t("shippingAddressDescription")}
         </p>
         <Form {...form}>
           <form
             method="post"
-            className="space-y-4"
+            className="space-y-5"
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            <div className="flex flex-col md:flex-row gap-5">
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field, fieldState }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>{t("fullName")}</FormLabel>
-                    <FormControl>
-                      <FormInput
-                        icon={User}
-                        placeholder={t("enterFullName")}
-                        error={fieldState.error?.message}
-                        isValid={fieldState.isDirty && !fieldState.error}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex flex-col md:flex-row gap-5">
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field, fieldState }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>{t("address")}</FormLabel>
-                    <FormControl>
-                      <FormInput
-                        icon={MapPin}
-                        placeholder={t("enterAddress")}
-                        error={fieldState.error?.message}
-                        isValid={fieldState.isDirty && !fieldState.error}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex flex-col md:flex-row gap-5">
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field, fieldState }) => (
+                <FormItem className="w-full">
+                  <FormLabel>{t("fullName")}</FormLabel>
+                  <FormControl>
+                    <FormInput
+                      icon={User}
+                      placeholder={t("enterFullName")}
+                      error={fieldState.error?.message}
+                      isValid={fieldState.isDirty && !fieldState.error}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field, fieldState }) => (
+                <FormItem className="w-full">
+                  <FormLabel>{t("address")}</FormLabel>
+                  <FormControl>
+                    <FormInput
+                      icon={MapPin}
+                      placeholder={t("enterAddress")}
+                      error={fieldState.error?.message}
+                      isValid={fieldState.isDirty && !fieldState.error}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
                 control={form.control}
                 name="city"
@@ -131,8 +126,6 @@ export default function ShippingAddressForm({
                   </FormItem>
                 )}
               />
-            </div>
-            <div className="flex flex-col md:flex-row gap-5">
               <FormField
                 control={form.control}
                 name="postalCode"
@@ -153,40 +146,42 @@ export default function ShippingAddressForm({
                 )}
               />
             </div>
-            <div className="flex flex-col md:flex-row gap-5">
-              <FormField
-                control={form.control}
-                name="country"
-                render={({ field, fieldState }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>{t("country")}</FormLabel>
-                    <FormControl>
-                      <FormInput
-                        icon={Globe}
-                        placeholder={t("enterCountry")}
-                        error={fieldState.error?.message}
-                        isValid={fieldState.isDirty && !fieldState.error}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button type="submit" disabled={isPending}>
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field, fieldState }) => (
+                <FormItem className="w-full">
+                  <FormLabel>{t("country")}</FormLabel>
+                  <FormControl>
+                    <FormInput
+                      icon={Globe}
+                      placeholder={t("enterCountry")}
+                      error={fieldState.error?.message}
+                      isValid={fieldState.isDirty && !fieldState.error}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="pt-2">
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="w-full h-12 rounded-xl bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold text-base"
+              >
                 {isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
                 ) : (
-                  <ArrowRight className="w-4 h-4" />
-                )}{" "}
-                {tCommon("continue")}
+                  <ArrowRight className="w-5 h-5 mr-2" />
+                )}
+                {t("continueToPayment")}
               </Button>
             </div>
           </form>
         </Form>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,9 +1,8 @@
-import { getAllCategories } from "@/lib/actions/product.actions";
+import { getTranslations } from "next-intl/server";
 import SearchAutocomplete from "./search-autocomplete";
 
 export default async function SearchWrapper() {
-  const categories = await getAllCategories();
-  const categoryNames = categories.map((c) => c.category);
+  const t = await getTranslations("Search");
 
-  return <SearchAutocomplete categories={categoryNames} />;
+  return <SearchAutocomplete placeholder={t("searchPlaceholder")} />;
 }

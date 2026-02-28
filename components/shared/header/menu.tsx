@@ -1,52 +1,52 @@
-import { EllipsisVertical, ShoppingCart } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import ModeToggle from "./mode-toggle";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import UserButton from "./user-button";
-import LanguageSwitcher from "./language-switcher";
-import { getTranslations } from "next-intl/server";
+import { getMyCart } from "@/lib/actions/cart.actions";
 
 export default async function Menu() {
-  const t = await getTranslations("Nav");
+  let cartItemCount = 0;
+  try {
+    const cart = await getMyCart();
+    cartItemCount = cart?.items?.reduce((acc: number, item: { qty: number }) => acc + item.qty, 0) ?? 0;
+  } catch {
+    // Cart not available
+  }
 
   return (
-    <div className="flex justify-end gap-3">
-      <nav className="hidden md:flex w-full max-w-xs gap-1">
-        <ModeToggle />
-        <LanguageSwitcher />
-        <Button asChild variant="ghost">
+    <div className="flex items-center gap-2">
+      {/* Desktop nav */}
+      <nav className="hidden md:flex items-center gap-1">
+        <Button asChild variant="ghost" size="icon">
+          <Link href="/user/wishlist">
+            <Heart className="h-5 w-5" />
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="icon" className="relative">
           <Link href="/cart">
-            <ShoppingCart />
-            {t("cart")}
+            <ShoppingCart className="h-5 w-5" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-brand-orange text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                {cartItemCount > 9 ? "9+" : cartItemCount}
+              </span>
+            )}
           </Link>
         </Button>
         <UserButton />
       </nav>
-      <nav className="md:hidden">
-        <Sheet>
-          <SheetTrigger className="align-middle">
-            <EllipsisVertical />
-          </SheetTrigger>
-          <SheetContent className="flex flex-col items-start">
-            <SheetTitle>{t("menu")}</SheetTitle>
-            <ModeToggle />
-            <LanguageSwitcher />
-            <Button asChild variant="ghost">
-              <Link href="/cart">
-                <ShoppingCart /> {t("cart")}
-              </Link>
-            </Button>
-            <UserButton />
-            <SheetDescription></SheetDescription>
-          </SheetContent>
-        </Sheet>
+
+      {/* Mobile: only cart icon (rest in bottom nav + mobile menu) */}
+      <nav className="md:hidden flex items-center gap-1">
+        <Button asChild variant="ghost" size="icon" className="relative">
+          <Link href="/cart">
+            <ShoppingCart className="h-5 w-5" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-brand-orange text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                {cartItemCount > 9 ? "9+" : cartItemCount}
+              </span>
+            )}
+          </Link>
+        </Button>
       </nav>
     </div>
   );

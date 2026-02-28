@@ -1,6 +1,11 @@
 import Header from "@/components/shared/header";
 import Footer from "@/components/footer";
 import PageTransition from "@/components/shared/page-transition";
+import StickyHeaderWrapper from "@/components/shared/header/sticky-header-wrapper";
+import AnnouncementBar from "@/components/shared/header/announcement-bar";
+import UtilityBar from "@/components/shared/header/utility-bar";
+import MobileBottomNav from "@/components/shared/header/mobile-bottom-nav";
+import MobileCategoryChips from "@/components/shared/header/mobile-category-chips";
 
 export default function RootLayout({
   children,
@@ -8,12 +13,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex h-screen flex-col">
-      <Header />
-      <main className="flex-1">
+    <div className="flex min-h-screen flex-col">
+      <StickyHeaderWrapper
+        utilityBar={<UtilityBar />}
+        announcementBar={<AnnouncementBar />}
+      >
+        <Header />
+      </StickyHeaderWrapper>
+      <MobileCategoryChips />
+      <main className="flex-1 pb-16 md:pb-0">
         <PageTransition>{children}</PageTransition>
       </main>
       <Footer />
+      <MobileBottomNav />
     </div>
   );
 }

@@ -1,10 +1,3 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { APP_NAME } from "@/lib/constants";
@@ -32,27 +25,23 @@ export default async function SignUpPage(props: {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <Card>
-        <CardHeader className="space-y-4">
-          <Link href="/" className="flex-center">
-            <Image
-              src="/images/logo.svg"
-              width={100}
-              height={100}
-              alt={`${APP_NAME} logo`}
-              priority={true}
-            />
-          </Link>
-          <CardTitle className="text-center">{t("createAccount")}</CardTitle>
-          <CardDescription className="text-center">
-            {t("signUpDescription")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <SignUpForm />
-        </CardContent>
-      </Card>
+    <div className="w-full">
+      <div className="mb-8">
+        <Link href="/" className="inline-block lg:hidden mb-6">
+          <Image
+            src="/images/logo.svg"
+            width={64}
+            height={64}
+            alt={`${APP_NAME} logo`}
+            priority={true}
+          />
+        </Link>
+        <h1 className="text-2xl font-bold tracking-tight">{t("createAccount")}</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          {t("signUpDescription")}
+        </p>
+      </div>
+      <SignUpForm />
     </div>
   );
 }

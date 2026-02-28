@@ -1,10 +1,3 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { APP_NAME } from "@/lib/constants";
@@ -32,27 +25,23 @@ export default async function SignInPage(props: {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <Card>
-        <CardHeader className="space-y-4">
-          <Link href="/" className="flex-center">
-            <Image
-              src="/images/logo.svg"
-              width={100}
-              height={100}
-              alt={`${APP_NAME} logo`}
-              priority={true}
-            />
-          </Link>
-          <CardTitle className="text-center">{t("signIn")}</CardTitle>
-          <CardDescription className="text-center">
-            {t("signInDescription")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <CredentialsSignInForm />
-        </CardContent>
-      </Card>
+    <div className="w-full">
+      <div className="mb-8">
+        <Link href="/" className="inline-block lg:hidden mb-6">
+          <Image
+            src="/images/logo.svg"
+            width={64}
+            height={64}
+            alt={`${APP_NAME} logo`}
+            priority={true}
+          />
+        </Link>
+        <h1 className="text-2xl font-bold tracking-tight">{t("welcomeBack")}</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          {t("signInDescription")}
+        </p>
+      </div>
+      <CredentialsSignInForm />
     </div>
   );
 }

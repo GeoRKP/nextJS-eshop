@@ -2,8 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, User, MapPin, CreditCard, ShoppingBag } from "lucide-react";
 import { useTranslations } from "next-intl";
+
+const stepIcons = [User, MapPin, CreditCard, ShoppingBag];
 
 export default function CheckoutSteps({ current = 0 }: { current: number }) {
   const t = useTranslations("Checkout");
@@ -21,6 +23,7 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
         {steps.map((step, index) => {
           const isCompleted = index < current;
           const isCurrent = index === current;
+          const Icon = stepIcons[index];
 
           return (
             <div key={step} className="flex items-center flex-1 last:flex-none">
@@ -31,12 +34,12 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
                     "relative flex items-center justify-center rounded-full font-semibold text-sm",
                     "w-10 h-10 md:w-12 md:h-12",
                     isCompleted &&
-                      "bg-green-600 text-white",
+                      "bg-green-600 text-white shadow-md",
                     isCurrent &&
-                      "bg-primary text-primary-foreground ring-4 ring-primary/20",
+                      "bg-brand-orange text-white ring-4 ring-brand-orange/20 shadow-md",
                     !isCompleted &&
                       !isCurrent &&
-                      "bg-muted text-muted-foreground"
+                      "bg-muted text-muted-foreground border-2 border-border"
                   )}
                   animate={{
                     scale: isCurrent ? 1.1 : 1,
@@ -56,14 +59,14 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
                       <Check className="w-5 h-5 md:w-6 md:h-6" strokeWidth={3} />
                     </motion.div>
                   ) : (
-                    <span className="text-sm md:text-base">{index + 1}</span>
+                    <Icon className="w-4 h-4 md:w-5 md:h-5" />
                   )}
                 </motion.div>
                 <span
                   className={cn(
                     "hidden sm:block text-xs md:text-sm text-center whitespace-nowrap",
                     isCompleted && "text-green-600 font-medium",
-                    isCurrent && "text-primary font-semibold",
+                    isCurrent && "text-brand-orange font-semibold",
                     !isCompleted &&
                       !isCurrent &&
                       "text-muted-foreground"
@@ -75,12 +78,15 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
 
               {/* Connecting line */}
               {index < steps.length - 1 && (
-                <div className="flex-1 mx-2 md:mx-4 h-1 rounded-full bg-muted overflow-hidden self-start mt-5 md:mt-6">
+                <div className="flex-1 mx-2 md:mx-4 h-0.5 rounded-full bg-muted overflow-hidden self-start mt-5 md:mt-6">
                   <motion.div
-                    className="h-full rounded-full bg-green-600"
+                    className={cn(
+                      "h-full rounded-full",
+                      isCompleted ? "bg-green-600" : "bg-brand-orange"
+                    )}
                     initial={{ width: 0 }}
                     animate={{
-                      width: isCompleted ? "100%" : "0%",
+                      width: isCompleted ? "100%" : isCurrent ? "50%" : "0%",
                     }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
                   />

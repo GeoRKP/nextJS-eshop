@@ -8,10 +8,10 @@ import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
-export async function getLatestProducts() {
+export async function getLatestProducts(limit?: number) {
   const data = await prisma.product.findMany({
     where: { deletedAt: null },
-    take: LATEST_PRODUCTS_LIMIT,
+    take: limit ?? LATEST_PRODUCTS_LIMIT,
     orderBy: {
       createdAt: "desc",
     },
@@ -304,6 +304,20 @@ export async function getDidYouMean(query: string): Promise<string[]> {
   `;
 
   return results.map((r) => r.name);
+}
+
+// Get product price range (min/max) for slider filter
+export async function getProductPriceRange(): Promise<{ min: number; max: number }> {
+  const result = await prisma.$queryRaw<[{ min: string; max: string }]>`
+    SELECT MIN(price)::text AS min, MAX(price)::text AS max
+    FROM "Product"
+    WHERE "deletedAt" IS NULL
+  `;
+
+  return {
+    min: Math.floor(Number(result[0]?.min ?? 0)),
+    max: Math.ceil(Number(result[0]?.max ?? 2000)),
+  };
 }
 
 // Get related products by category
