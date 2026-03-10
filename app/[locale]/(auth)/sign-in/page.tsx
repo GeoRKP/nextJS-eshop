@@ -29,7 +29,7 @@ export default async function SignInPage(props: {
       <div className="mb-8">
         <Link href="/" className="inline-block lg:hidden mb-6">
           <Image
-            src="/images/logo.svg"
+            src="/images/logo.png"
             width={64}
             height={64}
             alt={`${APP_NAME} logo`}

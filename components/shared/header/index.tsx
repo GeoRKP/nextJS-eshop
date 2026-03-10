@@ -16,7 +16,7 @@ const Header = () => {
           <MobileMenuWrapper />
           <Link href="/" className="flex-start">
             <Image
-              src="/images/logo.svg"
+              src="/images/logo.png"
               alt={`${APP_NAME} logo`}
               width={52}
               height={52}
@@ -24,7 +24,7 @@ const Header = () => {
               className="hidden md:block"
             />
             <Image
-              src="/images/logo.svg"
+              src="/images/logo.png"
               alt={`${APP_NAME} logo`}
               width={44}
               height={44}
