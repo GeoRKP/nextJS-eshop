@@ -16,20 +16,8 @@ import RelatedProducts from "@/components/shared/product/related-products";
 import WishlistButton from "@/components/shared/product/wishlist-button";
 import ProductDetailTabs from "@/components/shared/product/product-detail-tabs";
 import { Truck, Shield, RotateCcw } from "lucide-react";
-import { prisma } from "@/db/prisma";
 
-export async function generateStaticParams() {
-  try {
-    const products = await prisma.product.findMany({
-      select: { slug: true },
-      where: { deletedAt: null },
-      take: 100,
-    });
-    return products.map((p) => ({ slug: p.slug }));
-  } catch {
-    return [];
-  }
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
