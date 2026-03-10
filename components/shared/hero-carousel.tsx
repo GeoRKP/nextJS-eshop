@@ -53,24 +53,22 @@ export default function HeroCarousel({ products, translations }: Props) {
   const total = products.length;
 
   return (
-    <section className="relative w-full overflow-hidden">
+    <section className="relative w-full">
       <Carousel
         setApi={setApi}
         opts={{ loop: true }}
         plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
       >
-        <CarouselContent className="ml-0">
+        <CarouselContent>
           {products.map((product, index) => (
-            <CarouselItem key={product.id} className="pl-0">
+            <CarouselItem key={product.id}>
               <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
                 {product.banner ? (
                   product.banner.endsWith('.svg') ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
-                    <Image
+                    <img
                       src={product.banner}
                       alt={product.name}
-                      fill
-                      priority={index === 0}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
                   ) : (
