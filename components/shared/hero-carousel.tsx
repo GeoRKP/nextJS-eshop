@@ -24,7 +24,6 @@ type Props = {
   slides: SlideContent[];
   translations: {
     shopNow: string;
-    browseCollection: string;
   };
 };
 
@@ -122,9 +121,9 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                           {slide.subtitle}
                         </p>
 
-                        {/* CTAs */}
+                        {/* CTA */}
                         <div
-                          className="flex flex-col sm:flex-row gap-3 mt-6 opacity-0 animate-fade-up"
+                          className="mt-6 opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_300}
                         >
                           <Button
@@ -133,16 +132,6 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                             className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold text-base md:text-lg px-8 py-5 rounded-md uppercase tracking-wide border-0"
                           >
                             <Link href="/search">{translations.shopNow}</Link>
-                          </Button>
-                          <Button
-                            size="lg"
-                            variant="outline"
-                            asChild
-                            className="text-base md:text-lg bg-white/10 backdrop-blur-sm text-white border-2 border-white/40 hover:bg-white/20 font-semibold px-8 py-5 rounded-md"
-                          >
-                            <Link href={`/product/${product.slug}`}>
-                              {translations.browseCollection}
-                            </Link>
                           </Button>
                         </div>
                       </div>
