@@ -24,6 +24,7 @@ type Props = {
   slides: SlideContent[];
   translations: {
     shopNow: string;
+    browseCollection: string;
   };
 };
 
@@ -31,6 +32,7 @@ type Props = {
 const ANIMATION_STYLE_0 = { animationDelay: "0ms", animationFillMode: "forwards" } as const;
 const ANIMATION_STYLE_100 = { animationDelay: "100ms", animationFillMode: "forwards" } as const;
 const ANIMATION_STYLE_200 = { animationDelay: "200ms", animationFillMode: "forwards" } as const;
+const ANIMATION_STYLE_300 = { animationDelay: "300ms", animationFillMode: "forwards" } as const;
 
 export default function HeroCarousel({ products, slides, translations }: Props) {
   const [api, setApi] = useState<CarouselApi>();
@@ -51,8 +53,6 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
       api.off("select", onSelect);
     };
   }, [api, onSelect]);
-
-  const total = products.length;
 
   return (
     <section className="relative w-full">
@@ -88,32 +88,61 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-primary/40" />
                   )}
-                  {/* Multi-layer overlay */}
+                  {/* Multi-layer overlay: directional gradient + bottom fade */}
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent" />
 
-                  {/* Slide text content */}
-                  <div className="relative h-full wrapper flex flex-col justify-end pb-24 md:pb-28">
+                  {/* Content anchored at bottom */}
+                  <div className="relative h-full wrapper flex flex-col justify-end pb-10 md:pb-24">
                     {current === index && (
                       <div key={slideKey}>
+                        {/* Label badge */}
                         <span
                           className="inline-block text-label text-brand-accent mb-4 opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_0}
                         >
                           {slide.label}
                         </span>
+
+                        {/* Main heading */}
                         <h1
                           className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white max-w-3xl leading-[0.92] tracking-tight uppercase opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_100}
                         >
                           {slide.tagline}
                         </h1>
+
+                        {/* Subtitle */}
                         <p
                           className="text-lg md:text-xl text-white/80 max-w-xl font-light mt-4 opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_200}
                         >
                           {slide.subtitle}
                         </p>
+
+                        {/* CTAs */}
+                        <div
+                          className="flex flex-col sm:flex-row gap-3 mt-6 opacity-0 animate-fade-up"
+                          style={ANIMATION_STYLE_300}
+                        >
+                          <Button
+                            size="lg"
+                            asChild
+                            className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold text-base md:text-lg px-8 py-5 rounded-md uppercase tracking-wide border-0"
+                          >
+                            <Link href="/search">{translations.shopNow}</Link>
+                          </Button>
+                          <Button
+                            size="lg"
+                            variant="outline"
+                            asChild
+                            className="text-base md:text-lg bg-white/10 backdrop-blur-sm text-white border-2 border-white/40 hover:bg-white/20 font-semibold px-8 py-5 rounded-md"
+                          >
+                            <Link href={`/product/${product.slug}`}>
+                              {translations.browseCollection}
+                            </Link>
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -124,44 +153,6 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
         </CarouselContent>
       </Carousel>
 
-      {/* Bottom bar — sits over carousel, outside slide content */}
-      <div className="absolute bottom-0 inset-x-0 pointer-events-none pb-4 md:pb-8">
-        <div className="wrapper flex items-center justify-between gap-4">
-          <Button
-            size="lg"
-            asChild
-            className="pointer-events-auto bg-brand-accent hover:bg-brand-accent-dark text-white font-bold text-sm md:text-lg px-6 md:px-8 py-4 md:py-5 rounded-md uppercase tracking-wide border-0 shrink-0"
-          >
-            <Link href="/search">{translations.shopNow}</Link>
-          </Button>
-
-          {total > 1 && (
-            <div className="flex items-center gap-3 md:gap-4 pointer-events-auto">
-              <div className="flex items-center gap-1.5 md:gap-2">
-                {products.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => api?.scrollTo(i)}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      current === i
-                        ? "w-8 md:w-10 bg-brand-accent"
-                        : "w-2 md:w-2.5 bg-white/30 hover:bg-white/50"
-                    }`}
-                    aria-label={`Go to slide ${i + 1}`}
-                  />
-                ))}
-              </div>
-              <div className="text-white/60 text-xs md:text-sm font-heading tracking-wider whitespace-nowrap">
-                <span className="text-white font-bold">
-                  {String(current + 1).padStart(2, "0")}
-                </span>
-                {" / "}
-                {String(total).padStart(2, "0")}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
     </section>
   );
 }
