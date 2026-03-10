@@ -13,13 +13,17 @@ export default async function HeroSection({
   const items = products && products.length > 0 ? products : [];
   if (items.length === 0) return null;
 
+  const slides = items.map((_, i) => ({
+    label: t(`slides.${i}.label`),
+    tagline: t(`slides.${i}.tagline`),
+    subtitle: t(`slides.${i}.subtitle`),
+  }));
+
   return (
     <HeroCarousel
       products={items}
+      slides={slides}
       translations={{
-        label: t("label"),
-        tagline: t("tagline"),
-        subtitle: t("subtitle"),
         shopNow: t("shopNow"),
         browseCollection: t("browseCollection"),
       }}

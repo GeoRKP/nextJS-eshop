@@ -588,11 +588,30 @@
     "statSupport": "24/7 Support"
   },
   "Hero": {
-    "label": "PREMIUM TRUCK PARTS",
-    "tagline": "Built For The Road Ahead",
-    "subtitle": "Premium truck parts and accessories. Expert quality. Guaranteed fit.",
     "shopNow": "Shop Now",
-    "browseCollection": "View Details"
+    "browseCollection": "View Details",
+    "slides": {
+      "0": {
+        "label": "PRECISION & SAFETY",
+        "tagline": "The Road Demands The Best",
+        "subtitle": "OEM quality ABS sensor gears. Mercedes, DAF, MAN, Volvo, Scania."
+      },
+      "1": {
+        "label": "CUSTOM MANUFACTURING",
+        "tagline": "Built Exactly To Your Specs",
+        "subtitle": "CNC lathe & milling. Brass, steel, aluminum. Tolerance ±0.005mm."
+      },
+      "2": {
+        "label": "BRAKING SYSTEMS",
+        "tagline": "Braking Without Compromise",
+        "subtitle": "Bellows, connectors and air brake parts for every application."
+      },
+      "3": {
+        "label": "INDUSTRIAL FITTINGS",
+        "tagline": "Every Connection Counts",
+        "subtitle": "Fittings, pipes and hydraulics — BSP, NPT, push-in 4-16mm."
+      }
+    }
   },
   "ValueProps": {
     "freeShipping": "Free Shipping",

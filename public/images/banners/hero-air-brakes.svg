@@ -5,17 +5,21 @@
       <stop offset="40%" stop-color="#142040"/>
       <stop offset="100%" stop-color="#1c2f55"/>
     </linearGradient>
-    <radialGradient id="glow" cx="70%" cy="45%" r="45%">
+    <radialGradient id="glow" cx="68%" cy="45%" r="48%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.2"/>
+      <stop offset="45%" stop-color="#f59e0b" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#142040" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="85%" cy="75%" r="22%">
       <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.12"/>
-      <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.04"/>
       <stop offset="100%" stop-color="#142040" stop-opacity="0"/>
     </radialGradient>
     <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
-      <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#ffffff" stroke-opacity="0.025" stroke-width="0.5"/>
+      <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#ffffff" stroke-opacity="0.035" stroke-width="0.5"/>
     </pattern>
     <pattern id="hex" width="50" height="86.6" patternUnits="userSpaceOnUse">
-      <polygon points="25,0 50,14.4 50,43.3 25,57.7 0,43.3 0,14.4" fill="none" stroke="#f59e0b" stroke-opacity="0.03" stroke-width="0.5"/>
-      <polygon points="25,28.9 50,43.3 50,72.2 25,86.6 0,72.2 0,43.3" fill="none" stroke="#f59e0b" stroke-opacity="0.02" stroke-width="0.5"/>
+      <polygon points="25,0 50,14.4 50,43.3 25,57.7 0,43.3 0,14.4" fill="none" stroke="#f59e0b" stroke-opacity="0.05" stroke-width="0.6"/>
+      <polygon points="25,28.9 50,43.3 50,72.2 25,86.6 0,72.2 0,43.3" fill="none" stroke="#f59e0b" stroke-opacity="0.035" stroke-width="0.6"/>
     </pattern>
   </defs>
 
@@ -24,64 +28,69 @@
   <rect width="1920" height="700" fill="url(#grid)"/>
   <rect width="1920" height="700" fill="url(#hex)"/>
   <rect width="1920" height="700" fill="url(#glow)"/>
+  <rect width="1920" height="700" fill="url(#glow2)"/>
 
-  <!-- Pneumatic chamber - large -->
-  <g transform="translate(1300, 350)" opacity="0.10">
-    <ellipse cx="0" cy="0" rx="220" ry="280" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-    <ellipse cx="0" cy="0" rx="200" ry="260" fill="none" stroke="#ffffff" stroke-width="0.8"/>
-    <ellipse cx="0" cy="-180" rx="180" ry="20" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
-    <ellipse cx="0" cy="-130" rx="200" ry="22" fill="none" stroke="#f59e0b" stroke-width="1.2"/>
-    <ellipse cx="0" cy="-80" rx="210" ry="20" fill="none" stroke="#f59e0b" stroke-width="1"/>
-    <ellipse cx="0" cy="-30" rx="215" ry="18" fill="none" stroke="#f59e0b" stroke-width="1"/>
-    <ellipse cx="0" cy="20" rx="215" ry="18" fill="none" stroke="#f59e0b" stroke-width="1"/>
-    <ellipse cx="0" cy="70" rx="210" ry="20" fill="none" stroke="#f59e0b" stroke-width="1.2"/>
-    <ellipse cx="0" cy="120" rx="200" ry="22" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
-    <ellipse cx="0" cy="170" rx="180" ry="20" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
-    <line x1="0" y1="-280" x2="0" y2="280" stroke="#f59e0b" stroke-width="2"/>
-    <circle cx="0" cy="-280" r="8" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
-    <circle cx="0" cy="280" r="8" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
-    <rect x="-30" y="-300" width="60" height="20" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
-    <rect x="-30" y="280" width="60" height="20" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  <!-- Large pneumatic chamber -->
+  <g transform="translate(1300, 350)" opacity="0.18">
+    <ellipse cx="0" cy="0" rx="220" ry="280" fill="#f59e0b" fill-opacity="0.02" stroke="#f59e0b" stroke-width="3.5"/>
+    <ellipse cx="0" cy="0" rx="200" ry="260" fill="none" stroke="#ffffff" stroke-width="1.2"/>
+    <!-- Diaphragm folds -->
+    <ellipse cx="0" cy="-180" rx="180" ry="20" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <ellipse cx="0" cy="-130" rx="200" ry="22" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
+    <ellipse cx="0" cy="-80" rx="210" ry="20" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <ellipse cx="0" cy="-30" rx="215" ry="18" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <ellipse cx="0" cy="20" rx="215" ry="18" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <ellipse cx="0" cy="70" rx="210" ry="20" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
+    <ellipse cx="0" cy="120" rx="200" ry="22" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <ellipse cx="0" cy="170" rx="180" ry="20" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <!-- Push rod -->
+    <line x1="0" y1="-280" x2="0" y2="280" stroke="#f59e0b" stroke-width="2.5"/>
+    <circle cx="0" cy="-280" r="10" fill="#f59e0b" fill-opacity="0.12" stroke="#f59e0b" stroke-width="2"/>
+    <circle cx="0" cy="280" r="10" fill="#f59e0b" fill-opacity="0.12" stroke="#f59e0b" stroke-width="2"/>
+    <!-- Mounting brackets -->
+    <rect x="-35" y="-305" width="70" height="25" rx="3" fill="#f59e0b" fill-opacity="0.05" stroke="#f59e0b" stroke-width="2"/>
+    <rect x="-35" y="280" width="70" height="25" rx="3" fill="#f59e0b" fill-opacity="0.05" stroke="#f59e0b" stroke-width="2"/>
   </g>
 
   <!-- Smaller chamber - upper right -->
-  <g transform="translate(1650, 180)" opacity="0.06">
-    <ellipse cx="0" cy="0" rx="100" ry="130" fill="none" stroke="#f59e0b" stroke-width="2"/>
-    <ellipse cx="0" cy="-80" rx="85" ry="12" fill="none" stroke="#f59e0b" stroke-width="1"/>
-    <ellipse cx="0" cy="-40" rx="95" ry="14" fill="none" stroke="#f59e0b" stroke-width="1"/>
-    <ellipse cx="0" cy="0" rx="98" ry="14" fill="none" stroke="#f59e0b" stroke-width="1"/>
-    <ellipse cx="0" cy="40" rx="95" ry="14" fill="none" stroke="#f59e0b" stroke-width="1"/>
-    <ellipse cx="0" cy="80" rx="85" ry="12" fill="none" stroke="#f59e0b" stroke-width="1"/>
-    <line x1="0" y1="-130" x2="0" y2="130" stroke="#f59e0b" stroke-width="1.5"/>
+  <g transform="translate(1650, 180)" opacity="0.12">
+    <ellipse cx="0" cy="0" rx="100" ry="130" fill="#f59e0b" fill-opacity="0.02" stroke="#f59e0b" stroke-width="2.5"/>
+    <ellipse cx="0" cy="-80" rx="85" ry="12" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <ellipse cx="0" cy="-40" rx="95" ry="14" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <ellipse cx="0" cy="0" rx="98" ry="14" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <ellipse cx="0" cy="40" rx="95" ry="14" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <ellipse cx="0" cy="80" rx="85" ry="12" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <line x1="0" y1="-130" x2="0" y2="130" stroke="#f59e0b" stroke-width="2"/>
   </g>
 
-  <!-- Pneumatic tubing lines -->
-  <g stroke="#f59e0b" stroke-width="1.5" fill="none" opacity="0.08">
+  <!-- Pneumatic tubing -->
+  <g stroke="#f59e0b" stroke-width="2" fill="none" opacity="0.14">
     <path d="M 950,600 Q 1050,500 1100,350 Q 1150,200 1300,150"/>
     <path d="M 980,650 Q 1080,520 1150,380 Q 1220,240 1350,200"/>
-    <circle cx="950" cy="600" r="4" fill="#f59e0b"/>
-    <circle cx="1300" cy="150" r="4" fill="#f59e0b"/>
-    <circle cx="980" cy="650" r="4" fill="#f59e0b"/>
-    <circle cx="1350" cy="200" r="4" fill="#f59e0b"/>
+    <circle cx="950" cy="600" r="5" fill="#f59e0b" fill-opacity="0.3"/>
+    <circle cx="1300" cy="150" r="5" fill="#f59e0b" fill-opacity="0.3"/>
+    <circle cx="980" cy="650" r="5" fill="#f59e0b" fill-opacity="0.3"/>
+    <circle cx="1350" cy="200" r="5" fill="#f59e0b" fill-opacity="0.3"/>
   </g>
 
   <!-- Pressure gauge -->
-  <g transform="translate(1700, 520)" opacity="0.07">
-    <circle cx="0" cy="0" r="70" fill="none" stroke="#f59e0b" stroke-width="2"/>
-    <circle cx="0" cy="0" r="60" fill="none" stroke="#ffffff" stroke-width="0.5"/>
-    <line x1="0" y1="-55" x2="0" y2="-65" stroke="#f59e0b" stroke-width="1.5"/>
-    <line x1="55" y1="0" x2="65" y2="0" stroke="#f59e0b" stroke-width="1.5"/>
-    <line x1="0" y1="55" x2="0" y2="65" stroke="#f59e0b" stroke-width="1.5"/>
-    <line x1="-55" y1="0" x2="-65" y2="0" stroke="#f59e0b" stroke-width="1.5"/>
-    <line x1="39" y1="-39" x2="46" y2="-46" stroke="#f59e0b" stroke-width="1"/>
-    <line x1="39" y1="39" x2="46" y2="46" stroke="#f59e0b" stroke-width="1"/>
-    <line x1="-39" y1="-39" x2="-46" y2="-46" stroke="#f59e0b" stroke-width="1"/>
-    <line x1="-39" y1="39" x2="-46" y2="46" stroke="#f59e0b" stroke-width="1"/>
-    <line x1="0" y1="0" x2="35" y2="-35" stroke="#f59e0b" stroke-width="2"/>
-    <circle cx="0" cy="0" r="5" fill="#f59e0b"/>
+  <g transform="translate(1700, 520)" opacity="0.14">
+    <circle cx="0" cy="0" r="70" fill="#f59e0b" fill-opacity="0.03" stroke="#f59e0b" stroke-width="2.5"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#ffffff" stroke-width="0.8"/>
+    <line x1="0" y1="-55" x2="0" y2="-65" stroke="#f59e0b" stroke-width="2"/>
+    <line x1="55" y1="0" x2="65" y2="0" stroke="#f59e0b" stroke-width="2"/>
+    <line x1="0" y1="55" x2="0" y2="65" stroke="#f59e0b" stroke-width="2"/>
+    <line x1="-55" y1="0" x2="-65" y2="0" stroke="#f59e0b" stroke-width="2"/>
+    <line x1="39" y1="-39" x2="46" y2="-46" stroke="#f59e0b" stroke-width="1.5"/>
+    <line x1="39" y1="39" x2="46" y2="46" stroke="#f59e0b" stroke-width="1.5"/>
+    <line x1="-39" y1="-39" x2="-46" y2="-46" stroke="#f59e0b" stroke-width="1.5"/>
+    <line x1="-39" y1="39" x2="-46" y2="46" stroke="#f59e0b" stroke-width="1.5"/>
+    <!-- Needle -->
+    <line x1="0" y1="0" x2="38" y2="-38" stroke="#f59e0b" stroke-width="2.5"/>
+    <circle cx="0" cy="0" r="6" fill="#f59e0b"/>
   </g>
 
   <!-- Accent lines -->
-  <line x1="0" y1="698" x2="1920" y2="698" stroke="#f59e0b" stroke-width="2" opacity="0.3"/>
-  <line x1="0" y1="0" x2="1920" y2="0" stroke="#f59e0b" stroke-width="1" opacity="0.15"/>
+  <line x1="0" y1="698" x2="1920" y2="698" stroke="#f59e0b" stroke-width="3" opacity="0.4"/>
+  <line x1="0" y1="0" x2="1920" y2="0" stroke="#f59e0b" stroke-width="1.5" opacity="0.2"/>
 </svg>
