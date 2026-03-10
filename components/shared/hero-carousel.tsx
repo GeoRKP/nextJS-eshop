@@ -56,7 +56,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
   const total = products.length;
 
   return (
-    <section className="relative w-full">
+    <section className="relative w-full mb-10 md:mb-0">
       <Carousel
         setApi={setApi}
         opts={{ loop: true }}
@@ -94,7 +94,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                   <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent" />
 
                   {/* Content anchored at bottom */}
-                  <div className="relative h-full wrapper flex flex-col justify-end pb-32 md:pb-24">
+                  <div className="relative h-full wrapper flex flex-col justify-end pb-16 md:pb-24">
                     {current === index && (
                       <div key={slideKey}>
                         {/* Label badge */}
@@ -146,7 +146,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
 
       {/* Slide indicators — centered pills */}
       {total > 1 && (
-        <div className="absolute -bottom-1 md:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 min-h-[44px]">
+        <div className="absolute -bottom-8 md:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 min-h-[44px]">
           {products.map((_, index) => (
             <button
               key={index}
@@ -164,7 +164,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
 
       {/* Slide counter — bottom right */}
       {total > 1 && (
-        <div className="absolute -bottom-1 md:bottom-6 right-5 md:right-10 text-white/60 text-sm font-heading tracking-wider">
+        <div className="absolute -bottom-8 md:bottom-6 right-5 md:right-10 text-white/60 text-sm font-heading tracking-wider">
           <span className="text-white font-bold">
             {String(current + 1).padStart(2, "0")}
           </span>
