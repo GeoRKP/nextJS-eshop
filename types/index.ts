@@ -19,6 +19,7 @@ export type Product = z.infer<typeof insertProductSchema> & {
   numReviews: number;
   deletedAt?: Date | null;
   lowStockThreshold?: number;
+  categoryId?: string | null;
 };
 
 export type Cart = z.infer<typeof insertCartSchema>;
