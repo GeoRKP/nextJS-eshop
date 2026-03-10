@@ -1,15 +1,29 @@
 import { PrismaClient } from "@prisma/client";
-import { Pool, neonConfig } from "@neondatabase/serverless";
-import { PrismaNeon } from "@prisma/adapter-neon";
-import ws from "ws";
 
-neonConfig.webSocketConstructor = ws;
+function createPrismaClient() {
+  const url = process.env.DATABASE_URL ?? "";
+  const isNeon = url.includes("neon.tech") || url.includes("neon.db");
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaNeon(pool);
+  if (isNeon) {
+    // Dynamic imports are not needed — these are only loaded when Neon is used
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Pool, neonConfig } = require("@neondatabase/serverless");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { PrismaNeon } = require("@prisma/adapter-neon");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ws = require("ws");
+
+    neonConfig.webSocketConstructor = ws;
+    const pool = new Pool({ connectionString: url });
+    const adapter = new PrismaNeon(pool);
+    return new PrismaClient({ adapter });
+  }
+
+  return new PrismaClient();
+}
 
 // Extends the PrismaClient with a custom result transformer to convert the price and rating fields to strings.
-export const prisma = new PrismaClient({ adapter }).$extends({
+export const prisma = createPrismaClient().$extends({
   result: {
     product: {
       price: {
