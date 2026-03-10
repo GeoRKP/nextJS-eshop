@@ -11,6 +11,7 @@ import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 import SearchFilters from "./search-filters";
 import ViewToggle from "./view-toggle";
+import SortSelect from "./sort-select";
 import Pagination from "@/components/shared/pagination";
 import { SearchX } from "lucide-react";
 
@@ -284,8 +285,8 @@ export default async function SearchPage(props: {
 
         {/* Sort + View Toggle */}
         <div className="flex items-center gap-3">
-          {/* Segmented sort */}
-          <div className="flex items-center bg-muted/50 rounded-lg p-1 overflow-x-auto scrollbar-hide">
+          {/* Segmented sort — desktop only */}
+          <div className="hidden md:flex items-center bg-muted/50 rounded-lg p-1">
             {sortOrders.map((s) => (
               <Link
                 key={s}
@@ -301,6 +302,17 @@ export default async function SearchPage(props: {
               </Link>
             ))}
           </div>
+
+          {/* Sort dropdown — mobile only */}
+          <SortSelect
+            options={sortOrders.map((s) => ({
+              value: s,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              label: t(sortKeyMap[s] as any),
+            }))}
+            current={sort}
+            buildUrl={(s) => getFilterUrl({ s })}
+          />
 
           {/* View toggle */}
           <ViewToggle currentView={view} />
