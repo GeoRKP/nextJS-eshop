@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { Link } from "@/i18n/navigation";
-import { Grid3X3, ChevronDown, Sparkles, Tag, Layers } from "lucide-react";
+import { Grid3X3, ChevronDown, Tag, Layers } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
@@ -162,8 +162,8 @@ export default function CategoryNavClient({
                   if (e.key === "Escape") setActiveCategory(null);
                 }}
               >
-                <Layers className="h-3.5 w-3.5" />
-                {translations.shopByBrand}
+                <Layers className="h-3.5 w-3.5 shrink-0" />
+                <span className="whitespace-nowrap">{translations.shopByBrand}</span>
                 <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${activeCategory === "__brands__" ? "rotate-180" : ""}`} />
               </button>
             </>
@@ -173,16 +173,6 @@ export default function CategoryNavClient({
           <div className="flex-1" />
 
           {/* Quick links */}
-          <Link
-            href="/search?sort=newest"
-            className="flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide border-b-2 border-transparent hover:border-brand-accent/50 transition-all"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">{translations.newArrivals}</span>
-            <span className="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none hidden md:inline">
-              NEW
-            </span>
-          </Link>
           <Link
             href="/search?price=1-50"
             className="flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-bold uppercase tracking-wide text-brand-accent border-b-2 border-transparent hover:border-brand-accent/50 transition-all"
