@@ -4,7 +4,7 @@
 
 @layer utilities {
   .wrapper {
-    @apply max-w-7xl lg:mx-auto px-4 py-5 md:px-8 lg:px-10 w-full;
+    @apply max-w-7xl 2xl:max-w-[1440px] lg:mx-auto px-4 py-5 md:px-8 lg:px-10 w-full;
   }
 
   .wrapper-narrow {

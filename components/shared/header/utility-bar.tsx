@@ -18,7 +18,7 @@ export default async function UtilityBar() {
           <span className="w-1 h-1 rounded-full bg-primary-foreground/30" />
           <Link
             href="/search"
-            className="flex items-center gap-1 opacity-70 hover:opacity-100 transition-opacity"
+            className="flex items-center gap-1 text-primary-foreground/70 hover:text-primary-foreground transition-colors"
           >
             <HelpCircle className="h-3 w-3" />
             {t("helpCenter")}
@@ -26,7 +26,7 @@ export default async function UtilityBar() {
           <span className="w-1 h-1 rounded-full bg-primary-foreground/30" />
           <Link
             href="/user/orders"
-            className="flex items-center gap-1 opacity-70 hover:opacity-100 transition-opacity"
+            className="flex items-center gap-1 text-primary-foreground/70 hover:text-primary-foreground transition-colors"
           >
             <Package className="h-3 w-3" />
             {t("orderTracking")}
@@ -39,7 +39,7 @@ export default async function UtilityBar() {
           <span className="w-1 h-1 rounded-full bg-primary-foreground/30" />
           <Link
             href="/sign-in"
-            className="flex items-center gap-1 opacity-70 hover:opacity-100 transition-opacity"
+            className="flex items-center gap-1 text-primary-foreground/70 hover:text-primary-foreground transition-colors"
           >
             <BadgeCheck className="h-3 w-3" />
             {t("proAccount")}

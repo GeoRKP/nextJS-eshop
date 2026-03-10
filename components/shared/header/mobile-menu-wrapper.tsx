@@ -22,7 +22,7 @@ export default async function MobileMenuWrapper() {
   return (
     <MobileMenu
       categories={categories}
-      brands={brands.slice(0, 10)}
+      brands={brands.slice(0, 15)}
       userName={session?.user?.name}
     />
   );

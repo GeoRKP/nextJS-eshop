@@ -78,7 +78,8 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
   // Focus search input when menu opens
   useEffect(() => {
     if (open) {
-      setTimeout(() => searchInputRef.current?.focus(), 300);
+      const timer = setTimeout(() => searchInputRef.current?.focus(), 300);
+      return () => clearTimeout(timer);
     } else {
       setSearchQuery("");
     }

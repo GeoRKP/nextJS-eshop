@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import type { ProductSuggestion, CategorySuggestion } from "@/types/search";
@@ -36,12 +36,42 @@ function SearchDropdown({
   const showCategories = query && categories.length > 0;
   const showFallback = query && products.length === 0 && categories.length === 0;
 
-  let itemIndex = -1;
+  // Pre-calculate indices for keyboard navigation
+  const indices = useMemo(() => {
+    const result = {
+      recents: [] as number[],
+      products: [] as number[],
+      categories: [] as number[],
+      searchAll: -1,
+    };
+    let idx = 0;
+    if (!query && recentSearches.length > 0) {
+      for (let i = 0; i < recentSearches.length; i++) {
+        result.recents.push(idx++);
+      }
+    }
+    if (query && products.length > 0) {
+      for (let i = 0; i < products.length; i++) {
+        result.products.push(idx++);
+      }
+    }
+    if (query && categories.length > 0) {
+      for (let i = 0; i < categories.length; i++) {
+        result.categories.push(idx++);
+      }
+    }
+    if (query && (products.length > 0 || categories.length > 0)) {
+      result.searchAll = idx;
+    } else if (query && products.length === 0 && categories.length === 0) {
+      result.searchAll = 0;
+    }
+    return result;
+  }, [query, products.length, categories.length, recentSearches.length]);
 
   return (
     <div
       id="search-dropdown"
-      className="absolute top-full left-0 right-0 z-50 mt-2 max-h-[50vh] md:max-h-[400px] overflow-y-auto rounded-xl border border-t-2 border-t-brand-accent bg-popover shadow-elevated"
+      className="absolute top-full left-0 right-0 z-[55] mt-2 max-h-[50vh] md:max-h-[400px] overflow-y-auto rounded-xl border border-t-2 border-t-brand-accent bg-popover shadow-elevated"
       role="listbox"
     >
       {/* Recent searches */}
@@ -62,9 +92,8 @@ function SearchDropdown({
               Clear all
             </button>
           </div>
-          {recentSearches.map((term) => {
-            itemIndex++;
-            const idx = itemIndex;
+          {recentSearches.map((term, i) => {
+            const idx = indices.recents[i];
             return (
               <div
                 key={term}
@@ -105,9 +134,8 @@ function SearchDropdown({
           <span className="text-label text-muted-foreground px-1">
             Products
           </span>
-          {products.map((product) => {
-            itemIndex++;
-            const idx = itemIndex;
+          {products.map((product, i) => {
+            const idx = indices.products[i];
             return (
               <div
                 key={product.id}
@@ -152,9 +180,8 @@ function SearchDropdown({
           <span className="text-label text-muted-foreground px-1">
             Categories
           </span>
-          {categories.map((cat) => {
-            itemIndex++;
-            const idx = itemIndex;
+          {categories.map((cat, i) => {
+            const idx = indices.categories[i];
             return (
               <div
                 key={cat.category}
@@ -184,9 +211,9 @@ function SearchDropdown({
         <div className="p-3">
           <div
             role="option"
-            aria-selected={highlightedIndex === 0}
+            aria-selected={highlightedIndex === indices.searchAll}
             className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm ${
-              highlightedIndex === 0 ? "bg-brand-accent/10 text-brand-accent" : ""
+              highlightedIndex === indices.searchAll ? "bg-brand-accent/10 text-brand-accent" : ""
             }`}
             onMouseDown={(e) => {
               e.preventDefault();
@@ -204,28 +231,22 @@ function SearchDropdown({
       {/* "Search for ..." when there ARE suggestions too */}
       {query && (products.length > 0 || categories.length > 0) && (
         <div className="border-t p-3">
-          {(() => {
-            itemIndex++;
-            const idx = itemIndex;
-            return (
-              <div
-                role="option"
-                aria-selected={highlightedIndex === idx}
-                className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm ${
-                  highlightedIndex === idx ? "bg-brand-accent/10 text-brand-accent" : ""
-                }`}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  onSelectSearch(query);
-                }}
-              >
-                <SearchIcon className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>
-                  Search for &quot;{query}&quot;
-                </span>
-              </div>
-            );
-          })()}
+          <div
+            role="option"
+            aria-selected={highlightedIndex === indices.searchAll}
+            className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-sm ${
+              highlightedIndex === indices.searchAll ? "bg-brand-accent/10 text-brand-accent" : ""
+            }`}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              onSelectSearch(query);
+            }}
+          >
+            <SearchIcon className="h-3.5 w-3.5 text-muted-foreground" />
+            <span>
+              Search for &quot;{query}&quot;
+            </span>
+          </div>
         </div>
       )}
     </div>

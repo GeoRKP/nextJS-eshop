@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Link } from "@/i18n/navigation";
 import { Grid3X3, ChevronDown, Sparkles, Tag, Layers } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
 import MegaMenu from "./mega-menu";
@@ -68,7 +69,7 @@ export default function CategoryNavClient({
   const handleMegaMenuLeave = useCallback(() => {
     closeTimerRef.current = setTimeout(() => {
       setActiveCategory(null);
-    }, 200);
+    }, 300);
   }, []);
 
   const activeCategoryData = categories.find((c) => c.id === activeCategory);
@@ -76,24 +77,33 @@ export default function CategoryNavClient({
   return (
     <div ref={navRef} className="relative">
       <nav className="hidden md:block bg-primary text-primary-foreground relative z-[45]">
-        <div className="wrapper flex items-center gap-0 h-11 !py-0 overflow-hidden">
+        <div className="wrapper flex items-center gap-0 h-11 !py-0 overflow-x-auto scrollbar-hide">
           {/* All Categories button */}
           <button
-            className={`flex items-center gap-1.5 px-4 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all ${
+            aria-expanded={activeCategory === "__all__"}
+            aria-haspopup="menu"
+            className={`flex items-center gap-1.5 px-4 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all border-b-2 ${
               activeCategory === "__all__"
-                ? "bg-brand-accent/15 border-b-2 border-brand-accent text-white"
-                : "hover:border-b-2 hover:border-brand-accent/50"
+                ? "bg-brand-accent/15 border-brand-accent text-white"
+                : "border-transparent hover:border-brand-accent/50"
             }`}
             onMouseEnter={() => handleMouseEnter("__all__")}
             onMouseLeave={handleMouseLeave}
             onClick={() => handleClick("__all__")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleClick("__all__");
+              }
+              if (e.key === "Escape") setActiveCategory(null);
+            }}
           >
             <Grid3X3 className="h-4 w-4" />
             {translations.allCategories}
             <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${activeCategory === "__all__" ? "rotate-180" : ""}`} />
           </button>
 
-          <div className="h-4 w-px bg-primary-foreground/10 mx-1" />
+          <div className="h-4 w-px bg-primary-foreground/20 mx-1" />
 
           {/* Root category items with icons */}
           {categories.map((category) => {
@@ -102,19 +112,28 @@ export default function CategoryNavClient({
             return (
               <button
                 key={category.id}
-                className={`flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all ${
+                aria-expanded={isActive}
+                aria-haspopup="menu"
+                className={`flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all border-b-2 ${
                   isActive
-                    ? "bg-brand-accent/15 border-b-2 border-brand-accent text-white"
-                    : "hover:border-b-2 hover:border-brand-accent/50"
+                    ? "bg-brand-accent/15 border-brand-accent text-white"
+                    : "border-transparent hover:border-brand-accent/50"
                 }`}
                 onMouseEnter={() => handleMouseEnter(category.id)}
                 onMouseLeave={handleMouseLeave}
                 onClick={() => handleClick(category.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleClick(category.id);
+                  }
+                  if (e.key === "Escape") setActiveCategory(null);
+                }}
               >
                 <Icon className="h-3.5 w-3.5 shrink-0" />
-                <span className="hidden lg:inline truncate max-w-[140px] xl:max-w-[180px]">{category.name}</span>
+                <span className="hidden md:inline truncate max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]" title={category.name}>{category.name}</span>
                 {category.children && category.children.length > 0 && (
-                  <ChevronDown className={`h-3 w-3 hidden lg:block shrink-0 transition-transform duration-200 ${isActive ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`h-3 w-3 hidden md:block shrink-0 transition-transform duration-200 ${isActive ? "rotate-180" : ""}`} />
                 )}
               </button>
             );
@@ -123,16 +142,25 @@ export default function CategoryNavClient({
           {/* Shop by Brand button */}
           {brands.length > 0 && (
             <>
-              <div className="h-4 w-px bg-primary-foreground/10 mx-1" />
+              <div className="h-4 w-px bg-primary-foreground/20 mx-1" />
               <button
-                className={`flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all ${
+                aria-expanded={activeCategory === "__brands__"}
+                aria-haspopup="menu"
+                className={`flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all border-b-2 ${
                   activeCategory === "__brands__"
-                    ? "bg-brand-accent/15 border-b-2 border-brand-accent text-white"
-                    : "hover:border-b-2 hover:border-brand-accent/50"
+                    ? "bg-brand-accent/15 border-brand-accent text-white"
+                    : "border-transparent hover:border-brand-accent/50"
                 }`}
                 onMouseEnter={() => handleMouseEnter("__brands__")}
                 onMouseLeave={handleMouseLeave}
                 onClick={() => handleClick("__brands__")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleClick("__brands__");
+                  }
+                  if (e.key === "Escape") setActiveCategory(null);
+                }}
               >
                 <Layers className="h-3.5 w-3.5" />
                 {translations.shopByBrand}
@@ -147,63 +175,87 @@ export default function CategoryNavClient({
           {/* Quick links */}
           <Link
             href="/search?sort=newest"
-            className="flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide hover:border-b-2 hover:border-brand-accent/50 transition-all"
+            className="flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide border-b-2 border-transparent hover:border-brand-accent/50 transition-all"
           >
             <Sparkles className="h-3.5 w-3.5" />
-            <span className="hidden lg:inline">{translations.newArrivals}</span>
-            <span className="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none hidden lg:inline">
+            <span className="hidden md:inline">{translations.newArrivals}</span>
+            <span className="bg-brand-accent text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none hidden md:inline">
               NEW
             </span>
           </Link>
           <Link
             href="/search?price=1-50"
-            className="flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-bold uppercase tracking-wide text-brand-accent hover:border-b-2 hover:border-brand-accent/50 transition-all"
+            className="flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-bold uppercase tracking-wide text-brand-accent border-b-2 border-transparent hover:border-brand-accent/50 transition-all"
           >
             <Tag className="h-3.5 w-3.5" />
-            <span className="hidden lg:inline">{translations.deals}</span>
+            <span className="hidden md:inline">{translations.deals}</span>
             <span className="h-1.5 w-1.5 rounded-full bg-brand-accent animate-pulse-dot" />
           </Link>
         </div>
       </nav>
 
-      {/* Mega Menu — Single category */}
-      {activeCategory &&
-        activeCategory !== "__all__" &&
-        activeCategory !== "__brands__" &&
-        activeCategoryData && (
-          <MegaMenu
-            mode="single"
-            category={activeCategoryData}
-            translations={translations}
-            onMouseEnter={handleMegaMenuEnter}
-            onMouseLeave={handleMegaMenuLeave}
-            onClose={() => setActiveCategory(null)}
-          />
+      {/* Mega Menus with exit animation */}
+      <AnimatePresence>
+        {activeCategory &&
+          activeCategory !== "__all__" &&
+          activeCategory !== "__brands__" &&
+          activeCategoryData && (
+            <motion.div
+              key="single"
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <MegaMenu
+                mode="single"
+                category={activeCategoryData}
+                translations={translations}
+                onMouseEnter={handleMegaMenuEnter}
+                onMouseLeave={handleMegaMenuLeave}
+                onClose={() => setActiveCategory(null)}
+              />
+            </motion.div>
+          )}
+
+        {activeCategory === "__all__" && (
+          <motion.div
+            key="all"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <MegaMenu
+              mode="all"
+              categories={categories}
+              translations={translations}
+              onMouseEnter={handleMegaMenuEnter}
+              onMouseLeave={handleMegaMenuLeave}
+              onClose={() => setActiveCategory(null)}
+            />
+          </motion.div>
         )}
 
-      {/* Mega Menu — All Categories */}
-      {activeCategory === "__all__" && (
-        <MegaMenu
-          mode="all"
-          categories={categories}
-          translations={translations}
-          onMouseEnter={handleMegaMenuEnter}
-          onMouseLeave={handleMegaMenuLeave}
-          onClose={() => setActiveCategory(null)}
-        />
-      )}
-
-      {/* Mega Menu — Brands */}
-      {activeCategory === "__brands__" && brands.length > 0 && (
-        <MegaMenu
-          mode="brands"
-          brands={brands}
-          translations={translations}
-          onMouseEnter={handleMegaMenuEnter}
-          onMouseLeave={handleMegaMenuLeave}
-          onClose={() => setActiveCategory(null)}
-        />
-      )}
+        {activeCategory === "__brands__" && brands.length > 0 && (
+          <motion.div
+            key="brands"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <MegaMenu
+              mode="brands"
+              brands={brands}
+              translations={translations}
+              onMouseEnter={handleMegaMenuEnter}
+              onMouseLeave={handleMegaMenuLeave}
+              onClose={() => setActiveCategory(null)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

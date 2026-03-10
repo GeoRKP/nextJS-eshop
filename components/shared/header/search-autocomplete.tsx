@@ -81,6 +81,7 @@ export default function SearchAutocomplete({ placeholder }: Props) {
           />
           <button
             type="submit"
+            aria-label="Search"
             className="h-8 w-8 rounded-full bg-brand-accent hover:bg-brand-accent-dark text-white flex items-center justify-center shrink-0 mr-1 transition-colors"
           >
             <ArrowRight className="h-4 w-4" />

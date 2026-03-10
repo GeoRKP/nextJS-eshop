@@ -38,7 +38,7 @@ const Header = () => {
         </div>
 
         {/* Center: Full-width search bar */}
-        <div className="flex-1 max-w-2xl mx-auto hidden md:block">
+        <div className="flex-1 max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto hidden md:block">
           <SearchWrapper />
         </div>
 

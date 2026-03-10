@@ -33,7 +33,7 @@ export default async function UserButton() {
     <div className="flex items-center">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="h-9 w-9 rounded-full bg-primary text-primary-foreground font-heading font-bold text-sm flex items-center justify-center ml-1 hover:ring-2 hover:ring-brand-accent/30 transition-all">
+          <button aria-label="User menu" className="h-9 w-9 rounded-full bg-primary text-primary-foreground font-heading font-bold text-sm flex items-center justify-center ml-1 hover:ring-2 hover:ring-brand-accent/30 transition-all">
             {firstInitial}
           </button>
         </DropdownMenuTrigger>

@@ -18,12 +18,14 @@ export default async function Menu() {
       <nav className="hidden md:flex items-center gap-1 bg-muted/40 rounded-full px-1 py-1">
         <Link
           href="/user/wishlist"
+          aria-label="Wishlist"
           className="h-9 w-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-background/60 transition-all"
         >
           <Heart className="h-[18px] w-[18px] hover:fill-brand-accent/30 transition-all" />
         </Link>
         <Link
           href="/cart"
+          aria-label="Cart"
           className="h-9 w-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-background/60 transition-all relative"
         >
           <ShoppingCart className="h-[18px] w-[18px]" />
@@ -40,6 +42,7 @@ export default async function Menu() {
       <nav className="md:hidden flex items-center gap-1">
         <Link
           href="/cart"
+          aria-label="Cart"
           className="h-9 w-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground transition-all relative"
         >
           <ShoppingCart className="h-5 w-5" />

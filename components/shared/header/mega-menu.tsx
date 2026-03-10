@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import { Category } from "@/types";
@@ -107,11 +107,33 @@ function MegaMenuShell({
   onMouseLeave: () => void;
   onClose: () => void;
 }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Auto-focus first link when mega menu opens
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (panel) {
+      const firstLink = panel.querySelector<HTMLElement>("a, button");
+      firstLink?.focus({ preventScroll: true });
+    }
+  }, []);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
   return (
     <>
-      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/20 dark:bg-black/40 z-40" onClick={onClose} />
       <div
-        className="absolute left-0 right-0 z-50 bg-popover/98 backdrop-blur-2xl border-t-2 border-t-brand-accent border-b shadow-elevated animate-mega-reveal"
+        ref={panelRef}
+        role="menu"
+        className="absolute left-0 right-0 z-50 bg-popover/98 backdrop-blur-2xl border-t-2 border-t-brand-accent border-b shadow-elevated"
         style={{ boxShadow: "inset 0 1px 30px -10px hsl(var(--brand-accent) / 0.08), var(--shadow-elevated)" }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -159,6 +181,7 @@ function SingleCategoryMegaMenu({
                 return (
                   <div key={sub.id}>
                     <Link
+                      role="menuitem"
                       href={`/search?category=${encodeURIComponent(sub.name)}`}
                       onClick={onClose}
                       className="flex items-center gap-2 text-brand-accent font-bold uppercase text-xs tracking-widest hover:opacity-80 transition-opacity mb-3 pb-1 border-b border-brand-accent/20"
@@ -171,6 +194,7 @@ function SingleCategoryMegaMenu({
                         {sub.children.map((item) => (
                           <li key={item.id}>
                             <Link
+                              role="menuitem"
                               href={`/search?category=${encodeURIComponent(item.name)}`}
                               onClick={onClose}
                               className="block text-sm text-muted-foreground hover:text-brand-accent hover:border-l-2 hover:border-brand-accent hover:pl-2 transition-all py-0.5"
@@ -238,7 +262,7 @@ function SingleCategoryMegaMenu({
   );
 }
 
-/* ─── Mode B: All Categories ─── */
+/* ─── Mode B: All Categories (Two-Panel Layout) ─── */
 function AllCategoriesMegaMenu({
   categories,
   translations,
@@ -252,8 +276,27 @@ function AllCategoriesMegaMenu({
   onMouseLeave: () => void;
   onClose: () => void;
 }) {
-  const [activeRoot, setActiveRoot] = useState<string | null>(null);
+  const [activeRoot, setActiveRoot] = useState<string | null>(
+    categories[0]?.id ?? null
+  );
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeCat = categories.find((c) => c.id === activeRoot);
+
+  // Cleanup hover timer on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    };
+  }, []);
+
+  const handleCategoryHover = useCallback((catId: string) => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => setActiveRoot(catId), 300);
+  }, []);
+
+  const handleCategoryLeave = useCallback(() => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+  }, []);
 
   return (
     <MegaMenuShell
@@ -261,90 +304,99 @@ function AllCategoriesMegaMenu({
       onMouseLeave={onMouseLeave}
       onClose={onClose}
     >
-      {!activeCat ? (
-        /* Grid of root category cards */
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+      <div className="flex gap-6 min-h-[300px]">
+        {/* LEFT: Category list — always visible */}
+        <div className="w-2/5 max-h-[480px] overflow-y-auto border-r border-border pr-4 space-y-0.5">
           {categories.map((cat) => {
             const Icon = getCategoryIcon(cat.name);
             const subCount = cat.children?.length ?? 0;
+            const isActive = activeRoot === cat.id;
             return (
-              <button
+              <Link
                 key={cat.id}
-                className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border hover:border-brand-accent hover:shadow-card-glow transition-all text-left group"
-                onMouseEnter={() => setActiveRoot(cat.id)}
+                href={`/search?category=${encodeURIComponent(cat.name)}`}
+                onClick={onClose}
+                className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
+                  isActive
+                    ? "bg-brand-accent/10 border-l-2 border-brand-accent"
+                    : "border-l-2 border-transparent hover:bg-muted/50"
+                }`}
+                onMouseEnter={() => handleCategoryHover(cat.id)}
+                onMouseLeave={handleCategoryLeave}
               >
-                <div className="h-10 w-10 rounded-lg bg-primary text-brand-accent flex items-center justify-center shrink-0 group-hover:bg-primary/90 transition-colors">
-                  <Icon className="h-5 w-5" />
+                <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                  isActive ? "bg-brand-accent text-white" : "bg-primary text-brand-accent"
+                }`}>
+                  <Icon className="h-4 w-4" />
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium truncate">{cat.name}</p>
                   {subCount > 0 && (
                     <p className="text-xs text-muted-foreground">
-                      {translations.subcategories.replace(
-                        "{count}",
-                        String(subCount)
-                      )}
+                      {translations.subcategories.replace("{count}", String(subCount))}
                     </p>
                   )}
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto shrink-0 opacity-0 group-hover:opacity-100 group-hover:text-brand-accent transition-all" />
-              </button>
+                <ChevronRight className={`h-4 w-4 shrink-0 transition-all ${
+                  isActive ? "text-brand-accent" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                }`} />
+              </Link>
             );
           })}
         </div>
-      ) : (
-        /* Expanded view for hovered category */
-        <div>
-          <button
-            onClick={() => setActiveRoot(null)}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-brand-accent mb-4 transition-colors"
-          >
-            ← {translations.allCategories}
-          </button>
-          <div className="flex items-center gap-2 mb-4">
-            <h4 className="font-bold text-sm">{activeCat.name}</h4>
-            <Link
-              href={`/search?category=${encodeURIComponent(activeCat.name)}`}
-              onClick={onClose}
-              className="text-xs text-brand-accent hover:underline font-medium"
-            >
-              {translations.viewAll} →
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-6">
-            {(activeCat.children ?? []).map((sub) => {
-              const SubIcon = getCategoryIcon(sub.name);
-              return (
-                <div key={sub.id}>
-                  <Link
-                    href={`/search?category=${encodeURIComponent(sub.name)}`}
-                    onClick={onClose}
-                    className="flex items-center gap-2 text-brand-accent font-bold uppercase text-xs tracking-widest hover:opacity-80 transition-opacity mb-2 pb-1 border-b border-brand-accent/20"
-                  >
-                    <SubIcon className="h-3.5 w-3.5" />
-                    {sub.name}
-                  </Link>
-                  {sub.children && sub.children.length > 0 && (
-                    <ul className="space-y-1">
-                      {sub.children.map((child) => (
-                        <li key={child.id}>
-                          <Link
-                            href={`/search?category=${encodeURIComponent(child.name)}`}
-                            onClick={onClose}
-                            className="block text-sm text-muted-foreground hover:text-brand-accent hover:border-l-2 hover:border-brand-accent hover:pl-2 transition-all py-0.5"
-                          >
-                            {child.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+
+        {/* RIGHT: Subcategories of active category */}
+        <div className="flex-1 min-w-0 max-h-[480px] overflow-y-auto">
+          {activeCat && (
+            <>
+              <div className="flex items-center gap-2 mb-4">
+                <h4 className="font-bold text-sm">{activeCat.name}</h4>
+                <Link
+                  href={`/search?category=${encodeURIComponent(activeCat.name)}`}
+                  onClick={onClose}
+                  className="text-xs text-brand-accent hover:underline font-medium"
+                >
+                  {translations.viewAll} →
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
+                {(activeCat.children ?? []).map((sub) => {
+                  const SubIcon = getCategoryIcon(sub.name);
+                  return (
+                    <div key={sub.id}>
+                      <Link
+                        role="menuitem"
+                        href={`/search?category=${encodeURIComponent(sub.name)}`}
+                        onClick={onClose}
+                        className="flex items-center gap-2 text-brand-accent font-bold uppercase text-xs tracking-widest hover:opacity-80 transition-opacity mb-2 pb-1 border-b border-brand-accent/20"
+                      >
+                        <SubIcon className="h-3.5 w-3.5" />
+                        {sub.name}
+                      </Link>
+                      {sub.children && sub.children.length > 0 && (
+                        <ul className="space-y-1">
+                          {sub.children.map((child) => (
+                            <li key={child.id}>
+                              <Link
+                                role="menuitem"
+                                href={`/search?category=${encodeURIComponent(child.name)}`}
+                                onClick={onClose}
+                                className="block text-sm text-muted-foreground hover:text-brand-accent hover:border-l-2 hover:border-brand-accent hover:pl-2 transition-all py-0.5"
+                              >
+                                {child.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
-      )}
+      </div>
     </MegaMenuShell>
   );
 }
