@@ -95,7 +95,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                   <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent" />
 
                   {/* Content anchored at bottom */}
-                  <div className="relative h-full wrapper flex flex-col justify-end pb-28 md:pb-24">
+                  <div className="relative h-full wrapper flex flex-col justify-end pb-32 md:pb-24">
                     {current === index && (
                       <div key={slideKey}>
                         {/* Label badge */}
