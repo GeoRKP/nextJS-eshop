@@ -175,7 +175,7 @@ function SingleCategoryMegaMenu({
         {/* Main content: multi-column grid of subcategories */}
         <div className="flex-1 min-w-0">
           {columns.length > 0 ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-8">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-5">
               {columns.map((sub) => {
                 const SubIcon = getCategoryIcon(sub.name);
                 return (
@@ -184,20 +184,20 @@ function SingleCategoryMegaMenu({
                       role="menuitem"
                       href={`/search?category=${encodeURIComponent(sub.name)}`}
                       onClick={onClose}
-                      className="flex items-center gap-2 text-brand-accent font-bold uppercase text-xs tracking-widest hover:opacity-80 transition-opacity mb-3 pb-1 border-b border-brand-accent/20"
+                      className="flex items-center gap-2 text-brand-accent font-bold uppercase text-xs tracking-widest hover:opacity-80 transition-opacity mb-2 pb-1 border-b border-brand-accent/20"
                     >
                       <SubIcon className="h-4 w-4" />
                       {sub.name}
                     </Link>
                     {sub.children && sub.children.length > 0 && (
-                      <ul className="space-y-1.5">
+                      <ul className="space-y-1">
                         {sub.children.map((item) => (
                           <li key={item.id}>
                             <Link
                               role="menuitem"
                               href={`/search?category=${encodeURIComponent(item.name)}`}
                               onClick={onClose}
-                              className="block text-sm text-muted-foreground hover:text-brand-accent hover:border-l-2 hover:border-brand-accent hover:pl-2 transition-all py-0.5"
+                              className="block text-sm text-muted-foreground border-l-2 border-transparent pl-2 hover:text-brand-accent hover:border-brand-accent transition-all py-0.5"
                             >
                               {item.name}
                               {item._count?.products ? (
@@ -208,15 +208,6 @@ function SingleCategoryMegaMenu({
                             </Link>
                           </li>
                         ))}
-                        <li>
-                          <Link
-                            href={`/search?category=${encodeURIComponent(sub.name)}`}
-                            onClick={onClose}
-                            className="text-xs text-brand-accent hover:underline font-medium"
-                          >
-                            {translations.viewAll} {sub.name} →
-                          </Link>
-                        </li>
                       </ul>
                     )}
                   </div>
@@ -337,12 +328,12 @@ function AllCategoriesMegaMenu({
         <div className="flex-1 min-w-0 max-h-[400px] overflow-y-auto">
           {activeCat && (
             <>
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-3">
                 <h4 className="font-bold text-sm">{activeCat.name}</h4>
                 <Link
                   href={`/search?category=${encodeURIComponent(activeCat.name)}`}
                   onClick={onClose}
-                  className="text-xs text-brand-accent hover:underline font-medium"
+                  className="text-[11px] text-muted-foreground hover:text-brand-accent transition-colors"
                 >
                   {translations.viewAll} →
                 </Link>
@@ -369,7 +360,7 @@ function AllCategoriesMegaMenu({
                                 role="menuitem"
                                 href={`/search?category=${encodeURIComponent(child.name)}`}
                                 onClick={onClose}
-                                className="block text-sm text-muted-foreground hover:text-brand-accent hover:border-l-2 hover:border-brand-accent hover:pl-2 transition-all py-0.5"
+                                className="block text-sm text-muted-foreground border-l-2 border-transparent pl-2 hover:text-brand-accent hover:border-brand-accent transition-all py-0.5"
                               >
                                 {child.name}
                               </Link>
