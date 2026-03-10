@@ -304,9 +304,9 @@ function AllCategoriesMegaMenu({
       onMouseLeave={onMouseLeave}
       onClose={onClose}
     >
-      <div className="flex gap-6 min-h-[300px]">
+      <div className="flex gap-6 min-h-[250px]">
         {/* LEFT: Category list — always visible */}
-        <div className="w-2/5 max-h-[480px] overflow-y-auto border-r border-border pr-4 space-y-0.5">
+        <div className="w-2/5 max-h-[400px] overflow-y-auto border-r border-border pr-3 space-y-0.5">
           {categories.map((cat) => {
             const Icon = getCategoryIcon(cat.name);
             const subCount = cat.children?.length ?? 0;
@@ -316,7 +316,7 @@ function AllCategoriesMegaMenu({
                 key={cat.id}
                 href={`/search?category=${encodeURIComponent(cat.name)}`}
                 onClick={onClose}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-all ${
                   isActive
                     ? "bg-brand-accent/10 border-l-2 border-brand-accent"
                     : "border-l-2 border-transparent hover:bg-muted/50"
@@ -324,21 +324,10 @@ function AllCategoriesMegaMenu({
                 onMouseEnter={() => handleCategoryHover(cat.id)}
                 onMouseLeave={handleCategoryLeave}
               >
-                <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                  isActive ? "bg-brand-accent text-white" : "bg-primary text-brand-accent"
-                }`}>
-                  <Icon className="h-4 w-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium truncate">{cat.name}</p>
-                  {subCount > 0 && (
-                    <p className="text-xs text-muted-foreground">
-                      {translations.subcategories.replace("{count}", String(subCount))}
-                    </p>
-                  )}
-                </div>
-                <ChevronRight className={`h-4 w-4 shrink-0 transition-all ${
-                  isActive ? "text-brand-accent" : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? "text-brand-accent" : "text-muted-foreground"}`} />
+                <span className="text-sm font-medium truncate flex-1">{cat.name}</span>
+                <ChevronRight className={`h-3.5 w-3.5 shrink-0 transition-all ${
+                  isActive ? "text-brand-accent" : "text-muted-foreground opacity-0"
                 }`} />
               </Link>
             );
@@ -346,7 +335,7 @@ function AllCategoriesMegaMenu({
         </div>
 
         {/* RIGHT: Subcategories of active category */}
-        <div className="flex-1 min-w-0 max-h-[480px] overflow-y-auto">
+        <div className="flex-1 min-w-0 max-h-[400px] overflow-y-auto">
           {activeCat && (
             <>
               <div className="flex items-center gap-2 mb-4">
