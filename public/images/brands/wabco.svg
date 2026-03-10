@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Diamond accent -->
+  <rect x="8" y="30" width="16" height="16" rx="1" transform="rotate(45 16 38)" fill="#142040"/>
+  <!-- WABCO wordmark -->
+  <text x="38" y="50" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="30" fill="#142040" letter-spacing="4">WABCO</text>
+  <!-- Double underline -->
+  <rect x="38" y="56" width="140" height="2.5" rx="1" fill="#142040"/>
+  <rect x="38" y="61" width="140" height="1.5" rx="0.5" fill="#142040" opacity="0.4"/>
+</svg>

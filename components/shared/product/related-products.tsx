@@ -27,7 +27,7 @@ export default async function RelatedProducts({
     <ScrollFadeIn>
       <section>
         <h2 className="h2-bold mb-6">{t("relatedProducts")}</h2>
-        <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        <AnimatedGrid className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {products.map((product) => (
             <AnimatedGridItem key={product.id}>
               <ProductCard product={product} isInWishlist={wishlistIds.has(product.id)} />

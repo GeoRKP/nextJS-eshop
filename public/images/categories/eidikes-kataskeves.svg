@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2744" />
+      <stop offset="100%" style="stop-color:#142040" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bg)" />
+  <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e2d4a" stroke-width="0.5" />
+  </pattern>
+  <rect width="400" height="400" fill="url(#grid)" />
+  <!-- CNC Machine / Custom Parts icon -->
+  <g transform="translate(200, 170)" fill="none" stroke="#f59e0b" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Machine base -->
+    <rect x="-90" y="50" width="180" height="20" rx="3" stroke-width="2.5" />
+    <!-- Machine column -->
+    <rect x="-70" y="-70" width="20" height="120" rx="2" stroke-width="2" />
+    <!-- Spindle arm -->
+    <rect x="-60" y="-50" width="100" height="14" rx="2" stroke-width="2" />
+    <!-- Spindle -->
+    <line x1="30" y1="-36" x2="30" y2="10" stroke-width="2.5" />
+    <!-- Drill bit -->
+    <polygon points="30,-5 24,15 36,15" fill="#f59e0b" opacity="0.6" stroke="none" />
+    <line x1="30" y1="15" x2="30" y2="35" stroke-width="1.5" />
+    <!-- Workpiece on table -->
+    <rect x="5" y="35" width="50" height="15" rx="2" stroke-width="2" fill="#1e2d4a" />
+    <!-- Sparks / cutting indicator -->
+    <line x1="30" y1="35" x2="22" y2="28" stroke-width="1" opacity="0.7" />
+    <line x1="30" y1="35" x2="38" y2="28" stroke-width="1" opacity="0.7" />
+    <line x1="30" y1="35" x2="30" y2="25" stroke-width="1" opacity="0.7" />
+    <!-- Control panel -->
+    <rect x="50" y="-20" width="30" height="40" rx="3" stroke-width="1.5" />
+    <circle cx="65" cy="-5" r="4" stroke-width="1" />
+    <line x1="58" y1="8" x2="72" y2="8" stroke-width="1" />
+    <!-- Dimension arrows (precision) -->
+    <g stroke="#6b7a96" stroke-width="0.8">
+      <line x1="-90" y1="80" x2="90" y2="80" />
+      <line x1="-90" y1="75" x2="-90" y2="85" />
+      <line x1="90" y1="75" x2="90" y2="85" />
+    </g>
+  </g>
+  <!-- Category label -->
+  <text x="200" y="320" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">CNC KATASKEYEZ</text>
+  <!-- AVL branding -->
+  <text x="200" y="370" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#f59e0b" text-anchor="middle" letter-spacing="4">AVL</text>
+  <!-- Corner accents -->
+  <line x1="15" y1="15" x2="45" y2="15" stroke="#f59e0b" stroke-width="2" />
+  <line x1="15" y1="15" x2="15" y2="45" stroke="#f59e0b" stroke-width="2" />
+  <line x1="355" y1="385" x2="385" y2="385" stroke="#f59e0b" stroke-width="2" />
+  <line x1="385" y1="355" x2="385" y2="385" stroke="#f59e0b" stroke-width="2" />
+</svg>

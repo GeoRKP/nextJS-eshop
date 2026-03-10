@@ -162,7 +162,7 @@ export default function OrderDetailsTable({
           />
         )}
       </div>
-      <div className="grid lg:grid-cols-3 gap-8">
+      <div className="grid lg:grid-cols-3 gap-4 md:gap-8">
         <div className="lg:col-span-2 space-y-4">
           {/* Payment Method */}
           <div className="card-premium p-5">
@@ -170,7 +170,7 @@ export default function OrderDetailsTable({
               <CreditCard className="w-4 h-4 text-brand-accent" />
               <h2 className="font-semibold">{tCheckout("paymentMethod")}</h2>
             </div>
-            <div className="pl-6 space-y-2">
+            <div className="pl-4 space-y-2">
               <p className="text-sm">{paymentMethod}</p>
               {isPaid ? (
                 <Badge className="bg-brand-accent/10 text-brand-accent border-brand-accent/20">
@@ -188,7 +188,7 @@ export default function OrderDetailsTable({
               <MapPin className="w-4 h-4 text-brand-accent" />
               <h2 className="font-semibold">{tCheckout("shippingAddress")}</h2>
             </div>
-            <div className="text-sm text-muted-foreground space-y-0.5 pl-6">
+            <div className="text-sm text-muted-foreground space-y-0.5 pl-4">
               <p className="font-medium text-foreground">{shippingAddress.fullName}</p>
               <p>{shippingAddress.address}</p>
               <p>
@@ -196,7 +196,7 @@ export default function OrderDetailsTable({
               </p>
               <p>{shippingAddress.country}</p>
             </div>
-            <div className="pl-6 mt-2">
+            <div className="pl-4 mt-2">
               {isDelivered ? (
                 <Badge className="bg-brand-accent/10 text-brand-accent border-brand-accent/20">
                   {t("deliveredAt", { date: formatDateTime(deliveredAt!).dateTime })}
@@ -224,6 +224,7 @@ export default function OrderDetailsTable({
                         width={80}
                         height={80}
                         className="object-cover w-full h-full"
+                        sizes="(max-width: 768px) 64px, 80px"
                       />
                     </div>
                   </Link>

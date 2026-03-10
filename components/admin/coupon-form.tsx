@@ -118,7 +118,7 @@ export default function CouponForm({
           {type === "Create" ? t("createCoupon") : t("updateCoupon")}
         </h1>
 
-        <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-5">
           <FormField
             control={form.control}
             name="code"
@@ -169,7 +169,7 @@ export default function CouponForm({
           />
         </div>
 
-        <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-5">
           <FormField
             control={form.control}
             name="discountValue"
@@ -205,7 +205,7 @@ export default function CouponForm({
           />
         </div>
 
-        <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-5">
           <FormField
             control={form.control}
             name="maxDiscount"
@@ -268,7 +268,7 @@ export default function CouponForm({
           />
         </div>
 
-        <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-5">
           <FormField
             control={form.control}
             name="validFrom"

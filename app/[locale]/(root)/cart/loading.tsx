@@ -9,7 +9,7 @@ export default function CartLoading() {
         <Skeleton className="h-8 w-48" />
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
+      <div className="grid lg:grid-cols-3 gap-4 md:gap-8">
         {/* Cart items */}
         <div className="lg:col-span-2 space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (

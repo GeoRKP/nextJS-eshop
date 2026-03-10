@@ -84,7 +84,7 @@ export default function StripePayment({
           />
         </div>
         <Button
-          className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
+          className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-sm sm:text-base uppercase tracking-wide active:scale-[0.98] transition-all"
           type="submit"
           disabled={isLoading || !stripe || !elements}
         >

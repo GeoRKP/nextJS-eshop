@@ -40,6 +40,47 @@ export async function getProductById(productId: string) {
   return toPlainObject(data);
 }
 
+// Resolve a category name to the set of category UUIDs that should be matched.
+// If the selected category is a parent, returns IDs of all its active children
+// (plus its own ID). If it's a leaf, returns just its own ID.
+// Falls back to matching on the Product.category text field if not found.
+async function resolveCategoryFilter(categoryName: string): Promise<{
+  ids: string[] | null;
+  textFallback: string | null;
+}> {
+  const cat = await prisma.category.findFirst({
+    where: { name: categoryName, isActive: true },
+    include: {
+      children: {
+        where: { isActive: true },
+        select: { id: true },
+      },
+    },
+  });
+
+  if (!cat) {
+    // Category not in the Category table — fall back to text match
+    return { ids: null, textFallback: categoryName };
+  }
+
+  // Collect this category's ID plus all children IDs
+  const ids = [cat.id, ...cat.children.map((c) => c.id)];
+  return { ids, textFallback: null };
+}
+
+// Lazily ensure the unaccent extension is available for accent-insensitive search
+let _unaccentReady: boolean | null = null;
+async function ensureUnaccent(): Promise<boolean> {
+  if (_unaccentReady !== null) return _unaccentReady;
+  try {
+    await prisma.$executeRawUnsafe('CREATE EXTENSION IF NOT EXISTS unaccent');
+    _unaccentReady = true;
+  } catch {
+    _unaccentReady = false;
+  }
+  return _unaccentReady;
+}
+
 // Get all products
 export async function getAllProducts({
   query,
@@ -60,15 +101,49 @@ export async function getAllProducts({
 }) {
   const hasTextQuery = query && query !== "all" && query.trim() !== "";
 
-  // ─── Full-text search path (raw SQL with tsvector) ───
+  // Resolve category hierarchy: if a parent is selected, include children
+  let categoryFilter: { ids: string[] | null; textFallback: string | null } | null = null;
+  if (category && category !== "all") {
+    categoryFilter = await resolveCategoryFilter(category);
+  }
+
+  // ─── Full-text search path (raw SQL with tsvector, fallback to ILIKE) ───
   if (hasTextQuery) {
+    // Check if search_vector column exists (it's created by a custom migration)
+    let useFullText = true;
+    try {
+      await prisma.$queryRaw`SELECT search_vector FROM "Product" LIMIT 0`;
+    } catch {
+      useFullText = false;
+    }
+
+    const likeTerm = `%${query}%`;
+    const hasUnaccent = await ensureUnaccent();
+
+    const searchCondition = useFullText
+      ? hasUnaccent
+        ? Prisma.sql`(search_vector @@ plainto_tsquery('simple', ${query}) OR unaccent(name) ILIKE unaccent(${likeTerm}) OR unaccent(brand) ILIKE unaccent(${likeTerm}))`
+        : Prisma.sql`search_vector @@ plainto_tsquery('simple', ${query})`
+      : hasUnaccent
+        ? Prisma.sql`(unaccent(name) ILIKE unaccent(${likeTerm}) OR unaccent(brand) ILIKE unaccent(${likeTerm}) OR unaccent(category) ILIKE unaccent(${likeTerm}) OR unaccent(description) ILIKE unaccent(${likeTerm}))`
+        : Prisma.sql`(name ILIKE ${likeTerm} OR brand ILIKE ${likeTerm} OR category ILIKE ${likeTerm} OR description ILIKE ${likeTerm})`;
+
     const conditions: Prisma.Sql[] = [
-      Prisma.sql`search_vector @@ plainto_tsquery('english', ${query})`,
+      searchCondition,
       Prisma.sql`"deletedAt" IS NULL`,
     ];
 
-    if (category && category !== "all") {
-      conditions.push(Prisma.sql`category = ${category}`);
+    if (categoryFilter) {
+      if (categoryFilter.ids) {
+        // Filter by categoryId (UUID) — handles both parent and child categories
+        const uuidIds = categoryFilter.ids.map((id) => Prisma.sql`${id}::uuid`);
+        conditions.push(
+          Prisma.sql`"categoryId" IN (${Prisma.join(uuidIds)})`
+        );
+      } else if (categoryFilter.textFallback) {
+        // Fallback: match on the text category field
+        conditions.push(Prisma.sql`category = ${categoryFilter.textFallback}`);
+      }
     }
     if (price && price !== "all") {
       const [min, max] = price.split("-").map(Number);
@@ -87,7 +162,9 @@ export async function getAllProducts({
           ? Prisma.sql`price DESC`
           : sort === "rating"
             ? Prisma.sql`rating DESC`
-            : Prisma.sql`ts_rank(search_vector, plainto_tsquery('english', ${query})) DESC`;
+            : useFullText
+              ? Prisma.sql`ts_rank(search_vector, plainto_tsquery('simple', ${query})) DESC`
+              : Prisma.sql`name ASC`;
 
     const offset = (page - 1) * limit;
 
@@ -151,10 +228,13 @@ export async function getAllProducts({
   }
 
   // ─── Prisma path (filters only, no text query) ───
-  const categoryFilter: Prisma.ProductWhereInput =
-    category && category !== "all"
-      ? { category: { equals: category } as Prisma.StringFilter }
-      : {};
+  const categoryWhere: Prisma.ProductWhereInput = categoryFilter
+    ? categoryFilter.ids
+      ? { categoryId: { in: categoryFilter.ids } }
+      : categoryFilter.textFallback
+        ? { category: { equals: categoryFilter.textFallback } as Prisma.StringFilter }
+        : {}
+    : {};
 
   const priceFilter: Prisma.ProductWhereInput =
     price && price !== "all"
@@ -172,7 +252,7 @@ export async function getAllProducts({
       : {};
 
   const where = {
-    ...categoryFilter,
+    ...categoryWhere,
     ...priceFilter,
     ...ratingFilter,
     deletedAt: null,
@@ -285,16 +365,40 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
   }
 }
 
-// Get all categories (legacy — from distinct text field)
+// Get all categories with hierarchy from Category model
 export const getAllCategories = unstable_cache(
   async () => {
-    const data = await prisma.product.groupBy({
-      by: ["category"],
-      where: { deletedAt: null },
-      _count: true,
+    const parents = await prisma.category.findMany({
+      where: { isActive: true, parentId: null },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      include: {
+        children: {
+          where: { isActive: true },
+          orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+          include: {
+            _count: { select: { products: { where: { deletedAt: null } } } },
+          },
+        },
+        _count: { select: { products: { where: { deletedAt: null } } } },
+      },
     });
 
-    return data;
+    return parents.map((parent) => {
+      const childProductCount = parent.children.reduce(
+        (sum, child) => sum + child._count.products,
+        0
+      );
+      return {
+        name: parent.name,
+        slug: parent.slug,
+        productCount: parent._count.products + childProductCount,
+        children: parent.children.map((child) => ({
+          name: child.name,
+          slug: child.slug,
+          productCount: child._count.products,
+        })),
+      };
+    });
   },
   ["getAllCategories"],
   { revalidate: 3600, tags: ["categories"] }
@@ -303,17 +407,50 @@ export const getAllCategories = unstable_cache(
 // Get "Did you mean?" suggestions using pg_trgm similarity
 export async function getDidYouMean(query: string): Promise<string[]> {
   if (!query || query.trim() === "") return [];
+  const hasUnaccent = await ensureUnaccent();
 
-  const results = await prisma.$queryRaw<{ name: string }[]>`
-    SELECT DISTINCT name, similarity(name, ${query}) AS sim
-    FROM "Product"
-    WHERE similarity(name, ${query}) > 0.15
-      AND "deletedAt" IS NULL
-    ORDER BY sim DESC
-    LIMIT 3
-  `;
+  try {
+    const results = hasUnaccent
+      ? await prisma.$queryRaw<{ name: string }[]>`
+          SELECT DISTINCT name, similarity(unaccent(name), unaccent(${query})) AS sim
+          FROM "Product"
+          WHERE similarity(unaccent(name), unaccent(${query})) > 0.15
+            AND "deletedAt" IS NULL
+          ORDER BY sim DESC
+          LIMIT 3
+        `
+      : await prisma.$queryRaw<{ name: string }[]>`
+          SELECT DISTINCT name, similarity(name, ${query}) AS sim
+          FROM "Product"
+          WHERE similarity(name, ${query}) > 0.15
+            AND "deletedAt" IS NULL
+          ORDER BY sim DESC
+          LIMIT 3
+        `;
 
-  return results.map((r) => r.name);
+    return results.map((r) => r.name);
+  } catch {
+    // Fallback if pg_trgm extension is not available
+    const likeTerm = `%${query}%`;
+    const results = hasUnaccent
+      ? await prisma.$queryRaw<{ name: string }[]>`
+          SELECT DISTINCT name
+          FROM "Product"
+          WHERE unaccent(name) ILIKE unaccent(${likeTerm})
+            AND "deletedAt" IS NULL
+          ORDER BY name ASC
+          LIMIT 3
+        `
+      : await prisma.$queryRaw<{ name: string }[]>`
+          SELECT DISTINCT name
+          FROM "Product"
+          WHERE name ILIKE ${likeTerm}
+            AND "deletedAt" IS NULL
+          ORDER BY name ASC
+          LIMIT 3
+        `;
+    return results.map((r) => r.name);
+  }
 }
 
 // Get product price range (min/max) for slider filter

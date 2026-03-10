@@ -30,7 +30,7 @@ function QuantityControls({
         variant="ghost"
         size="icon"
         type="button"
-        className="w-9 h-9 rounded-none hover:bg-brand-accent/10"
+        className="w-10 h-10 rounded-none hover:bg-brand-accent/10"
         onClick={onRemove}
       >
         {isPending ? (
@@ -45,7 +45,7 @@ function QuantityControls({
         variant="ghost"
         size="icon"
         type="button"
-        className="w-9 h-9 rounded-none hover:bg-brand-accent/10"
+        className="w-10 h-10 rounded-none hover:bg-brand-accent/10"
         onClick={onAdd}
       >
         {isPending ? (
@@ -114,7 +114,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
           </div>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-4 md:gap-8">
           {/* Cart items */}
           <div className="lg:col-span-2 space-y-4">
             {cart.items.map((item) => (
@@ -130,6 +130,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                       width={96}
                       height={96}
                       className="object-cover w-full h-full"
+                      sizes="(max-width: 768px) 80px, 96px"
                     />
                   </div>
                 </Link>
@@ -147,7 +148,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                     </div>
                     <button
                       onClick={() => handleRemove(item.productId)}
-                      className="text-muted-foreground/50 hover:text-destructive transition-colors p-1"
+                      className="text-muted-foreground/50 hover:text-destructive transition-colors p-2"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

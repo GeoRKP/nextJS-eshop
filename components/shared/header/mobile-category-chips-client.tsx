@@ -38,7 +38,7 @@ export default function MobileCategoryChipsClient({
               <Link
                 key={category.id}
                 href={`/search?category=${encodeURIComponent(category.name)}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium bg-card border border-border hover:border-brand-accent/50 rounded-lg whitespace-nowrap shrink-0 transition-colors shadow-inner-soft scroll-snap-start"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium bg-card border border-border hover:border-brand-accent/50 rounded-lg whitespace-nowrap shrink-0 transition-colors shadow-inner-soft scroll-snap-start"
               >
                 <Icon className="h-3 w-3 text-brand-accent" />
                 {category.name}

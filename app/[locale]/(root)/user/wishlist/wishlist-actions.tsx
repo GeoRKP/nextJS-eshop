@@ -67,6 +67,7 @@ export default function WishlistActions({
         disabled={isPending}
       >
         <Trash2 className="w-4 h-4" />
+        <span className="sr-only">{t("remove")}</span>
       </Button>
     </div>
   );

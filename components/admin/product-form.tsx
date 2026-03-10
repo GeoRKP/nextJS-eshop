@@ -16,12 +16,12 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import slugify from "slugify";
+import { greekSlugify } from "@/lib/slugify";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { createProduct, updateProduct } from "@/lib/actions/product.actions";
-import { UploadButton } from "@/lib/uploadthing";
+import { ImageUploadButton } from "@/components/shared/image-upload";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
@@ -110,7 +110,7 @@ export default function ProductForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8"
       >
-        <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-5">
           <FormField
             control={form.control}
             name="name"
@@ -155,7 +155,7 @@ export default function ProductForm({
                       onClick={() => {
                         form.setValue(
                           "slug",
-                          slugify(form.getValues("name"), { lower: true })
+                          greekSlugify(form.getValues("name"))
                         );
                       }}
                     >
@@ -168,7 +168,7 @@ export default function ProductForm({
             )}
           />
         </div>
-        <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-5">
           <FormField
             control={form.control}
             name="category"
@@ -236,7 +236,7 @@ export default function ProductForm({
             )}
           />
         </div>
-        <div className="flex flex-col md:flex-row gap-5">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-5">
           <FormField
             control={form.control}
             name="price"
@@ -278,7 +278,7 @@ export default function ProductForm({
             )}
           />
         </div>
-        <div className="upload-field flex flex-col md:flex-row gap-5">
+        <div className="upload-field flex flex-col md:flex-row gap-3 md:gap-5">
           <FormField
             control={form.control}
             name="images"
@@ -298,9 +298,8 @@ export default function ProductForm({
                       />
                     ))}
                     <FormControl>
-                      <UploadButton
-                        endpoint="imageUploader"
-                        onClientUploadComplete={(res: { url: string }[]) => {
+                      <ImageUploadButton
+                        onUploadComplete={(res: { url: string }[]) => {
                           form.setValue("images", [...images, res[0].url]);
                         }}
                         onUploadError={(error: Error) => {
@@ -346,9 +345,8 @@ export default function ProductForm({
                 />
               )}
               {isFeatured && !banner && (
-                <UploadButton
-                  endpoint="imageUploader"
-                  onClientUploadComplete={(res: { url: string }[]) => {
+                <ImageUploadButton
+                  onUploadComplete={(res: { url: string }[]) => {
                     form.setValue("banner", res[0].url);
                   }}
                   onUploadError={(error: Error) => {

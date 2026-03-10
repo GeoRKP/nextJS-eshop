@@ -71,7 +71,7 @@ export default function PaymentMethodForm({
         <Form {...form}>
           <form
             method="post"
-            className="space-y-6"
+            className="space-y-4 md:space-y-6"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField
@@ -105,7 +105,7 @@ export default function PaymentMethodForm({
                             </div>
                             <div className="flex-1">
                               <p className="font-semibold">{paymentMethod}</p>
-                              <p className="text-xs text-muted-foreground mt-0.5">
+                              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                                 {t(paymentDescKeys[paymentMethod] as Parameters<typeof t>[0])}
                               </p>
                             </div>

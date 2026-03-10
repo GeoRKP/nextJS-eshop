@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- CAMOZZI wordmark -->
+  <text x="100" y="46" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="24" fill="#142040" letter-spacing="3" text-anchor="middle">CAMOZZI</text>
+  <!-- Italian-inspired triple stripe accent -->
+  <rect x="40" y="54" width="40" height="3" rx="1" fill="#009246"/>
+  <rect x="80" y="54" width="40" height="3" rx="1" fill="#ffffff" stroke="#142040" stroke-width="0.3"/>
+  <rect x="120" y="54" width="40" height="3" rx="1" fill="#ce2b37"/>
+  <!-- Top bar -->
+  <rect x="40" y="22" width="120" height="2" rx="1" fill="#142040"/>
+</svg>

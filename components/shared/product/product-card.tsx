@@ -37,7 +37,7 @@ export default async function ProductCard({
         <div className="flex flex-row">
           {/* Image - fixed width */}
           <Link href={`/product/${product.slug}`} className="flex-shrink-0">
-            <div className="w-36 md:w-56 h-full image-zoom-container bg-muted/30 relative">
+            <div className="w-24 md:w-36 lg:w-56 h-full image-zoom-container bg-muted/30 relative">
               <Image
                 src={product.images[0]}
                 alt={product.name}
@@ -52,7 +52,7 @@ export default async function ProductCard({
           {/* Content */}
           <div className="flex flex-col flex-1 p-4 min-w-0">
             {/* Brand */}
-            <div className="text-brand-accent text-[10px] font-bold uppercase tracking-[0.15em] mb-1">
+            <div className="text-brand-accent text-xs font-bold uppercase tracking-[0.15em] mb-1">
               <HighlightText text={product.brand} query={searchQuery} />
             </div>
 
@@ -79,12 +79,12 @@ export default async function ProductCard({
             {/* Badges */}
             <div className="flex gap-1.5 mt-2">
               {isNew && (
-                <Badge className="bg-brand-accent hover:bg-brand-accent-dark text-white text-[10px] px-2 py-0 rounded-md font-bold">
+                <Badge className="bg-brand-accent hover:bg-brand-accent-dark text-white text-xs px-2 py-0 rounded-md font-bold">
                   {tBadge("new")}
                 </Badge>
               )}
               {isLowStock && (
-                <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-[10px] px-2 py-0 rounded-md font-bold">
+                <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-2 py-0 rounded-md font-bold">
                   {tBadge("lowStock")}
                 </Badge>
               )}
@@ -112,7 +112,7 @@ export default async function ProductCard({
   // Grid variant (default)
   return (
     <AnimatedCard>
-      <Card className="w-full max-w-sm group overflow-hidden card-premium relative">
+      <Card className="w-full group overflow-hidden card-premium relative">
         <CardHeader className="p-0 items-center">
           <Link href={`/product/${product.slug}`}>
             <div className="aspect-[4/3] image-zoom-container bg-muted/30 relative">
@@ -145,24 +145,24 @@ export default async function ProductCard({
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {isNew && (
-              <Badge className="bg-brand-accent hover:bg-brand-accent-dark text-white text-[10px] px-2.5 py-0.5 rounded-md font-bold">
+              <Badge className="bg-brand-accent hover:bg-brand-accent-dark text-white text-xs px-2.5 py-0.5 rounded-md font-bold">
                 {tBadge("new")}
               </Badge>
             )}
             {product.isFeatured && (
-              <Badge className="bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] px-2.5 py-0.5 rounded-md font-bold">
+              <Badge className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-2.5 py-0.5 rounded-md font-bold">
                 {tBadge("featured")}
               </Badge>
             )}
             {isLowStock && (
-              <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-[10px] px-2.5 py-0.5 rounded-md font-bold">
+              <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-2.5 py-0.5 rounded-md font-bold">
                 {tBadge("lowStock")}
               </Badge>
             )}
           </div>
         </CardHeader>
         <CardContent className="p-4 grid gap-2">
-          <div className="text-brand-accent text-[10px] font-bold uppercase tracking-[0.15em]">
+          <div className="text-brand-accent text-xs font-bold uppercase tracking-[0.15em]">
             <HighlightText text={product.brand} query={searchQuery} />
           </div>
           <Link href={`/product/${product.slug}`}>
@@ -179,7 +179,7 @@ export default async function ProductCard({
           {/* Price divider */}
           <div className="border-t border-border/30 pt-2 mt-1">
             {product.stock > 0 ? (
-              <div className="text-lg font-black tracking-tight">
+              <div className="text-base sm:text-lg font-black tracking-tight">
                 <ProductPrice value={Number(product.price)} />
               </div>
             ) : (

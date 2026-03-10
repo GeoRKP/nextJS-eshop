@@ -94,14 +94,14 @@ export default async function CategoryDraw() {
           <div className="space-y-1 mt-4">
             {categories.map((x) => (
               <Button
-                key={x.category}
+                key={x.name}
                 className="w-full justify-start"
                 variant="ghost"
                 asChild
               >
                 <DrawerClose asChild>
-                  <Link href={`/search?category=${x.category}`}>
-                    {x.category} ({x._count})
+                  <Link href={`/search?category=${x.name}`}>
+                    {x.name} ({x.productCount})
                   </Link>
                 </DrawerClose>
               </Button>

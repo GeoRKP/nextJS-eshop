@@ -2,18 +2,10 @@ import NextAuth from "next-auth";
 import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compareSync } from "bcrypt-ts-edge";
-import type { NextAuthConfig } from "next-auth";
-import { NextResponse } from "next/server";
+import { authConfig } from "./auth.config";
 
-export const config: NextAuthConfig = {
-  pages: {
-    signIn: "/sign-in",
-    error: "/sign-in",
-  },
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -49,6 +41,7 @@ export const config: NextAuthConfig = {
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async session({ session, user, trigger, token }: any) {
       session.user.id = token.sub as string;
       session.user.role = token.role as string;
@@ -60,7 +53,6 @@ export const config: NextAuthConfig = {
     },
     async jwt({ token, user, session, trigger }: any) {
       if (user) {
-        
         token.role = user.role;
 
         if (user.name === "NO_NAME") {
@@ -71,8 +63,6 @@ export const config: NextAuthConfig = {
             data: { name: token.name },
           });
         }
-
-      
       }
 
       if (session?.user.name && trigger === "update") {
@@ -81,45 +71,5 @@ export const config: NextAuthConfig = {
 
       return token;
     },
-    authorized({ request, auth }: any) {
-      // Array of regex patterns of paths we want to protect
-      const protectedPaths = [
-        /^(?:\/en)?\/shipping-address/,
-        /^(?:\/en)?\/payment-method/,
-        /^(?:\/en)?\/place-order/,
-        /^(?:\/en)?\/profile/,
-        /^(?:\/en)?\/user\/(.*)/,
-        /^(?:\/en)?\/order\/(.*)/,
-        /^(?:\/en)?\/admin/,
-      ];
-
-      // Get the pathname of the req url object
-      const { pathname } = request.nextUrl;
-
-      // Check if the pathname matches any of the protected paths and user is not authenticated
-      if (!auth && protectedPaths.some((p) => p.test(pathname))) return false;
-
-      // Cherck for session cart cookie
-      if (!request.cookies.get("sessionCartId")) {
-        // Generate a new cart id cookie
-        const sessionCartId = crypto.randomUUID();
-
-        const newRequestHeaders = new Headers(request.headers);
-
-        const response = NextResponse.next({
-          request: {
-            headers: newRequestHeaders,
-          },
-        });
-
-        response.cookies.set("sessionCartId", sessionCartId);
-
-        return response;
-      } else {
-        return true;
-      }
-    },
   },
-} satisfies NextAuthConfig;
-
-export const { handlers, signIn, signOut, auth } = NextAuth(config);
+});

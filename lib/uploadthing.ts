@@ -1,11 +1,5 @@
-import {
-  generateUploadButton,
-  generateUploadDropzone,
-} from "@uploadthing/react";
-
-
-
-import type { OurFileRouter } from "@/app/api/uploadthing/core";
-
-export const UploadButton = generateUploadButton<OurFileRouter>();
-export const UploadDropzone = generateUploadDropzone<OurFileRouter>();
+// UploadThing has been replaced with local file uploads.
+// See: components/shared/image-upload.tsx
+// See: app/api/upload/route.ts
+// See: app/api/uploads/[...path]/route.ts
+export {};

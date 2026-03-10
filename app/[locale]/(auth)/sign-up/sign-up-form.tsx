@@ -59,7 +59,7 @@ export default function SignUpForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -154,7 +154,7 @@ export default function SignUpForm() {
           )}
           <div className="text-sm text-center text-muted-foreground mt-2">
             {t("hasAccount")}{" "}
-            <Link href="/sign-in" className="text-accent font-semibold hover:underline">
+            <Link href="/sign-in" className="text-accent font-semibold hover:underline inline-block px-1 py-1">
               {t("signIn")}
             </Link>
           </div>

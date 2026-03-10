@@ -57,7 +57,7 @@ export default function CredentialsSignInForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
         <FormField
           control={form.control}
           name="email"
@@ -112,7 +112,7 @@ export default function CredentialsSignInForm() {
           )}
           <div className="text-sm text-center text-muted-foreground mt-2">
             {t("noAccount")}{" "}
-            <Link href="/sign-up" className="text-accent font-semibold hover:underline">
+            <Link href="/sign-up" className="text-accent font-semibold hover:underline inline-block px-1 py-1">
               {t("signUp")}
             </Link>
           </div>

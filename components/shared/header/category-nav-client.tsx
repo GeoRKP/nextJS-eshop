@@ -50,6 +50,14 @@ export default function CategoryNavClient({
     }, 300);
   }, []);
 
+  const handleClick = useCallback((categoryId: string) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setActiveCategory((prev) => (prev === categoryId ? null : categoryId));
+  }, []);
+
   const handleMegaMenuEnter = useCallback(() => {
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
@@ -67,8 +75,8 @@ export default function CategoryNavClient({
 
   return (
     <div ref={navRef} className="relative">
-      <nav className="hidden md:block bg-primary text-primary-foreground">
-        <div className="wrapper flex items-center gap-0 h-11 !py-0">
+      <nav className="hidden md:block bg-primary text-primary-foreground relative z-[45]">
+        <div className="wrapper flex items-center gap-0 h-11 !py-0 overflow-hidden">
           {/* All Categories button */}
           <button
             className={`flex items-center gap-1.5 px-4 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all ${
@@ -78,6 +86,7 @@ export default function CategoryNavClient({
             }`}
             onMouseEnter={() => handleMouseEnter("__all__")}
             onMouseLeave={handleMouseLeave}
+            onClick={() => handleClick("__all__")}
           >
             <Grid3X3 className="h-4 w-4" />
             {translations.allCategories}
@@ -100,12 +109,12 @@ export default function CategoryNavClient({
                 }`}
                 onMouseEnter={() => handleMouseEnter(category.id)}
                 onMouseLeave={handleMouseLeave}
+                onClick={() => handleClick(category.id)}
               >
-                <Icon className="h-3.5 w-3.5" />
-                <span className="hidden lg:inline">{category.name}</span>
-                <span className="lg:hidden">{category.name}</span>
+                <Icon className="h-3.5 w-3.5 shrink-0" />
+                <span className="hidden lg:inline truncate max-w-[140px] xl:max-w-[180px]">{category.name}</span>
                 {category.children && category.children.length > 0 && (
-                  <ChevronDown className={`h-3 w-3 hidden lg:block transition-transform duration-200 ${isActive ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`h-3 w-3 hidden lg:block shrink-0 transition-transform duration-200 ${isActive ? "rotate-180" : ""}`} />
                 )}
               </button>
             );
@@ -123,6 +132,7 @@ export default function CategoryNavClient({
                 }`}
                 onMouseEnter={() => handleMouseEnter("__brands__")}
                 onMouseLeave={handleMouseLeave}
+                onClick={() => handleClick("__brands__")}
               >
                 <Layers className="h-3.5 w-3.5" />
                 {translations.shopByBrand}

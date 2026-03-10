@@ -40,7 +40,7 @@ export default function SearchDropdown({
   return (
     <div
       id="search-dropdown"
-      className="absolute top-full left-0 right-0 z-50 mt-2 max-h-[400px] overflow-y-auto rounded-xl border border-t-2 border-t-brand-accent bg-popover shadow-elevated"
+      className="absolute top-full left-0 right-0 z-50 mt-2 max-h-[50vh] md:max-h-[400px] overflow-y-auto rounded-xl border border-t-2 border-t-brand-accent bg-popover shadow-elevated"
       role="listbox"
     >
       {/* Recent searches */}
@@ -56,7 +56,7 @@ export default function SearchDropdown({
                 e.preventDefault();
                 onClearRecents();
               }}
-              className="text-xs text-muted-foreground hover:text-foreground"
+              className="text-xs text-muted-foreground hover:text-foreground px-2 py-1"
             >
               Clear all
             </button>
@@ -88,9 +88,9 @@ export default function SearchDropdown({
                     e.stopPropagation();
                     onRemoveRecent(term);
                   }}
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             );
@@ -126,6 +126,7 @@ export default function SearchDropdown({
                   width={44}
                   height={44}
                   className="rounded-lg object-cover border"
+                  sizes="44px"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="truncate text-sm font-medium">

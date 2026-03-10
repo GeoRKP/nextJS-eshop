@@ -56,7 +56,7 @@ const Footer = async () => {
       {/* Tier 2: Trust Bar */}
       <div className="border-b border-white/5">
         <div className="wrapper py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: Truck, title: tv("freeShipping"), desc: tv("freeShippingDesc") },
               { icon: Shield, title: tv("securePayment"), desc: tv("securePaymentDesc") },
@@ -79,14 +79,14 @@ const Footer = async () => {
 
       {/* Tier 3: Main Grid (6 columns) */}
       <div className="wrapper py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 sm:gap-8 lg:gap-10">
           {/* Brand column (2-col) */}
           <div className="lg:col-span-2 space-y-4">
             <h3 className="font-heading text-xl font-bold uppercase">{APP_NAME}</h3>
             <p className="text-sm text-primary-foreground/70 leading-relaxed max-w-sm">
               {t("description")}
             </p>
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-4 pt-2">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
@@ -107,17 +107,17 @@ const Footer = async () => {
             </h3>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/search" className="text-sm text-primary-foreground/60 hover:text-white transition-colors">
+                <Link href="/search" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
                   {t("allProducts")}
                 </Link>
               </li>
               <li>
-                <Link href="/search?sort=newest" className="text-sm text-primary-foreground/60 hover:text-white transition-colors">
+                <Link href="/search?sort=newest" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
                   {t("newArrivals")}
                 </Link>
               </li>
               <li>
-                <Link href="/search?price=1-50" className="text-sm text-primary-foreground/60 hover:text-white transition-colors">
+                <Link href="/search?price=1-50" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
                   {t("deals")}
                 </Link>
               </li>
@@ -134,7 +134,7 @@ const Footer = async () => {
                 <li key={key}>
                   <a
                     href="#"
-                    className="text-sm text-primary-foreground/60 hover:text-white transition-colors"
+                    className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block"
                   >
                     {t(key as "contactUs" | "faq" | "returns" | "shippingInfo")}
                   </a>
@@ -150,22 +150,22 @@ const Footer = async () => {
             </h3>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/user/orders" className="text-sm text-primary-foreground/60 hover:text-white transition-colors">
+                <Link href="/user/orders" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
                   {t("myOrders")}
                 </Link>
               </li>
               <li>
-                <Link href="/user/wishlist" className="text-sm text-primary-foreground/60 hover:text-white transition-colors">
+                <Link href="/user/wishlist" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
                   {t("myWishlist")}
                 </Link>
               </li>
               <li>
-                <Link href="/user/profile" className="text-sm text-primary-foreground/60 hover:text-white transition-colors">
+                <Link href="/user/profile" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
                   {t("myProfile")}
                 </Link>
               </li>
               <li>
-                <Link href="/user/addresses" className="text-sm text-primary-foreground/60 hover:text-white transition-colors">
+                <Link href="/user/addresses" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
                   {t("myAddresses")}
                 </Link>
               </li>
@@ -179,19 +179,19 @@ const Footer = async () => {
             </h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-primary-foreground/60">
-                <Phone className="h-4 w-4 text-brand-accent shrink-0 mt-0.5" />
+                <Phone className="h-5 w-5 text-brand-accent shrink-0 mt-0.5" />
                 <span>+30 210 1234567</span>
               </li>
               <li className="flex items-start gap-2 text-sm text-primary-foreground/60">
-                <Mail className="h-4 w-4 text-brand-accent shrink-0 mt-0.5" />
+                <Mail className="h-5 w-5 text-brand-accent shrink-0 mt-0.5" />
                 <span>info@geostore.gr</span>
               </li>
               <li className="flex items-start gap-2 text-sm text-primary-foreground/60">
-                <MapPin className="h-4 w-4 text-brand-accent shrink-0 mt-0.5" />
+                <MapPin className="h-5 w-5 text-brand-accent shrink-0 mt-0.5" />
                 <span>Athens, Greece</span>
               </li>
               <li className="flex items-start gap-2 text-sm text-primary-foreground/60">
-                <Clock className="h-4 w-4 text-brand-accent shrink-0 mt-0.5" />
+                <Clock className="h-5 w-5 text-brand-accent shrink-0 mt-0.5" />
                 <span>{t("businessHours")}</span>
               </li>
             </ul>
@@ -224,10 +224,10 @@ const Footer = async () => {
             <span className="text-primary-foreground/30">|</span>
             <a
               href="#"
-              className="text-xs text-primary-foreground/50 hover:text-white transition-colors flex items-center gap-1"
+              className="text-xs text-primary-foreground/50 hover:text-white transition-colors flex items-center gap-1 py-2 px-2"
               aria-label={t("backToTop")}
             >
-              <ArrowUp className="h-3 w-3" />
+              <ArrowUp className="h-4 w-4" />
               {t("backToTop")}
             </a>
           </div>

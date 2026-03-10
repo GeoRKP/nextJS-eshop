@@ -79,7 +79,7 @@ export default function ReviewList({
         <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-8 p-6 bg-card rounded-lg border border-border/50 shadow-card-subtle">
           {/* Average rating */}
           <div className="flex flex-col items-center justify-center gap-1">
-            <span className="text-5xl font-black">{avgRating.toFixed(1)}</span>
+            <span className="text-4xl sm:text-5xl font-black">{avgRating.toFixed(1)}</span>
             <Rating value={avgRating} />
             <span className="text-xs text-muted-foreground mt-1">
               {t("numReviews", { count: totalReviews })}
@@ -137,7 +137,7 @@ export default function ReviewList({
             </div>
 
             {/* Body */}
-            <p className="text-sm text-muted-foreground leading-relaxed mt-3">
+            <p className="text-sm text-muted-foreground leading-relaxed mt-3 break-words">
               {review.description}
             </p>
 

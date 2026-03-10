@@ -37,7 +37,7 @@ export default async function UserButton() {
             {firstInitial}
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-64 rounded-xl shadow-elevated" align="end" forceMount>
+        <DropdownMenuContent className="w-[min(256px,90vw)] rounded-xl shadow-elevated" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">

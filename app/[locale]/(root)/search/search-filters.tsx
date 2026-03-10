@@ -14,8 +14,16 @@ import { SlidersHorizontal, ChevronDown, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
 
+type CategoryItem = {
+  name: string;
+  count: number;
+  href: string;
+  isActive: boolean;
+  children?: CategoryItem[];
+};
+
 type FilterData = {
-  categories: { name: string; count: number; href: string; isActive: boolean }[];
+  categories: CategoryItem[];
   ratings: { value: number; label: string; href: string; isActive: boolean }[];
   priceRange: { min: number; max: number; currentMin: number; currentMax: number };
   anyHref: { category: string; price: string; rating: string };
@@ -136,7 +144,8 @@ function PriceSlider({
           type="number"
           value={values[0]}
           onChange={(e) => setValues([Number(e.target.value), values[1]])}
-          className="input-modern text-center text-xs !px-2 !py-2"
+          className="input-modern text-center text-sm !px-3 !py-2.5"
+          step={0.01}
           min={priceRange.min}
           max={values[1]}
         />
@@ -145,7 +154,8 @@ function PriceSlider({
           type="number"
           value={values[1]}
           onChange={(e) => setValues([values[0], Number(e.target.value)])}
-          className="input-modern text-center text-xs !px-2 !py-2"
+          className="input-modern text-center text-sm !px-3 !py-2.5"
+          step={0.01}
           min={values[0]}
           max={priceRange.max}
         />
@@ -153,7 +163,7 @@ function PriceSlider({
       <Slider
         min={priceRange.min}
         max={priceRange.max}
-        step={10}
+        step={1}
         value={values}
         onValueChange={(v) => setValues(v as [number, number])}
       />
@@ -170,6 +180,75 @@ function PriceSlider({
         {translations.applyPrice}
       </Button>
     </div>
+  );
+}
+
+function CategoryNode({ cat }: { cat: CategoryItem }) {
+  const hasChildren = cat.children && cat.children.length > 0;
+  const isChildActive = hasChildren && cat.children!.some((c) => c.isActive);
+  const isExpanded = cat.isActive || isChildActive;
+  const [open, setOpen] = useState(isExpanded);
+
+  return (
+    <li>
+      <div className="flex items-center">
+        <Link
+          className={`text-sm py-2 px-3 flex-1 flex items-center justify-between rounded-lg transition-all ${
+            cat.isActive
+              ? "font-semibold text-brand-accent bg-brand-accent/8 border-l-2 border-brand-accent"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          }`}
+          href={cat.href}
+        >
+          <span>{cat.name}</span>
+          <span className="text-[10px] tabular-nums bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground">
+            {cat.count}
+          </span>
+        </Link>
+        {hasChildren && (
+          <button
+            onClick={() => setOpen(!open)}
+            className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Toggle subcategories"
+          >
+            <ChevronDown
+              className={`h-3.5 w-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+            />
+          </button>
+        )}
+      </div>
+      {hasChildren && (
+        <AnimatePresence>
+          {open && (
+            <motion.ul
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="overflow-hidden pl-3 space-y-0.5"
+            >
+              {cat.children!.map((child) => (
+                <li key={child.name}>
+                  <Link
+                    className={`text-xs py-1.5 px-3 flex items-center justify-between rounded-lg transition-all ${
+                      child.isActive
+                        ? "font-semibold text-brand-accent bg-brand-accent/8 border-l-2 border-brand-accent"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }`}
+                    href={child.href}
+                  >
+                    <span>{child.name}</span>
+                    <span className="text-[10px] tabular-nums bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground">
+                      {child.count}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </motion.ul>
+          )}
+        </AnimatePresence>
+      )}
+    </li>
   );
 }
 
@@ -214,21 +293,7 @@ function FilterContent({ filterData }: { filterData: FilterData }) {
             </Link>
           </li>
           {categories.map((cat) => (
-            <li key={cat.name}>
-              <Link
-                className={`text-sm py-2 px-3 flex items-center justify-between rounded-lg transition-all ${
-                  cat.isActive
-                    ? "font-semibold text-brand-accent bg-brand-accent/8 border-l-2 border-brand-accent"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                }`}
-                href={cat.href}
-              >
-                <span>{cat.name}</span>
-                <span className="text-[10px] tabular-nums bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground">
-                  {cat.count}
-                </span>
-              </Link>
-            </li>
+            <CategoryNode key={cat.name} cat={cat} />
           ))}
         </ul>
       </FilterSection>
@@ -268,7 +333,7 @@ function FilterContent({ filterData }: { filterData: FilterData }) {
                 href={r.href}
               >
                 <StarRating count={r.value} />
-                <span className="text-xs">&amp; up</span>
+                <span className="text-xs">{r.label.replace(/^\d+\s*/, '')}</span>
               </Link>
             </li>
           ))}
@@ -295,7 +360,7 @@ export default function SearchFilters({ filterData, filterCount }: Props) {
               )}
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[320px] sm:w-[360px] p-0 overflow-y-auto">
+          <SheetContent side="left" className="w-[min(320px,90vw)] sm:w-[360px] p-0 overflow-y-auto">
             <div className="sticky top-0 z-10 bg-card border-b border-border px-5 py-4">
               <SheetTitle>
                 {filterData.translations.filters}

@@ -41,7 +41,7 @@ export default async function AddressesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {addresses.map((address) => (
             <div key={address.id} className="card-premium overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-3 border-b border-border/40">
+              <div className="flex items-center justify-between px-4 md:px-5 py-3 border-b border-border/40">
                 <h3 className="font-heading font-bold text-sm uppercase">
                   {address.label || address.fullName}
                 </h3>
@@ -49,7 +49,7 @@ export default async function AddressesPage() {
                   <Badge variant="accent">{t("default")}</Badge>
                 )}
               </div>
-              <div className="p-5 space-y-1 text-sm">
+              <div className="p-4 md:p-5 space-y-1 text-sm">
                 <p className="font-medium">{address.fullName}</p>
                 {address.phone && (
                   <p className="text-muted-foreground">{address.phone}</p>
@@ -63,7 +63,7 @@ export default async function AddressesPage() {
                 </p>
                 <p>{address.country}</p>
 
-                <div className="flex gap-2 pt-4">
+                <div className="flex flex-col sm:flex-row gap-2 pt-4">
                   <Button asChild variant="outline" size="sm">
                     <Link href={`/user/addresses/${address.id}`}>
                       {tCommon("edit")}

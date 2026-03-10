@@ -56,15 +56,25 @@ export default function HeroCarousel({ products, translations }: Props) {
         <CarouselContent>
           {products.map((product, index) => (
             <CarouselItem key={product.id}>
-              <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
+              <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
                 {product.banner ? (
-                  <Image
-                    src={product.banner}
-                    alt={product.name}
-                    fill
-                    priority={index === 0}
-                    className="object-cover"
-                  />
+                  product.banner.endsWith('.svg') ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={product.banner}
+                      alt={product.name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Image
+                      src={product.banner}
+                      alt={product.name}
+                      fill
+                      priority={index === 0}
+                      className="object-cover"
+                      sizes="100vw"
+                    />
+                  )
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-primary/40" />
                 )}
@@ -86,7 +96,7 @@ export default function HeroCarousel({ products, translations }: Props) {
 
                       {/* Main heading */}
                       <h1
-                        className="text-5xl md:text-7xl lg:text-8xl font-black text-white max-w-3xl leading-[0.92] tracking-tight uppercase opacity-0 animate-fade-up"
+                        className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white max-w-3xl leading-[0.92] tracking-tight uppercase opacity-0 animate-fade-up"
                         style={{ animationDelay: "100ms", animationFillMode: "forwards" }}
                       >
                         {translations.tagline}
@@ -102,7 +112,7 @@ export default function HeroCarousel({ products, translations }: Props) {
 
                       {/* CTAs */}
                       <div
-                        className="flex gap-3 mt-6 opacity-0 animate-fade-up"
+                        className="flex flex-col sm:flex-row gap-3 mt-6 opacity-0 animate-fade-up"
                         style={{ animationDelay: "300ms", animationFillMode: "forwards" }}
                       >
                         <Button
@@ -134,7 +144,7 @@ export default function HeroCarousel({ products, translations }: Props) {
 
       {/* Slide indicators — centered pills with progress bar */}
       {total > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 min-h-[44px]">
           {products.map((_, index) => (
             <button
               key={index}

@@ -38,7 +38,7 @@ export default async function StripePaymentSuccess(props: {
 
   return (
     <div className="wrapper max-w-2xl mx-auto py-12">
-      <div className="card-premium p-8 md:p-12 flex flex-col items-center text-center gap-6">
+      <div className="card-premium p-5 md:p-8 lg:p-12 flex flex-col items-center text-center gap-6">
         {/* Success icon */}
         <div className="w-20 h-20 rounded-full bg-brand-accent/10 flex items-center justify-center">
           <CheckCircle2 className="w-10 h-10 text-brand-accent" />

@@ -28,6 +28,7 @@ import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
 import ModeToggle from "./mode-toggle";
 import LanguageSwitcher from "./language-switcher";
+import { LanguageToggle } from "./language-switcher";
 
 type BrandItem = { brand: string; _count: number };
 
@@ -92,7 +93,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-[340px] sm:w-[400px] p-0 flex flex-col"
+        className="w-[min(340px,85vw)] sm:w-[400px] p-0 flex flex-col"
       >
         {/* Header - gradient with industrial stripe */}
         <div className="relative bg-gradient-to-r from-primary to-primary/90 text-primary-foreground">
@@ -101,9 +102,12 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
             <SheetTitle className="text-lg font-heading font-black tracking-tight uppercase text-primary-foreground">
               {t("categories")}
             </SheetTitle>
-            <Button variant="ghost" size="icon" onClick={closeMenu} className="text-primary-foreground hover:bg-white/10">
-              <X className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <LanguageToggle />
+              <Button variant="ghost" size="icon" onClick={closeMenu} className="text-primary-foreground hover:bg-white/10">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -120,7 +124,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
               className="flex-1 h-10 bg-transparent pl-2 pr-2 text-sm focus:outline-none"
               autoComplete="off"
             />
-            <button type="submit" className="h-8 w-8 rounded-full bg-brand-accent text-white flex items-center justify-center shrink-0 mr-1">
+            <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-white flex items-center justify-center shrink-0 mr-1">
               <SearchIcon className="h-3.5 w-3.5" />
             </button>
           </form>
@@ -340,7 +344,7 @@ function CategoryAccordion({
         {hasChildren && (
           <button
             onClick={() => onToggle(category.id)}
-            className="p-3 hover:bg-accent/50"
+            className="p-3 hover:bg-accent/50 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             {isExpanded ? (
               <ChevronDown className="h-4 w-4 text-brand-accent" />

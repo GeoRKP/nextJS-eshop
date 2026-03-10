@@ -113,7 +113,7 @@ export default function MobileSearch({ onClose }: Props) {
               value={query}
               onChange={(e) => handleInputChange(e.target.value)}
               placeholder="Search..."
-              className="flex-1 h-10 bg-transparent pl-2 text-sm text-primary-foreground placeholder:text-primary-foreground/50 focus:outline-none"
+              className="flex-1 h-11 bg-transparent pl-2 text-sm text-primary-foreground placeholder:text-primary-foreground/50 focus:outline-none"
               autoComplete="off"
             />
             {query && (
@@ -131,7 +131,7 @@ export default function MobileSearch({ onClose }: Props) {
               </button>
             )}
           </div>
-          <button type="submit" className="h-9 w-9 rounded-full bg-brand-accent text-white flex items-center justify-center shrink-0">
+          <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-white flex items-center justify-center shrink-0">
             <SearchIcon className="h-4 w-4" />
           </button>
         </form>
@@ -167,9 +167,9 @@ export default function MobileSearch({ onClose }: Props) {
                 </button>
                 <button
                   onClick={() => removeSearch(term)}
-                  className="text-muted-foreground"
+                  className="text-muted-foreground p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             ))}
@@ -194,6 +194,7 @@ export default function MobileSearch({ onClose }: Props) {
                   width={52}
                   height={52}
                   className="rounded-lg object-cover border"
+                  sizes="52px"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{product.name}</p>

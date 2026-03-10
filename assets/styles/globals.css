@@ -4,7 +4,7 @@
 
 @layer utilities {
   .wrapper {
-    @apply max-w-7xl lg:mx-auto p-5 md:px-10 w-full;
+    @apply max-w-7xl lg:mx-auto px-4 py-5 md:px-8 lg:px-10 w-full;
   }
 
   .wrapper-narrow {
@@ -23,11 +23,11 @@
   }
 
   .h1-bold {
-    @apply font-heading font-bold text-3xl md:text-4xl lg:text-5xl tracking-tight uppercase;
+    @apply font-heading font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight uppercase;
   }
 
   .h2-bold {
-    @apply font-heading font-bold text-2xl lg:text-3xl tracking-tight uppercase;
+    @apply font-heading font-bold text-2xl md:text-2xl lg:text-3xl tracking-tight uppercase;
   }
 
   .h3-bold {
@@ -35,11 +35,11 @@
   }
 
   .text-display {
-    @apply font-heading text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight uppercase;
+    @apply font-heading text-3xl md:text-4xl lg:text-6xl font-extrabold tracking-tight uppercase;
   }
 
   .text-label {
-    @apply font-heading text-xs font-semibold uppercase tracking-[0.2em];
+    @apply font-heading text-xs font-semibold uppercase tracking-widest sm:tracking-[0.2em];
   }
 
   .transition-default {
@@ -158,8 +158,10 @@
   .image-zoom-container img {
     @apply transition-transform duration-500 ease-out;
   }
-  .image-zoom-container:hover img {
-    transform: scale(1.08);
+  @media (hover: hover) {
+    .image-zoom-container:hover img {
+      transform: scale(1.08);
+    }
   }
 
   /* Tab indicator underline for active tab */

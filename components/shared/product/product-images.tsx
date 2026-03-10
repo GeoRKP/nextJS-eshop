@@ -31,14 +31,14 @@ export default function ProductImages({ images }: { images: string[] }) {
           <>
             <button
               onClick={(e) => { e.stopPropagation(); goTo(current - 1); }}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-white/80 dark:bg-card/80 backdrop-blur border border-border/50 flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity duration-200 hover:bg-white dark:hover:bg-card shadow-sm"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-white/80 dark:bg-card/80 backdrop-blur border border-border/50 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/image:opacity-100 transition-opacity duration-200 hover:bg-white dark:hover:bg-card shadow-sm"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); goTo(current + 1); }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-white/80 dark:bg-card/80 backdrop-blur border border-border/50 flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity duration-200 hover:bg-white dark:hover:bg-card shadow-sm"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-white/80 dark:bg-card/80 backdrop-blur border border-border/50 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/image:opacity-100 transition-opacity duration-200 hover:bg-white dark:hover:bg-card shadow-sm"
               aria-label="Next image"
             >
               <ChevronRight className="w-5 h-5" />
@@ -63,7 +63,7 @@ export default function ProductImages({ images }: { images: string[] }) {
               onClick={() => setCurrent(index)}
               aria-current={current === index ? "true" : undefined}
               className={cn(
-                "rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-200 flex-shrink-0 w-[72px] h-[72px]",
+                "rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-200 flex-shrink-0 w-[56px] h-[56px] sm:w-[72px] sm:h-[72px]",
                 current === index
                   ? "border-brand-accent ring-2 ring-brand-accent/20"
                   : "border-transparent hover:border-muted-foreground/30 opacity-70 hover:opacity-100"

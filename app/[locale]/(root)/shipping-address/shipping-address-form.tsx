@@ -65,7 +65,7 @@ export default function ShippingAddressForm({
         <Form {...form}>
           <form
             method="post"
-            className="space-y-5"
+            className="space-y-3 md:space-y-5"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField
@@ -106,7 +106,7 @@ export default function ShippingAddressForm({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
               <FormField
                 control={form.control}
                 name="city"

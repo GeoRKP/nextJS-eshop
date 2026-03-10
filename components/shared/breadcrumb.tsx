@@ -20,7 +20,7 @@ export default async function Breadcrumb({
         <li>
           <Link
             href="/"
-            className="flex items-center gap-1 hover:text-foreground transition-colors"
+            className="flex items-center gap-1 hover:text-foreground transition-colors py-1 px-0.5"
           >
             <Home className="w-4 h-4" />
             <span>{t("home")}</span>
@@ -32,12 +32,12 @@ export default async function Breadcrumb({
             {item.href ? (
               <Link
                 href={item.href}
-                className="hover:text-foreground transition-colors"
+                className="hover:text-foreground transition-colors py-1 px-0.5 truncate max-w-[200px]"
               >
                 {item.label}
               </Link>
             ) : (
-              <span className="text-foreground font-medium">{item.label}</span>
+              <span className="text-foreground font-medium truncate max-w-[200px]">{item.label}</span>
             )}
           </li>
         ))}

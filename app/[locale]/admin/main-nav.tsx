@@ -99,13 +99,13 @@ export default function MainNav({
             key={link.href}
             href={link.href}
             className={cn(
-              "flex items-center gap-1.5 px-4 py-2 text-xs whitespace-nowrap transition-all rounded-full",
+              "flex items-center gap-1.5 px-4 py-2.5 text-sm whitespace-nowrap transition-all rounded-full",
               active
                 ? "bg-accent text-accent-foreground font-bold"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
-            <Icon className="w-3.5 h-3.5" />
+            <Icon className="w-4 h-4" />
             {link.title}
           </Link>
         );

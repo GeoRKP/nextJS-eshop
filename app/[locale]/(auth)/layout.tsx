@@ -43,14 +43,14 @@ export default async function AuthLayout({
       </div>
 
       {/* Mobile branded header — shown only on mobile */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-10 bg-primary text-primary-foreground px-4 py-3 flex items-center gap-3">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-10 bg-primary text-primary-foreground px-4 py-3 flex items-center gap-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
         <h2 className="font-heading font-bold text-lg uppercase">{APP_NAME}</h2>
         <p className="text-xs text-primary-foreground/60 truncate">{t("authTagline")}</p>
       </div>
 
       {/* Right panel - form */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-gradient-subtle pt-20 lg:pt-6">
-        <div className="w-full max-w-[420px]">{children}</div>
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-gradient-subtle pt-16 lg:pt-6">
+        <div className="w-full max-w-full sm:max-w-[420px]">{children}</div>
       </div>
     </div>
   );

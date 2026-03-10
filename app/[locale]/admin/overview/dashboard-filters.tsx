@@ -86,7 +86,7 @@ export default function DashboardFilters({
           value={hasCustomRange ? "custom" : currentPeriod}
           onValueChange={handlePeriodChange}
         >
-          <SelectTrigger className="w-[160px]">
+          <SelectTrigger className="w-full sm:w-[160px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -113,7 +113,7 @@ export default function DashboardFilters({
           type="date"
           value={currentFrom}
           onChange={(e) => handleDateChange("from", e.target.value)}
-          className="w-[150px]"
+          className="w-full sm:w-[150px]"
         />
       </div>
       <div className="space-y-1">
@@ -124,7 +124,7 @@ export default function DashboardFilters({
           type="date"
           value={currentTo}
           onChange={(e) => handleDateChange("to", e.target.value)}
-          className="w-[150px]"
+          className="w-full sm:w-[150px]"
         />
       </div>
 
@@ -137,7 +137,7 @@ export default function DashboardFilters({
           value={currentPaidStatus}
           onValueChange={(v) => updateParams({ paidStatus: v })}
         >
-          <SelectTrigger className="w-[160px]">
+          <SelectTrigger className="w-full sm:w-[160px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -157,7 +157,7 @@ export default function DashboardFilters({
           value={currentPayment}
           onValueChange={(v) => updateParams({ paymentMethod: v })}
         >
-          <SelectTrigger className="w-[160px]">
+          <SelectTrigger className="w-full sm:w-[160px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -181,7 +181,7 @@ export default function DashboardFilters({
             value={currentCategory}
             onValueChange={(v) => updateParams({ category: v })}
           >
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-full sm:w-[160px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

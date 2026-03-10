@@ -5,7 +5,7 @@ export default function HomeLoading() {
   return (
     <>
       {/* Hero skeleton */}
-      <Skeleton className="w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-none" />
+      <Skeleton className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] rounded-none" />
 
       <div className="wrapper">
         {/* Value props skeleton */}

@@ -49,7 +49,7 @@ export default async function ProductList({
         )}
       </div>
       {data.length > 0 ? (
-        <AnimatedGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+        <AnimatedGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 md:gap-4">
           {limitedData.map((product: Product) => (
             <AnimatedGridItem key={product.slug}>
               <ProductCard product={product} isInWishlist={wishlistIds.has(product.id)} />

@@ -13,7 +13,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import slugify from "slugify";
+import { greekSlugify } from "@/lib/slugify";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -141,7 +141,7 @@ export default function CategoryForm({
                       onClick={() => {
                         form.setValue(
                           "slug",
-                          slugify(form.getValues("name"), { lower: true })
+                          greekSlugify(form.getValues("name"))
                         );
                       }}
                     >

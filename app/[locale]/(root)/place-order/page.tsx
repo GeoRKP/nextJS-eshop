@@ -43,7 +43,7 @@ export default async function PlaceOrderPage() {
     <div className="wrapper">
       <CheckoutSteps current={3} />
       <h1 className="h2-bold mb-6">{t("reviewOrder")}</h1>
-      <div className="grid lg:grid-cols-3 gap-8">
+      <div className="grid lg:grid-cols-3 gap-4 md:gap-8">
         {/* Left: Details */}
         <div className="lg:col-span-2 space-y-4">
           {/* Shipping Address Card */}
@@ -157,11 +157,11 @@ export default async function PlaceOrderPage() {
             {/* Trust badges */}
             <div className="flex items-center justify-center gap-4 pt-2">
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Lock className="w-3.5 h-3.5" />
+                <Lock className="w-4 h-4" />
                 <span>{tCart("secureCheckout")}</span>
               </div>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Shield className="w-3.5 h-3.5" />
+                <Shield className="w-4 h-4" />
                 <span>{tCart("buyerProtection")}</span>
               </div>
             </div>

@@ -45,7 +45,7 @@ export default async function ProductDetailsPage(props: {
       />
       <ScrollFadeIn>
         <section>
-          <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-4 sm:gap-8 lg:gap-16">
             {/* Image Column */}
             <div className="lg:sticky lg:top-24 lg:self-start bg-muted/20 rounded-lg border border-border/30 p-4">
               <ProductImages images={product.images} />
@@ -59,8 +59,8 @@ export default async function ProductDetailsPage(props: {
               </div>
 
               {/* Product name + wishlist */}
-              <div className="flex items-start justify-between gap-4">
-                <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">
+              <div className="flex flex-col-reverse sm:flex-row items-start justify-between gap-4">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
                   {product.name}
                 </h1>
                 <div className="flex-shrink-0 mt-1 rounded-lg border border-border/50 p-2">
@@ -74,7 +74,7 @@ export default async function ProductDetailsPage(props: {
                 <a href="#reviews" className="text-sm text-muted-foreground hover:text-brand-accent transition-colors">
                   {t("numReviews", { count: product.numReviews })}
                 </a>
-                <span className="text-border">|</span>
+                <span className="text-border hidden sm:inline">|</span>
                 <a href="#reviews" className="text-sm text-brand-accent hover:text-brand-accent-dark transition-colors font-medium">
                   {t("writeReview")}
                 </a>
@@ -86,7 +86,7 @@ export default async function ProductDetailsPage(props: {
                 <div className="flex items-baseline gap-2">
                   <ProductPrice
                     value={Number(product.price)}
-                    className="text-3xl font-black"
+                    className="text-2xl sm:text-3xl font-black"
                   />
                   <span className="text-xs text-muted-foreground">{t("vatIncluded")}</span>
                 </div>
@@ -131,7 +131,7 @@ export default async function ProductDetailsPage(props: {
               )}
 
               {/* Trust signals */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
                   { icon: Truck, label: tv("freeShipping"), desc: tv("freeShippingDesc") },
                   { icon: Shield, label: tv("securePayment"), desc: tv("securePaymentDesc") },
@@ -142,7 +142,7 @@ export default async function ProductDetailsPage(props: {
                     className="flex flex-col items-center text-center gap-1.5 p-3 rounded-lg bg-card border border-border/50"
                   >
                     <item.icon className="w-5 h-5 text-brand-accent" />
-                    <span className="text-[11px] font-medium leading-tight">{item.label}</span>
+                    <span className="text-xs font-medium leading-tight">{item.label}</span>
                   </div>
                 ))}
               </div>

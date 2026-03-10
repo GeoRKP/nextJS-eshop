@@ -112,7 +112,7 @@ export default async function OrdersPage(props: {
               <Link key={order.id} href={`/order/${order.id}`} className="block">
                 <div className="card-premium p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-muted-foreground">{formatId(order.id)}</span>
+                    <span className="font-mono text-sm text-muted-foreground">{formatId(order.id)}</span>
                     <OrderStatusBadge
                       status={(order as { status?: string }).status || "pending"}
                       label={t(statusTranslationKey[(order as { status?: string }).status || "pending"] as Parameters<typeof t>[0]) || (order as { status?: string }).status || "pending"}

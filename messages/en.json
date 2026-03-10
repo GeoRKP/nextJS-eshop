@@ -769,5 +769,26 @@
     "stayUpdated": "STAY UPDATED",
     "newsletterTitle": "Get the Latest Parts & Deals",
     "newsletterSubtitle": "Subscribe to our newsletter for exclusive offers, new arrivals, and expert tips delivered to your inbox."
+  },
+  "ProductCatalog": {
+    "cat_granazia_abs": "ABS Sensor Gears",
+    "cat_eidikes_kataskeues": "Custom CNC Manufacturing",
+    "cat_eksartimata_aerofrenon": "Air Brake Components",
+    "cat_eksartimata_solinoseon_rakor": "Pipe Fittings & Connectors",
+    "cat_kataskeues_solinon_markoutsia": "Hose & Tubing Assemblies",
+    "cat_granazia_daf_man": "DAF / MAN ABS Gears",
+    "cat_granazia_mercedes": "Mercedes ABS Gears",
+    "cat_granazia_volvo_scania": "Volvo / Scania ABS Gears",
+    "cat_katergasia_tornou_cnc": "CNC Lathe Machining",
+    "cat_katergasia_frezas_cnc": "CNC Milling",
+    "cat_fisounes_tampouro": "Drum Brake Diaphragms",
+    "cat_fisounes_diskofrenou": "Disc Brake Diaphragms",
+    "cat_automatoi_syndesmoi_aeros": "Push-in Air Connectors",
+    "cat_rakor_ydravlikon_frenon": "Hydraulic Brake Fittings",
+    "cat_antistaseis_sfines_solinas": "Tube Inserts & Sleeves",
+    "cat_oures_moufes_tapes": "Nipples, Couplings & Plugs",
+    "cat_solines_lastixa": "Tubes & Hoses",
+    "cat_markoutsia_teflon": "Teflon Hoses",
+    "cat_markoutsia_frenon_abragkiaz": "Brake & Clutch Hoses"
   }
 }

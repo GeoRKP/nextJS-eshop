@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2744" />
+      <stop offset="100%" style="stop-color:#142040" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bg)" />
+  <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e2d4a" stroke-width="0.5" />
+  </pattern>
+  <rect width="400" height="400" fill="url(#grid)" />
+  <!-- Air Brake Diaphragm -->
+  <g transform="translate(200, 170)" fill="none" stroke="#f59e0b" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer housing - top half (dome) -->
+    <path d="M -75 0 Q -75 -70 0 -70 Q 75 -70 75 0" stroke-width="2.5" />
+    <!-- Outer housing - bottom half -->
+    <path d="M -75 0 Q -75 60 0 60 Q 75 60 75 0" stroke-width="2.5" />
+    <!-- Flange / clamp ring -->
+    <line x1="-85" y1="0" x2="85" y2="0" stroke-width="3" />
+    <!-- Diaphragm membrane (wavy line) -->
+    <path d="M -65 -5 Q -50 -20 -30 -8 Q -10 5 10 -8 Q 30 -20 50 -8 Q 65 3 65 -5" stroke-width="1.5" opacity="0.6" />
+    <!-- Push rod -->
+    <line x1="0" y1="0" x2="0" y2="95" stroke-width="3" />
+    <circle cx="0" cy="95" r="5" stroke-width="2" />
+    <!-- Spring inside (coil representation) -->
+    <path d="M -15 15 L 15 25 L -15 35 L 15 45" stroke-width="1.5" opacity="0.5" />
+    <!-- Air port -->
+    <circle cx="-55" cy="-40" r="8" stroke-width="1.5" />
+    <text x="-55" y="-36" font-family="Arial" font-size="9" fill="#f59e0b" text-anchor="middle">AIR</text>
+    <!-- Bolt holes on flange -->
+    <circle cx="-70" cy="0" r="3" fill="#f59e0b" opacity="0.4" />
+    <circle cx="-35" cy="0" r="3" fill="#f59e0b" opacity="0.4" />
+    <circle cx="35" cy="0" r="3" fill="#f59e0b" opacity="0.4" />
+    <circle cx="70" cy="0" r="3" fill="#f59e0b" opacity="0.4" />
+  </g>
+  <!-- Category label -->
+  <text x="200" y="325" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="1">AEROFRENA</text>
+  <!-- AVL branding -->
+  <text x="200" y="370" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#f59e0b" text-anchor="middle" letter-spacing="4">AVL</text>
+  <!-- Corner accents -->
+  <line x1="15" y1="15" x2="45" y2="15" stroke="#f59e0b" stroke-width="2" />
+  <line x1="15" y1="15" x2="15" y2="45" stroke="#f59e0b" stroke-width="2" />
+  <line x1="355" y1="385" x2="385" y2="385" stroke="#f59e0b" stroke-width="2" />
+  <line x1="385" y1="355" x2="385" y2="385" stroke="#f59e0b" stroke-width="2" />
+</svg>

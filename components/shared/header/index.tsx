@@ -12,7 +12,7 @@ const Header = () => {
       {/* Main Header */}
       <div className="wrapper flex items-center gap-4 header-row !py-0">
         {/* Left: Hamburger (mobile) + Logo */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <MobileMenuWrapper />
           <Link href="/" className="flex-start">
             <Image

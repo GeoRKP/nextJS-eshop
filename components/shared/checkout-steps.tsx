@@ -64,7 +64,7 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
                 </motion.div>
                 <span
                   className={cn(
-                    "hidden sm:block text-xs md:text-sm text-center whitespace-nowrap",
+                    "text-[10px] sm:text-xs md:text-sm text-center whitespace-nowrap",
                     isCompleted && "text-brand-accent font-medium",
                     isCurrent && "text-brand-accent font-semibold",
                     !isCompleted &&

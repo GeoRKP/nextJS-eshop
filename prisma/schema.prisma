@@ -1,6 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -49,6 +48,7 @@ model Product {
   numReviews       Int       @default(0)
   isFeatured       Boolean   @default(false)
   banner           String?
+  specs            Json?     @db.Json
   lowStockThreshold Int      @default(5)
   deletedAt        DateTime? @db.Timestamp(6)
   createdAt        DateTime  @default(now()) @db.Timestamp(6)

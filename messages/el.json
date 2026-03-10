@@ -769,5 +769,26 @@
     "stayUpdated": "ΜΕΙΝΕΤΕ ΕΝΗΜΕΡΩΜΕΝΟΙ",
     "newsletterTitle": "Λάβετε τα Τελευταία Ανταλλακτικά & Προσφορές",
     "newsletterSubtitle": "Εγγραφείτε στο newsletter μας για αποκλειστικές προσφορές, νέες αφίξεις και συμβουλές ειδικών."
+  },
+  "ProductCatalog": {
+    "cat_granazia_abs": "Γρανάζια ABS",
+    "cat_eidikes_kataskeues": "Ειδικές Κατασκευές",
+    "cat_eksartimata_aerofrenon": "Εξαρτήματα Αεροφρένων",
+    "cat_eksartimata_solinoseon_rakor": "Εξαρτήματα Σωληνώσεων / Ρακόρ",
+    "cat_kataskeues_solinon_markoutsia": "Κατασκευές Σωλήνων / Μαρκούτσια",
+    "cat_granazia_daf_man": "Γρανάζια DAF / MAN",
+    "cat_granazia_mercedes": "Γρανάζια Mercedes",
+    "cat_granazia_volvo_scania": "Γρανάζια Volvo / Scania",
+    "cat_katergasia_tornou_cnc": "Κατεργασία Τόρνου CNC",
+    "cat_katergasia_frezas_cnc": "Κατεργασία Φρέζας CNC",
+    "cat_fisounes_tampouro": "Φυσούνες για Ταμπούρο",
+    "cat_fisounes_diskofrenou": "Φυσούνες Δισκοφρένου",
+    "cat_automatoi_syndesmoi_aeros": "Αυτόματοι Σύνδεσμοι Αέρος",
+    "cat_rakor_ydravlikon_frenon": "Ρακόρ Υδραυλικών Φρένων",
+    "cat_antistaseis_sfines_solinas": "Αντιστάσεις & Σφήνες Σωλήνας",
+    "cat_oures_moufes_tapes": "Ουρές, Μούφες & Τάπες",
+    "cat_solines_lastixa": "Σωλήνες & Λάστιχα",
+    "cat_markoutsia_teflon": "Μαρκούτσια Teflon",
+    "cat_markoutsia_frenon_abragkiaz": "Μαρκούτσια Φρένων & Αμπραγιάζ"
   }
 }

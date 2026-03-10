@@ -169,6 +169,7 @@ export default function AddressForm({
                   <FormInput
                     icon={Phone}
                     placeholder={t("enterPhone")}
+                    type="tel"
                     error={fieldState.error?.message}
                     isValid={fieldState.isDirty && !fieldState.error}
                     {...field}

@@ -155,7 +155,7 @@ function RevenueChart({
   if (data.length === 0) return <NoData label={noDataLabel} />;
 
   return (
-    <ResponsiveContainer width="100%" height={350}>
+    <ResponsiveContainer width="100%" height={280} className="sm:!h-[350px]">
       <ComposedChart data={data}>
         <defs>
           <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
@@ -236,7 +236,7 @@ function StatusDonut({
   const total = data.reduce((sum, d) => sum + d.count, 0);
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={240} className="sm:!h-[300px]">
       <PieChart>
         <Pie
           data={data}
@@ -279,7 +279,7 @@ function PaymentDonut({
   if (data.length === 0) return <NoData label={noDataLabel} />;
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={240} className="sm:!h-[300px]">
       <PieChart>
         <Pie
           data={data}
@@ -377,7 +377,7 @@ function CategoryPie({
   const total = data.reduce((sum, d) => sum + d.revenue, 0);
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={240} className="sm:!h-[300px]">
       <PieChart>
         <Pie
           data={data}

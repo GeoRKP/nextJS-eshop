@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 700" width="1920" height="700">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bg" x1="0.2" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1525"/>
+      <stop offset="50%" stop-color="#142040"/>
+      <stop offset="100%" stop-color="#182848"/>
+    </linearGradient>
+    <!-- CNC spark glow -->
+    <radialGradient id="spark" cx="65%" cy="35%" r="35%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.18"/>
+      <stop offset="40%" stop-color="#f59e0b" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#142040" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Grid pattern - engineering graph paper -->
+    <pattern id="engGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.03" stroke-width="0.3"/>
+    </pattern>
+    <pattern id="engGridMajor" width="200" height="200" patternUnits="userSpaceOnUse">
+      <path d="M 200 0 L 0 0 0 200" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="0.5"/>
+    </pattern>
+    <!-- Crosshatch for machined surface -->
+    <pattern id="crosshatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="12" stroke="#f59e0b" stroke-opacity="0.025" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+
+  <!-- Base -->
+  <rect width="1920" height="700" fill="url(#bg)"/>
+  <rect width="1920" height="700" fill="url(#engGrid)"/>
+  <rect width="1920" height="700" fill="url(#engGridMajor)"/>
+  <rect width="1920" height="700" fill="url(#crosshatch)"/>
+  <rect width="1920" height="700" fill="url(#spark)"/>
+
+  <!-- CNC Lathe schematic - right side -->
+  <g transform="translate(1250, 320)" opacity="0.12">
+    <!-- Lathe bed -->
+    <rect x="-300" y="120" width="600" height="30" rx="2" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <!-- Guide rails -->
+    <line x1="-280" y1="130" x2="280" y2="130" stroke="#f59e0b" stroke-width="1"/>
+    <line x1="-280" y1="140" x2="280" y2="140" stroke="#f59e0b" stroke-width="1"/>
+
+    <!-- Headstock (left) -->
+    <rect x="-300" y="-80" width="100" height="200" rx="3" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <!-- Spindle -->
+    <circle cx="-250" cy="20" r="50" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <circle cx="-250" cy="20" r="35" fill="none" stroke="#f59e0b" stroke-width="1"/>
+    <circle cx="-250" cy="20" r="15" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <!-- Chuck jaws -->
+    <line x1="-250" y1="-30" x2="-250" y2="-50" stroke="#f59e0b" stroke-width="2"/>
+    <line x1="-220" y1="40" x2="-207" y2="57" stroke="#f59e0b" stroke-width="2"/>
+    <line x1="-280" y1="40" x2="-293" y2="57" stroke="#f59e0b" stroke-width="2"/>
+
+    <!-- Workpiece (cylinder between headstock and tailstock) -->
+    <rect x="-200" y="5" width="300" height="30" rx="2" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="4,2"/>
+
+    <!-- Tool post / carriage -->
+    <rect x="-50" y="-40" width="60" height="80" rx="2" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <!-- Cutting tool -->
+    <line x1="-20" y1="5" x2="-20" y2="35" stroke="#f59e0b" stroke-width="3"/>
+    <polygon points="-25,35 -15,35 -20,45" fill="none" stroke="#f59e0b" stroke-width="1"/>
+
+    <!-- Tailstock (right) -->
+    <rect x="140" y="-40" width="80" height="120" rx="3" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <line x1="140" y1="20" x2="100" y2="20" stroke="#f59e0b" stroke-width="2"/>
+    <circle cx="100" cy="20" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  </g>
+
+  <!-- CNC Milling head - upper right -->
+  <g transform="translate(1650, 150)" opacity="0.08">
+    <!-- Spindle housing -->
+    <rect x="-30" y="-80" width="60" height="120" rx="4" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <!-- Collet -->
+    <path d="M -15,40 L -10,70 L 10,70 L 15,40" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <!-- End mill -->
+    <rect x="-8" y="70" width="16" height="50" rx="1" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <!-- Flute lines -->
+    <line x1="-8" y1="75" x2="8" y2="95" stroke="#f59e0b" stroke-width="0.8"/>
+    <line x1="-8" y1="85" x2="8" y2="105" stroke="#f59e0b" stroke-width="0.8"/>
+    <line x1="-8" y1="95" x2="8" y2="115" stroke="#f59e0b" stroke-width="0.8"/>
+    <!-- Motor housing -->
+    <rect x="-40" y="-120" width="80" height="50" rx="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  </g>
+
+  <!-- Coordinate axes -->
+  <g transform="translate(1000, 550)" opacity="0.06">
+    <!-- X axis -->
+    <line x1="0" y1="0" x2="150" y2="0" stroke="#f59e0b" stroke-width="1.5"/>
+    <polygon points="150,0 140,-5 140,5" fill="#f59e0b"/>
+    <text x="155" y="5" fill="#f59e0b" font-family="monospace" font-size="14" font-weight="bold">X</text>
+    <!-- Y axis -->
+    <line x1="0" y1="0" x2="0" y2="-120" stroke="#f59e0b" stroke-width="1.5"/>
+    <polygon points="0,-120 -5,-110 5,-110" fill="#f59e0b"/>
+    <text x="-15" y="-125" fill="#f59e0b" font-family="monospace" font-size="14" font-weight="bold">Y</text>
+    <!-- Z axis (isometric) -->
+    <line x1="0" y1="0" x2="-80" y2="60" stroke="#f59e0b" stroke-width="1.5"/>
+    <polygon points="-80,60 -68,55 -75,48" fill="#f59e0b"/>
+    <text x="-95" y="70" fill="#f59e0b" font-family="monospace" font-size="14" font-weight="bold">Z</text>
+    <!-- Origin -->
+    <circle cx="0" cy="0" r="3" fill="#f59e0b"/>
+  </g>
+
+  <!-- G-code snippets floating -->
+  <g opacity="0.05" fill="#f59e0b" font-family="'Courier New', monospace" font-size="11">
+    <text x="1400" y="50">G00 X0 Y0 Z5.0</text>
+    <text x="1400" y="65">G01 Z-2.0 F100</text>
+    <text x="1400" y="80">G02 X20 Y0 I10 J0</text>
+    <text x="1400" y="95">G01 X50 F200</text>
+    <text x="1050" y="630">M03 S3000</text>
+    <text x="1050" y="645">T01 M06</text>
+  </g>
+
+  <!-- Dimension callouts -->
+  <g opacity="0.05" stroke="#ffffff" stroke-width="0.5" fill="#ffffff" font-family="monospace" font-size="9">
+    <!-- Tolerance box -->
+    <rect x="1500" y="500" width="120" height="40" rx="2" fill="none" stroke="#ffffff"/>
+    <text x="1510" y="518" font-size="10">+0.005</text>
+    <text x="1510" y="533" font-size="10">-0.002</text>
+    <line x1="1555" y1="505" x2="1555" y2="535" stroke="#ffffff"/>
+    <text x="1565" y="524" font-size="11">mm</text>
+  </g>
+
+  <!-- Spark/chip particles emanating from cutting area -->
+  <g fill="#f59e0b" opacity="0.1">
+    <circle cx="1230" cy="310" r="1.5"/>
+    <circle cx="1245" cy="295" r="1"/>
+    <circle cx="1260" cy="285" r="2"/>
+    <circle cx="1240" cy="275" r="1"/>
+    <circle cx="1255" cy="265" r="1.5"/>
+    <circle cx="1225" cy="290" r="0.8"/>
+    <circle cx="1270" cy="300" r="1.2"/>
+    <circle cx="1250" cy="250" r="0.8"/>
+    <circle cx="1235" cy="260" r="1"/>
+    <circle cx="1265" cy="270" r="1.5"/>
+  </g>
+
+  <!-- Accent lines -->
+  <line x1="0" y1="698" x2="1920" y2="698" stroke="#f59e0b" stroke-width="2" opacity="0.3"/>
+  <line x1="0" y1="0" x2="1920" y2="0" stroke="#f59e0b" stroke-width="1" opacity="0.15"/>
+
+  <!-- Content area -->
+  <g transform="translate(120, 180)">
+    <!-- Category label -->
+    <text x="0" y="0" fill="#f59e0b" font-family="'Roboto Condensed', 'Arial Narrow', sans-serif" font-size="16" font-weight="700" letter-spacing="4">CNC CUSTOM MANUFACTURING</text>
+
+    <!-- Accent line -->
+    <rect x="0" y="12" width="60" height="3" fill="#f59e0b" rx="1"/>
+
+    <!-- Main headline -->
+    <text x="0" y="85" fill="#ffffff" font-family="'Roboto Condensed', 'Arial Narrow', sans-serif" font-size="68" font-weight="900" letter-spacing="-1">ΕΙΔΙΚΕΣ</text>
+    <text x="0" y="155" fill="#ffffff" font-family="'Roboto Condensed', 'Arial Narrow', sans-serif" font-size="68" font-weight="900" letter-spacing="-1">ΚΑΤΑΣΚΕΥΕΣ CNC</text>
+
+    <!-- Product types -->
+    <text x="0" y="215" fill="#ffffff" font-family="'Roboto', Arial, sans-serif" font-size="18" font-weight="400" opacity="0.6" letter-spacing="2">Τόρνος  &#x2022;  Φρέζα  &#x2022;  Ορείχαλκος  &#x2022;  Ατσάλι  &#x2022;  Αλουμίνιο</text>
+
+    <!-- Decorative line -->
+    <rect x="0" y="240" width="450" height="1" fill="#ffffff" opacity="0.1"/>
+
+    <!-- Precision tagline -->
+    <text x="0" y="275" fill="#ffffff" font-family="'Roboto', Arial, sans-serif" font-size="15" font-weight="300" opacity="0.5" letter-spacing="1">Precision: +/- 0.005mm  |  ISO 9001</text>
+  </g>
+
+  <!-- AVL Logo -->
+  <g transform="translate(1800, 640)">
+    <rect x="-45" y="-22" width="90" height="44" rx="4" fill="#142040" stroke="#f59e0b" stroke-width="1.5" opacity="0.9"/>
+    <text x="0" y="8" fill="#f59e0b" font-family="'Roboto Condensed', 'Arial Narrow', sans-serif" font-size="24" font-weight="900" text-anchor="middle" letter-spacing="3">AVL</text>
+  </g>
+</svg>

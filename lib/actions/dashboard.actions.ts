@@ -157,7 +157,7 @@ export async function getDashboardData(
     getTopProducts(range, paymentMethod, category, paidStatus, 10),
     // 10. Sales by category
     getSalesByCategory(range, paymentMethod, paidStatus),
-    // 11. Low stock products (stock <= 5)
+    // 11. Low stock products (stock <= per-product threshold)
     getLowStockProducts(),
     // 12. Latest orders
     prisma.order.findMany({
@@ -463,14 +463,24 @@ async function getLowStockProducts(): Promise<
     price: string;
   }[]
 > {
-  const products = await prisma.product.findMany({
-    where: { stock: { lte: 5 }, deletedAt: null },
-    select: { id: true, name: true, slug: true, stock: true, price: true },
-    orderBy: { stock: "asc" },
-    take: 10,
-  });
+  const raw = await prisma.$queryRaw<
+    Array<{
+      id: string;
+      name: string;
+      slug: string;
+      stock: number;
+      price: number | string;
+      lowStockThreshold: number;
+    }>
+  >`
+    SELECT id, name, slug, stock, price, "lowStockThreshold"
+    FROM "Product"
+    WHERE stock <= "lowStockThreshold" AND "deletedAt" IS NULL
+    ORDER BY stock ASC
+    LIMIT 10
+  `;
 
-  return products.map((p) => ({
+  return raw.map((p) => ({
     id: p.id,
     name: p.name,
     slug: p.slug,

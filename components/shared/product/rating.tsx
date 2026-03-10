@@ -29,7 +29,7 @@ const Rating = ({ value, caption }: { value: number; caption?: string }) => {
 
   return (
     <div className='flex gap-2'>
-      <div className='flex gap-1'>
+      <div className='flex gap-2'>
         {value >= 1 ? <Full /> : value >= 0.5 ? <Half /> : <Empty />}
         {value >= 2 ? <Full /> : value >= 1.5 ? <Half /> : <Empty />}
         {value >= 3 ? <Full /> : value >= 2.5 ? <Half /> : <Empty />}

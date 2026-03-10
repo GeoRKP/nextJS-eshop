@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Hexagonal accent -->
+  <polygon points="18,40 24,28 36,28 42,40 36,52 24,52" fill="none" stroke="#142040" stroke-width="2.5"/>
+  <polygon points="24,40 27,35 33,35 36,40 33,45 27,45" fill="#142040"/>
+  <!-- SORL wordmark -->
+  <text x="54" y="50" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="34" fill="#142040" letter-spacing="5">SORL</text>
+  <!-- Accent underline -->
+  <rect x="54" y="55" width="100" height="2.5" rx="1" fill="#f59e0b"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Bold geometric accent bar -->
+  <rect x="16" y="14" width="4" height="52" rx="1" fill="#f59e0b"/>
+  <!-- AVL wordmark -->
+  <text x="30" y="55" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="46" fill="#142040" letter-spacing="4">AVL</text>
+  <!-- Underline accent -->
+  <rect x="30" y="60" width="90" height="3" rx="1" fill="#142040"/>
+</svg>

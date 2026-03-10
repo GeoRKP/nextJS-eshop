@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Angled accent stripe (Swedish-inspired) -->
+  <polygon points="8,20 16,20 16,60 8,60" fill="#006AA7"/>
+  <polygon points="18,20 26,20 26,60 18,60" fill="#FECC02"/>
+  <!-- HALDEX wordmark -->
+  <text x="38" y="50" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="28" fill="#142040" letter-spacing="4">HALDEX</text>
+  <!-- Subtle underline -->
+  <rect x="38" y="56" width="130" height="2.5" rx="1" fill="#142040"/>
+</svg>

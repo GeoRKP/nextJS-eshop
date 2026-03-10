@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Top accent bar -->
+  <rect x="10" y="16" width="180" height="3" rx="1" fill="#142040"/>
+  <!-- KNORR wordmark -->
+  <text x="100" y="42" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="22" fill="#142040" letter-spacing="3" text-anchor="middle">KNORR</text>
+  <!-- Separator dot -->
+  <circle cx="100" cy="49" r="2" fill="#f59e0b"/>
+  <!-- BREMSE wordmark -->
+  <text x="100" y="62" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="16" fill="#142040" letter-spacing="4" text-anchor="middle">BREMSE</text>
+  <!-- Bottom accent bar -->
+  <rect x="10" y="67" width="180" height="3" rx="1" fill="#142040"/>
+</svg>

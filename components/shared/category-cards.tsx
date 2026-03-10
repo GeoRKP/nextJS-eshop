@@ -67,6 +67,7 @@ export default async function CategoryCards() {
                     alt={cat.name}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
                 ) : (
                   <div className="absolute inset-0 bg-gradient-industrial" />
@@ -75,7 +76,7 @@ export default async function CategoryCards() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
                 {/* Hover arrow top-right */}
-                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-3 right-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                   <ArrowUpRight className="h-5 w-5 text-white" />
                 </div>
 
@@ -127,25 +128,25 @@ export default async function CategoryCards() {
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-12 gap-4 auto-rows-[200px]">
         {categories.map((cat, i) => {
-          const Icon = getCategoryIcon(cat.category) || ShoppingBag;
+          const Icon = getCategoryIcon(cat.name) || ShoppingBag;
           const span = bentoSpans[i % bentoSpans.length];
 
           return (
             <Link
-              key={cat.category}
-              href={`/search?category=${encodeURIComponent(cat.category)}`}
+              key={cat.name}
+              href={`/search?category=${encodeURIComponent(cat.name)}`}
               className={`group relative flex flex-col justify-end rounded-xl overflow-hidden ${span}`}
             >
               <div className="absolute inset-0 bg-gradient-industrial" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-3 right-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                 <ArrowUpRight className="h-5 w-5 text-white" />
               </div>
               <div className="relative p-4 md:p-5">
                 <Icon className="h-7 w-7 text-brand-accent mb-2" />
-                <p className="font-bold text-white text-base">{cat.category}</p>
+                <p className="font-bold text-white text-base">{cat.name}</p>
                 <span className="inline-block mt-2 text-brand-accent text-xs font-medium">
-                  {t("productCount", { count: cat._count })}
+                  {t("productCount", { count: cat.productCount })}
                 </span>
               </div>
             </Link>

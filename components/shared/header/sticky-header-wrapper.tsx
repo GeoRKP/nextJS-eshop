@@ -42,7 +42,7 @@ export default function StickyHeaderWrapper({
   }, [handleScroll]);
 
   return (
-    <div className="sticky top-0 z-50">
+    <div className="sticky top-0 z-50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       {/* Utility bar + Announcement bar — hidden when scrolled */}
       <div
         className={`transition-all duration-300 overflow-hidden ${

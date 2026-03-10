@@ -83,7 +83,7 @@ export default function MobileBottomNav() {
                   className="flex flex-col items-center justify-center gap-0.5 text-muted-foreground"
                 >
                   <Icon className="h-[22px] w-[22px]" />
-                  <span className="text-[11px] font-heading">{tab.label}</span>
+                  <span className="text-xs font-heading">{tab.label}</span>
                 </button>
               );
             }
@@ -100,10 +100,10 @@ export default function MobileBottomNav() {
               >
                 {/* Active indicator dot bar */}
                 {tab.isActive && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 h-0.5 w-5 bg-brand-accent rounded-full" />
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 h-1 w-5 bg-brand-accent rounded-full" />
                 )}
                 <Icon className="h-[22px] w-[22px]" />
-                <span className="text-[11px] font-heading font-medium">{tab.label}</span>
+                <span className="text-xs font-heading font-medium">{tab.label}</span>
               </Link>
             );
           })}

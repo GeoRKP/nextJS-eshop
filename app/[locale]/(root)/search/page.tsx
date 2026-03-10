@@ -170,10 +170,16 @@ export default async function SearchPage(props: {
   // Build filter data for client component
   const filterData = {
     categories: categories.map((c) => ({
-      name: c.category,
-      count: c._count,
-      href: getFilterUrl({ c: c.category }),
-      isActive: category === c.category,
+      name: c.name,
+      count: c.productCount,
+      href: getFilterUrl({ c: c.name }),
+      isActive: category === c.name,
+      children: c.children.map((child) => ({
+        name: child.name,
+        count: child.productCount,
+        href: getFilterUrl({ c: child.name }),
+        isActive: category === child.name,
+      })),
     })),
     priceRange: {
       min: priceRange.min,
@@ -216,7 +222,7 @@ export default async function SearchPage(props: {
     <div className="wrapper">
       {/* Results banner */}
       <div className="card-premium overflow-hidden mb-6">
-        <div className="industrial-stripe p-6">
+        <div className="industrial-stripe p-4 md:p-6">
           {/* Breadcrumb */}
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
             <Link href="/" className="hover:text-foreground transition-colors">{tBreadcrumb("home")}</Link>
@@ -281,11 +287,11 @@ export default async function SearchPage(props: {
         {/* Sort + View Toggle */}
         <div className="flex items-center gap-3">
           {/* Segmented sort */}
-          <div className="flex items-center bg-muted/50 rounded-lg p-1">
+          <div className="flex items-center bg-muted/50 rounded-lg p-1 overflow-x-auto scrollbar-hide">
             {sortOrders.map((s) => (
               <Link
                 key={s}
-                className={`px-3 py-1.5 rounded-md text-xs transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs transition-all whitespace-nowrap ${
                   sort === s
                     ? "bg-card shadow-card-subtle text-foreground font-medium"
                     : "text-muted-foreground hover:text-foreground"
@@ -341,7 +347,7 @@ export default async function SearchPage(props: {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
               {products.data.map((product) => (
                 <ProductCard
                   key={product.id}
