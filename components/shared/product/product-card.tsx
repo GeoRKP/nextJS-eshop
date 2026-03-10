@@ -9,6 +9,7 @@ import HighlightText from "@/lib/highlight-text";
 import { getTranslations } from "next-intl/server";
 import AnimatedCard from "./animated-card";
 import WishlistButton from "./wishlist-button";
+import AddToCartButton from "./add-to-cart-button";
 import { isInWishlist } from "@/lib/actions/wishlist.actions";
 
 export default async function ProductCard({
@@ -90,18 +91,37 @@ export default async function ProductCard({
               )}
             </div>
 
-            {/* Price + Wishlist divider */}
+            {/* Price + Actions */}
             <div className="mt-auto pt-3 border-t border-border/30 flex items-center justify-between">
               {product.stock > 0 ? (
-                <div className="text-lg font-black tracking-tight">
-                  <ProductPrice value={Number(product.price)} />
-                </div>
+                <>
+                  <div className="text-lg font-black tracking-tight">
+                    <ProductPrice value={Number(product.price)} />
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <AddToCartButton
+                      item={{
+                        productId: product.id,
+                        name: product.name,
+                        slug: product.slug,
+                        qty: 1,
+                        image: product.images[0],
+                        price: product.price,
+                      }}
+                    />
+                    <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5">
+                      <WishlistButton productId={product.id} isInWishlist={inWishlist} />
+                    </div>
+                  </div>
+                </>
               ) : (
-                <p className="text-destructive text-sm font-medium">{t("outOfStock")}</p>
+                <>
+                  <p className="text-destructive text-sm font-medium">{t("outOfStock")}</p>
+                  <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5">
+                    <WishlistButton productId={product.id} isInWishlist={inWishlist} />
+                  </div>
+                </>
               )}
-              <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5">
-                <WishlistButton productId={product.id} isInWishlist={inWishlist} />
-              </div>
             </div>
           </div>
         </div>
@@ -176,12 +196,24 @@ export default async function ProductCard({
               ({product.numReviews})
             </span>
           </div>
-          {/* Price divider */}
-          <div className="border-t border-border/30 pt-2 mt-1">
+          {/* Price + Add to Cart */}
+          <div className="border-t border-border/30 pt-2 mt-1 flex items-center justify-between">
             {product.stock > 0 ? (
-              <div className="text-base sm:text-lg font-black tracking-tight">
-                <ProductPrice value={Number(product.price)} />
-              </div>
+              <>
+                <div className="text-base sm:text-lg font-black tracking-tight">
+                  <ProductPrice value={Number(product.price)} />
+                </div>
+                <AddToCartButton
+                  item={{
+                    productId: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    qty: 1,
+                    image: product.images[0],
+                    price: product.price,
+                  }}
+                />
+              </>
             ) : (
               <p className="text-destructive text-sm font-medium">{t("outOfStock")}</p>
             )}
