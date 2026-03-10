@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 const Rating = ({ value, caption }: { value: number; caption?: string }) => {
   const Full = () => (
     <svg
@@ -41,4 +43,4 @@ const Rating = ({ value, caption }: { value: number; caption?: string }) => {
     </div>
   );
 };
-export default Rating;
+export default memo(Rating);

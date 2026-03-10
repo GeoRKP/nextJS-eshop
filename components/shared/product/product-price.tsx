@@ -1,6 +1,7 @@
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 
-export default function ProductPrice({
+function ProductPrice({
   value,
   className,
 }: {
@@ -17,3 +18,5 @@ export default function ProductPrice({
     </p>
   );
 }
+
+export default memo(ProductPrice);

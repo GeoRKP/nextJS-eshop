@@ -6,23 +6,36 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import {
-  PayPalButtons,
-  PayPalScriptProvider,
-  usePayPalScriptReducer,
-} from "@paypal/react-paypal-js";
-import {
-  createPaypalOrder,
-  approvePaypalOrder,
   updateOrderToPaidCOD,
   deliverOrder,
 } from "@/lib/actions/order.actions";
 import { useToast } from "@/hooks/use-toast";
 import { useTransition } from "react";
-import StripePayment from "./stripe-payment";
 import { useTranslations } from "next-intl";
 import OrderStatusBadge from "@/components/shared/order-status-badge";
 import { CreditCard, MapPin, Package } from "lucide-react";
+
+const StripePayment = dynamic(() => import("./stripe-payment"), {
+  ssr: false,
+  loading: () => (
+    <div className="space-y-3 animate-pulse">
+      <div className="h-5 w-32 bg-muted/50 rounded" />
+      <div className="h-12 bg-muted/50 rounded-lg" />
+      <div className="h-12 bg-muted/50 rounded-lg" />
+    </div>
+  ),
+});
+
+const PayPalPayment = dynamic(() => import("./paypal-payment"), {
+  ssr: false,
+  loading: () => (
+    <div className="space-y-3 animate-pulse">
+      <div className="h-12 bg-muted/50 rounded-lg" />
+    </div>
+  ),
+});
 
 const statusTranslationKey: Record<string, string> = {
   pending: "statusPending",
@@ -34,6 +47,54 @@ const statusTranslationKey: Record<string, string> = {
   refund_requested: "statusRefundRequested",
   refunded: "statusRefunded",
 };
+
+function MarkAsPaidButton({ orderId }: { orderId: string }) {
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
+  const tCommon = useTranslations("Common");
+  const t = useTranslations("Order");
+
+  return (
+    <Button
+      type="button"
+      disabled={isPending}
+      className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
+      onClick={() => startTransition(async () => {
+        const res = await updateOrderToPaidCOD(orderId);
+        toast({
+          variant: res.success ? "default" : "destructive",
+          description: res.message,
+        });
+      })}
+    >
+      {isPending ? tCommon("processing") : t("markAsPaid")}
+    </Button>
+  );
+}
+
+function MarkAsDeliveredButton({ orderId }: { orderId: string }) {
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
+  const tCommon = useTranslations("Common");
+  const t = useTranslations("Order");
+
+  return (
+    <Button
+      type="button"
+      disabled={isPending}
+      className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
+      onClick={() => startTransition(async () => {
+        const res = await deliverOrder(orderId);
+        toast({
+          variant: res.success ? "default" : "destructive",
+          description: res.message,
+        });
+      })}
+    >
+      {isPending ? tCommon("processing") : t("markAsDelivered")}
+    </Button>
+  );
+}
 
 export default function OrderDetailsTable({
   order,
@@ -68,88 +129,6 @@ export default function OrderDetailsTable({
   const t = useTranslations("Order");
   const tCheckout = useTranslations("Checkout");
   const tCommon = useTranslations("Common");
-
-  const PrintLoadingState = () => {
-    const [{ isPending, isRejected }] = usePayPalScriptReducer();
-
-    let status = "";
-
-    if (isPending) {
-      status = t("loadingPaypal");
-    } else if (isRejected) {
-      status = t("errorLoadingPaypal");
-    }
-
-    return status;
-  };
-
-  const handleCreatePaypalOrder = async () => {
-    const res = await createPaypalOrder(order.id);
-
-    if (!res.success) {
-      toast({
-        description: res.message,
-        variant: "destructive",
-      });
-    }
-
-    return res.data;
-  };
-
-  const handleApprovePaypalOrder = async (data: { orderID: string }) => {
-    const res = await approvePaypalOrder(order.id, data);
-
-    toast({
-      variant: res.success ? "default" : "destructive",
-      description: res.message,
-    });
-  };
-
-  // Button to mark order as paid
-  const MarkAsPaidButton = () => {
-    const [isPending, startTransition] = useTransition();
-    const { toast } = useToast();
-
-    return (
-      <Button
-        type="button"
-        disabled={isPending}
-        className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
-        onClick={() => startTransition(async () => {
-          const res = await updateOrderToPaidCOD(order.id);
-          toast({
-            variant: res.success ? "default" : "destructive",
-            description: res.message,
-          });
-        })}
-      >
-        {isPending ? tCommon("processing") : t("markAsPaid")}
-      </Button>
-    );
-  };
-
-  // Button to mark order as delivered
-  const MarkAsDeliveredButton = () => {
-    const [isPending, startTransition] = useTransition();
-    const { toast } = useToast();
-
-    return (
-      <Button
-        type="button"
-        disabled={isPending}
-        className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
-        onClick={() => startTransition(async () => {
-          const res = await deliverOrder(order.id);
-          toast({
-            variant: res.success ? "default" : "destructive",
-            description: res.message,
-          });
-        })}
-      >
-        {isPending ? tCommon("processing") : t("markAsDelivered")}
-      </Button>
-    );
-  };
 
   return (
     <>
@@ -287,19 +266,10 @@ export default function OrderDetailsTable({
 
             {/* Payment actions */}
             {!isPaid && paymentMethod === "Paypal" && (
-              <div>
-                <PayPalScriptProvider
-                  options={{
-                    clientId: paypalClientId,
-                  }}
-                >
-                  <PrintLoadingState />
-                  <PayPalButtons
-                    createOrder={handleCreatePaypalOrder}
-                    onApprove={handleApprovePaypalOrder}
-                  />
-                </PayPalScriptProvider>
-              </div>
+              <PayPalPayment
+                paypalClientId={paypalClientId}
+                orderId={order.id}
+              />
             )}
             {!isPaid && paymentMethod === "Stripe" && stripeClientSecret && (
               <StripePayment
@@ -310,10 +280,10 @@ export default function OrderDetailsTable({
             )}
             {/* COD */}
             {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
-              <MarkAsPaidButton />
+              <MarkAsPaidButton orderId={order.id} />
             )}
             {isAdmin && isPaid && !isDelivered && (
-              <MarkAsDeliveredButton />
+              <MarkAsDeliveredButton orderId={order.id} />
             )}
           </div>
         </div>

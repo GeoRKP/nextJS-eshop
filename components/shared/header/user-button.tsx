@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import { signOutUser } from "@/lib/actions/user.actions";
 import {
   DropdownMenu,
@@ -14,7 +14,7 @@ import { LogOutIcon, UserIcon, Package, Heart, MapPin } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 export default async function UserButton() {
-  const session = await auth();
+  const session = await getAuthSession();
   const t = await getTranslations("UserNav");
 
   if (!session) {

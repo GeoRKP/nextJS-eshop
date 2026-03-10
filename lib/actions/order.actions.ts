@@ -2,14 +2,14 @@
 
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { formatError, toPlainObject } from "../utils";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import { getMyCart } from "./cart.actions";
 import { getUserById } from "./user.actions";
 import { createInsertOrderSchema } from "../validators";
 import { prisma } from "@/db/prisma";
 import { CartItem, PaymentResult } from "@/types";
 import { paypal } from "../paypal";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
@@ -17,7 +17,7 @@ import { getTranslations } from "next-intl/server";
 export async function createOrder() {
   try {
     const t = await getTranslations("Actions");
-    const session = await auth();
+    const session = await getAuthSession();
     if (!session?.user) {
       throw new Error(t("userNotAuthenticated"));
     }
@@ -232,6 +232,8 @@ export async function approvePaypalOrder(
     });
 
     revalidatePath(`/order/${orderId}`);
+    revalidatePath(`/en/order/${orderId}`);
+    revalidateTag("orders");
 
     return {
       success: true,
@@ -262,18 +264,15 @@ export async function updateOrderToPaid({
   if (order.isPaid) throw new Error(t("orderAlreadyPaid"));
 
   await prisma.$transaction(async (tx) => {
-    // Iterate over products and update stock
-
-    for (const item of order.orderitems) {
-      await tx.product.update({
-        where: { id: item.productId },
-        data: {
-          stock: {
-            increment: -item.qty,
-          },
-        },
-      });
-    }
+    // Batch update stock for all order items
+    await Promise.all(
+      order.orderitems.map((item) =>
+        tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: -item.qty } },
+        })
+      )
+    );
 
     await tx.order.update({
       where: { id: orderId },
@@ -295,19 +294,9 @@ export async function updateOrderToPaid({
     });
   });
 
-  // Get updated order after the transaction
-
-  const updatedOrder = await prisma.order.findFirst({
-    where: { id: orderId },
-    include: {
-      orderitems: true,
-      user: { select: { name: true, email: true } },
-    },
-  });
-
   revalidatePath(`/order/${orderId}`);
-
-  if (!updatedOrder) throw new Error(t("orderNotFound"));
+  revalidatePath(`/en/order/${orderId}`);
+  revalidateTag("orders");
 }
 
 // Get the users orders
@@ -319,7 +308,7 @@ export async function getMyOrders({
   limit?: number;
   page: number;
 }) {
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session?.user) {
     const t = await getTranslations("Actions");
     throw new Error(t("userNotAuthenticated"));
@@ -462,6 +451,7 @@ export async function deleteOrder(id: string) {
     await prisma.order.delete({ where: { id } });
 
     revalidatePath("/admin/orders");
+    revalidateTag("orders");
 
     return { success: true, message: t("orderDeletedSuccessfully") };
   } catch (error) {
@@ -477,6 +467,8 @@ export async function updateOrderToPaidCOD(orderId: string) {
     await updateOrderToPaid({ orderId });
 
     revalidatePath(`/order/${orderId}`);
+    revalidatePath(`/en/order/${orderId}`);
+    revalidateTag("orders");
 
     return { success: true, message: t("orderMarkedAsPaid") };
 
@@ -520,6 +512,8 @@ export async function deliverOrder(orderId: string) {
     });
 
     revalidatePath(`/order/${orderId}`);
+    revalidatePath(`/en/order/${orderId}`);
+    revalidateTag("orders");
 
     return { success: true, message: t("orderMarkedAsDelivered") };
   } catch (error) {
@@ -540,7 +534,7 @@ export async function updateOrderStatus({
 }) {
   try {
     const t = await getTranslations("Actions");
-    const session = await auth();
+    const session = await getAuthSession();
 
     const order = await prisma.order.findFirst({
       where: { id: orderId },
@@ -577,7 +571,9 @@ export async function updateOrderStatus({
     });
 
     revalidatePath(`/order/${orderId}`);
+    revalidatePath(`/en/order/${orderId}`);
     revalidatePath("/admin/orders");
+    revalidateTag("orders");
 
     return { success: true, message: t("orderStatusUpdatedSuccessfully") };
   } catch (error) {

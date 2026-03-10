@@ -1,5 +1,5 @@
 import { getMyCart } from "@/lib/actions/cart.actions";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import { getUserById } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
 import { ShippingAddress } from "@/types";
@@ -24,8 +24,7 @@ export default async function PlaceOrderPage() {
   const tCommon = await getTranslations("Common");
   const tCart = await getTranslations("Cart");
 
-  const cart = await getMyCart();
-  const session = await auth();
+  const [cart, session] = await Promise.all([getMyCart(), getAuthSession()]);
   const userid = session?.user?.id;
 
   if (!userid) throw new Error("User not found");

@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/db/prisma";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import { formatError, toPlainObject } from "../utils";
 import { revalidatePath } from "next/cache";
 import { createInsertAddressSchema, createUpdateAddressSchema } from "../validators";
@@ -11,7 +11,7 @@ import { getTranslations } from "next-intl/server";
 
 // Get all addresses for the current user
 export async function getMyAddresses() {
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session?.user?.id) return [];
 
   const data = await prisma.address.findMany({
@@ -24,7 +24,7 @@ export async function getMyAddresses() {
 
 // Get address by id
 export async function getAddressById(id: string) {
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session?.user?.id) return null;
 
   const data = await prisma.address.findFirst({
@@ -36,7 +36,7 @@ export async function getAddressById(id: string) {
 
 // Get default address
 export async function getDefaultAddress() {
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session?.user?.id) return null;
 
   const data = await prisma.address.findFirst({
@@ -51,7 +51,7 @@ export async function createAddress(data: z.infer<typeof insertAddressSchema>) {
   try {
     const t = await getTranslations("Actions");
     const tV = await getTranslations("Validation");
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       throw new Error(t("userNotAuthenticated"));
@@ -81,7 +81,9 @@ export async function createAddress(data: z.infer<typeof insertAddressSchema>) {
     });
 
     revalidatePath("/user/addresses");
+    revalidatePath("/en/user/addresses");
     revalidatePath("/shipping-address");
+    revalidatePath("/en/shipping-address");
 
     return { success: true, message: t("addressCreatedSuccessfully") };
   } catch (error) {
@@ -94,7 +96,7 @@ export async function updateAddress(data: z.infer<typeof updateAddressSchema>) {
   try {
     const t = await getTranslations("Actions");
     const tV = await getTranslations("Validation");
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       throw new Error(t("userNotAuthenticated"));
@@ -135,7 +137,9 @@ export async function updateAddress(data: z.infer<typeof updateAddressSchema>) {
     });
 
     revalidatePath("/user/addresses");
+    revalidatePath("/en/user/addresses");
     revalidatePath("/shipping-address");
+    revalidatePath("/en/shipping-address");
 
     return { success: true, message: t("addressUpdatedSuccessfully") };
   } catch (error) {
@@ -147,7 +151,7 @@ export async function updateAddress(data: z.infer<typeof updateAddressSchema>) {
 export async function deleteAddress(id: string) {
   try {
     const t = await getTranslations("Actions");
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       throw new Error(t("userNotAuthenticated"));
@@ -177,7 +181,9 @@ export async function deleteAddress(id: string) {
     }
 
     revalidatePath("/user/addresses");
+    revalidatePath("/en/user/addresses");
     revalidatePath("/shipping-address");
+    revalidatePath("/en/shipping-address");
 
     return { success: true, message: t("addressDeletedSuccessfully") };
   } catch (error) {
@@ -189,7 +195,7 @@ export async function deleteAddress(id: string) {
 export async function setDefaultAddress(id: string) {
   try {
     const t = await getTranslations("Actions");
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session?.user?.id) {
       throw new Error(t("userNotAuthenticated"));
@@ -208,7 +214,9 @@ export async function setDefaultAddress(id: string) {
     });
 
     revalidatePath("/user/addresses");
+    revalidatePath("/en/user/addresses");
     revalidatePath("/shipping-address");
+    revalidatePath("/en/shipping-address");
 
     return { success: true, message: t("defaultAddressUpdatedSuccessfully") };
   } catch (error) {

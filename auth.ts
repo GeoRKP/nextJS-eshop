@@ -28,10 +28,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
 
           if (isMatch) {
+            // Generate name from email if user has default "NO_NAME"
+            let name = user.name;
+            if (name === "NO_NAME") {
+              name = user.email.split("@")[0];
+              await prisma.user.update({
+                where: { id: user.id },
+                data: { name },
+              });
+            }
+
             return {
               id: user.id,
               email: user.email,
-              name: user.name,
+              name,
               role: user.role,
             };
           }
@@ -54,15 +64,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user, session, trigger }: any) {
       if (user) {
         token.role = user.role;
-
-        if (user.name === "NO_NAME") {
-          token.name = user.email!.split("@")[0];
-
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { name: token.name },
-          });
-        }
       }
 
       if (session?.user.name && trigger === "update") {

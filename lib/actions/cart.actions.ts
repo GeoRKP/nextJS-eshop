@@ -3,12 +3,27 @@
 import { cookies } from "next/headers";
 import { CartItem } from "@/types";
 import { formatError, round2, toPlainObject } from "../utils";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import { prisma } from "@/db/prisma";
 import { cartItemSchema, insertCartSchema } from "../validators";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
+
+// Helper to get coupon data for price recalculation
+async function getCouponData(couponCode: string | null | undefined) {
+  if (!couponCode) return null;
+  const coupon = await prisma.coupon.findUnique({
+    where: { code: couponCode },
+  });
+  if (!coupon) return null;
+  return {
+    discountType: coupon.discountType,
+    discountValue: coupon.discountValue.toString(),
+    minOrderAmount: coupon.minOrderAmount?.toString(),
+    maxDiscount: coupon.maxDiscount?.toString(),
+  };
+}
 
 // Calculate prices with optional coupon discount
 const calcPrice = (
@@ -66,7 +81,7 @@ export async function addItemToCart(data: CartItem) {
 
     if (!sessionCartId) throw new Error(t("cartSessionNotFound"));
 
-    const session = await auth();
+    const session = await getAuthSession();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
 
     const cart = await getMyCart();
@@ -94,6 +109,10 @@ export async function addItemToCart(data: CartItem) {
       });
 
       revalidatePath(`/product/${product.slug}`);
+      revalidatePath(`/en/product/${product.slug}`);
+      revalidatePath("/cart");
+      revalidatePath("/en/cart");
+      revalidateTag("cart");
 
       return {
         success: true,
@@ -123,21 +142,7 @@ export async function addItemToCart(data: CartItem) {
         cart.items.push(item);
       }
 
-      // Get coupon data if cart has one applied
-      let couponData = null;
-      if (cart.couponCode) {
-        const coupon = await prisma.coupon.findUnique({
-          where: { code: cart.couponCode },
-        });
-        if (coupon) {
-          couponData = {
-            discountType: coupon.discountType,
-            discountValue: coupon.discountValue.toString(),
-            minOrderAmount: coupon.minOrderAmount?.toString(),
-            maxDiscount: coupon.maxDiscount?.toString(),
-          };
-        }
-      }
+      const couponData = await getCouponData(cart.couponCode);
 
       await prisma.cart.update({
         where: {
@@ -150,6 +155,10 @@ export async function addItemToCart(data: CartItem) {
       });
 
       revalidatePath(`/product/${product.slug}`);
+      revalidatePath(`/en/product/${product.slug}`);
+      revalidatePath("/cart");
+      revalidatePath("/en/cart");
+      revalidateTag("cart");
 
       return {
         success: true,
@@ -171,7 +180,7 @@ export async function getMyCart() {
 
   if (!sessionCartId) throw new Error("Cart session not found");
 
-  const session = await auth();
+  const session = await getAuthSession();
   const userId = session?.user?.id ? (session.user.id as string) : undefined;
 
   const cart = await prisma.cart.findFirst({
@@ -232,21 +241,7 @@ export async function removeItemFromCart(productId: string) {
       )!.qty = exist.qty - 1;
     }
 
-    // Get coupon data if cart has one applied
-    let couponData = null;
-    if (cart.couponCode) {
-      const coupon = await prisma.coupon.findUnique({
-        where: { code: cart.couponCode },
-      });
-      if (coupon) {
-        couponData = {
-          discountType: coupon.discountType,
-          discountValue: coupon.discountValue.toString(),
-          minOrderAmount: coupon.minOrderAmount?.toString(),
-          maxDiscount: coupon.maxDiscount?.toString(),
-        };
-      }
-    }
+    const couponData = await getCouponData(cart.couponCode);
 
     // Update cart in db
     await prisma.cart.update({
@@ -258,6 +253,10 @@ export async function removeItemFromCart(productId: string) {
     });
 
     revalidatePath(`/product/${product.slug}`);
+    revalidatePath(`/en/product/${product.slug}`);
+    revalidatePath("/cart");
+    revalidatePath("/en/cart");
+    revalidateTag("cart");
 
     return {
       success: true,
@@ -295,7 +294,7 @@ export async function applyCouponToCart(code: string) {
     if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) throw new Error(t("couponMaxUsesReached"));
 
     // Check per-user usage
-    const session = await auth();
+    const session = await getAuthSession();
     if (session?.user?.id) {
       const userUsageCount = await prisma.couponUsage.count({
         where: {
@@ -326,7 +325,10 @@ export async function applyCouponToCart(code: string) {
     });
 
     revalidatePath("/cart");
+    revalidatePath("/en/cart");
     revalidatePath("/place-order");
+    revalidatePath("/en/place-order");
+    revalidateTag("cart");
 
     return {
       success: true,
@@ -356,7 +358,10 @@ export async function removeCouponFromCart() {
     });
 
     revalidatePath("/cart");
+    revalidatePath("/en/cart");
     revalidatePath("/place-order");
+    revalidatePath("/en/place-order");
+    revalidateTag("cart");
 
     return { success: true, message: t("couponRemoved") };
   } catch (error) {

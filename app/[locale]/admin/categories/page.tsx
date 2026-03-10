@@ -26,7 +26,7 @@ export default async function AdminCategoriesPage() {
   await requireAdmin();
   const t = await getTranslations("AdminCategories");
   const tCommon = await getTranslations("Common");
-  const categories = await getAdminCategories();
+  const { data: categories } = await getAdminCategories();
 
   return (
     <div className="space-y-4">

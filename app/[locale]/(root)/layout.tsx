@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Header from "@/components/shared/header";
 import Footer from "@/components/footer";
 import PageTransition from "@/components/shared/page-transition";
@@ -18,7 +19,9 @@ export default function RootLayout({
         utilityBar={<UtilityBar />}
         announcementBar={<AnnouncementBar />}
       >
-        <Header />
+        <Suspense fallback={<div className="h-16 bg-background" />}>
+          <Header />
+        </Suspense>
       </StickyHeaderWrapper>
       <MobileCategoryChips />
       <main className="flex-1 pb-20 md:pb-0 pt-1 md:pt-0">

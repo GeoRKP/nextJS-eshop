@@ -1,11 +1,11 @@
 "use server";
 
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import { formatError } from "../utils";
 import { insertReviewSchema, createInsertReviewSchema } from "../validators";
 import { z } from "zod";
 import { prisma } from "@/db/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { getTranslations } from "next-intl/server";
 
 // Create and update reviews
@@ -16,7 +16,7 @@ export async function createUpdateReview(
 
   try {
     const t = await getTranslations("Actions");
-    const session = await auth();
+    const session = await getAuthSession();
 
     if (!session) throw new Error(t("userNotAuthenticated"));
 
@@ -97,6 +97,9 @@ export async function createUpdateReview(
     });
 
     revalidatePath(`/product/${product.slug}`);
+    revalidatePath(`/en/product/${product.slug}`);
+    revalidateTag("reviews");
+    revalidateTag("products");
 
     return {
       success: true,
@@ -110,31 +113,41 @@ export async function createUpdateReview(
   }
 }
 
-// Get all reviews for a product
-export async function getReviews({ productId }: { productId: string }) {
-  const data = await prisma.review.findMany({
-    where: {
-      productId,
-    },
-    include: {
-      user: {
-        select: {
-          name: true,
+// Get reviews for a product with pagination
+export async function getReviews({
+  productId,
+  page = 1,
+  limit = 10,
+}: {
+  productId: string;
+  page?: number;
+  limit?: number;
+}) {
+  const [data, totalCount] = await Promise.all([
+    prisma.review.findMany({
+      where: { productId },
+      include: {
+        user: {
+          select: { name: true },
         },
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      skip: (page - 1) * limit,
+    }),
+    prisma.review.count({ where: { productId } }),
+  ]);
 
-  return { data };
+  return {
+    data,
+    totalPages: Math.ceil(totalCount / limit),
+  };
 }
 
 
 // Get a review written by the current user
 export const getReviewByProductId = async ({productId} : {productId: string}) => {
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session) {
     const t = await getTranslations("Actions");
     throw new Error(t("userNotAuthenticated"));

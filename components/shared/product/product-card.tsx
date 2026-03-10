@@ -10,22 +10,19 @@ import { getTranslations } from "next-intl/server";
 import AnimatedCard from "./animated-card";
 import WishlistButton from "./wishlist-button";
 import AddToCartButton from "./add-to-cart-button";
-import { isInWishlist } from "@/lib/actions/wishlist.actions";
+import ProductCardWishlist from "./product-card-wishlist";
 
 export default async function ProductCard({
   product,
   searchQuery,
-  isInWishlist: isInWishlistProp,
   variant = "grid",
 }: {
   product: Product;
   searchQuery?: string;
-  isInWishlist?: boolean;
   variant?: "grid" | "list";
 }) {
   const t = await getTranslations("Product");
   const tBadge = await getTranslations("ProductCard");
-  const inWishlist = isInWishlistProp ?? (await isInWishlist(product.id));
 
   const isNew =
     new Date().getTime() - new Date(product.createdAt).getTime() <
@@ -110,7 +107,7 @@ export default async function ProductCard({
                       }}
                     />
                     <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5">
-                      <WishlistButton productId={product.id} isInWishlist={inWishlist} />
+                      <WishlistButton productId={product.id} />
                     </div>
                   </div>
                 </>
@@ -118,7 +115,7 @@ export default async function ProductCard({
                 <>
                   <p className="text-destructive text-sm font-medium">{t("outOfStock")}</p>
                   <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5">
-                    <WishlistButton productId={product.id} isInWishlist={inWishlist} />
+                    <WishlistButton productId={product.id} />
                   </div>
                 </>
               )}
@@ -148,20 +145,8 @@ export default async function ProductCard({
               <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </Link>
-          {/* Wishlist button - always visible on mobile, hover-reveal on desktop */}
-          <div className="absolute top-3 right-3 z-10 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
-            <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5 shadow-sm">
-              <WishlistButton productId={product.id} isInWishlist={inWishlist} />
-            </div>
-          </div>
-          {/* Always show if in wishlist on desktop */}
-          {inWishlist && (
-            <div className="absolute top-3 right-3 z-10 hidden md:block md:group-hover:opacity-0 transition-opacity duration-200">
-              <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5 shadow-sm">
-                <WishlistButton productId={product.id} isInWishlist={inWishlist} />
-              </div>
-            </div>
-          )}
+          {/* Wishlist button - client-side state, always visible on mobile / when in wishlist */}
+          <ProductCardWishlist productId={product.id} />
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {isNew && (

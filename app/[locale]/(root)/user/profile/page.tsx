@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import { SessionProvider } from "next-auth/react";
 import ProfileForm from "./profile-form";
 import { getTranslations } from "next-intl/server";
@@ -12,7 +12,7 @@ export async function generateMetadata() {
 }
 
 export default async function ProfilePage() {
-  const session = await auth();
+  const session = await getAuthSession();
   const t = await getTranslations("UserProfile");
 
   return (

@@ -1,4 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
+import { PROTECTED_PATHS } from "@/lib/constants";
 
 export const authConfig: NextAuthConfig = {
   pages: {
@@ -12,19 +13,9 @@ export const authConfig: NextAuthConfig = {
   providers: [],
   callbacks: {
     authorized({ request, auth }: any) {
-      const protectedPaths = [
-        /^(?:\/en)?\/shipping-address/,
-        /^(?:\/en)?\/payment-method/,
-        /^(?:\/en)?\/place-order/,
-        /^(?:\/en)?\/profile/,
-        /^(?:\/en)?\/user\/(.*)/,
-        /^(?:\/en)?\/order\/(.*)/,
-        /^(?:\/en)?\/admin/,
-      ];
-
       const { pathname } = request.nextUrl;
 
-      if (!auth && protectedPaths.some((p) => p.test(pathname))) return false;
+      if (!auth && PROTECTED_PATHS.some((p) => p.test(pathname))) return false;
 
       return true;
     },

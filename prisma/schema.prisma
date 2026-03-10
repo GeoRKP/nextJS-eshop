@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -29,6 +30,7 @@ model Category {
 
   @@index([parentId])
   @@index([sortOrder])
+  @@index([parentId, isActive])
 }
 
 // ─── Product ───────────────────────────────────────────────────
@@ -122,6 +124,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -131,6 +134,8 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now()) @db.Timestamp(6)
   updatedAt    DateTime @updatedAt @db.Timestamp(6)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -158,6 +163,7 @@ model Cart {
   user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([sessionCartId])
+  @@index([userId])
 }
 
 // ─── Order ─────────────────────────────────────────────────────
@@ -193,6 +199,9 @@ model Order {
 
   @@index([userId])
   @@index([status])
+  @@index([createdAt])
+  @@index([createdAt, isPaid])
+  @@index([paymentMethod])
 }
 
 model OrderItem {
@@ -208,6 +217,7 @@ model OrderItem {
 
   @@id([orderId, productId], map: "orderitems_orderId_productId_pk")
   @@index([productId])
+  @@index([orderId])
 }
 
 // ─── Order Status History ──────────────────────────────────────
@@ -242,6 +252,8 @@ model Review {
 
   @@unique([userId, productId])
   @@index([productId])
+  @@index([userId])
+  @@index([productId, createdAt])
 }
 
 // ─── Wishlist ──────────────────────────────────────────────────
@@ -302,6 +314,7 @@ model CouponCategory {
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([couponId, categoryId])
+  @@index([categoryId])
 }
 
 model CouponProduct {
@@ -312,6 +325,7 @@ model CouponProduct {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([couponId, productId])
+  @@index([productId])
 }
 
 model CouponUsage {
@@ -324,6 +338,9 @@ model CouponUsage {
   coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([couponId, userId])
+  @@index([userId])
 }
 
 // ─── Address Book ──────────────────────────────────────────────
@@ -351,6 +368,7 @@ model Address {
 
   @@index([userId])
   @@index([userId, isDefault])
+  @@index([createdAt])
 }
 
 // ─── Return Requests ───────────────────────────────────────────
@@ -375,6 +393,8 @@ model ReturnRequest {
 
   @@index([orderId])
   @@index([userId])
+  @@index([status])
+  @@index([status, createdAt])
 }
 
 // ─── Notification ──────────────────────────────────────────────
@@ -394,4 +414,5 @@ model Notification {
 
   @@index([userId])
   @@index([userId, isRead])
+  @@index([createdAt])
 }

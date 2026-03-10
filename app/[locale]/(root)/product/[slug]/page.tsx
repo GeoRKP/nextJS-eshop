@@ -6,7 +6,8 @@ import AddToCart from "@/components/shared/product/add-to-cart";
 import { getMyCart } from "@/lib/actions/cart.actions";
 import { Cart } from "@/types";
 import ReviewList from "./review-list";
-import { auth } from "@/auth";
+import { getReviews } from "@/lib/actions/review-actions";
+import { getAuthSession } from "@/lib/auth-session";
 import Rating from "@/components/shared/product/rating";
 import { getTranslations } from "next-intl/server";
 import Breadcrumb from "@/components/shared/breadcrumb";
@@ -14,8 +15,35 @@ import ScrollFadeIn from "@/components/shared/scroll-fade-in";
 import RelatedProducts from "@/components/shared/product/related-products";
 import WishlistButton from "@/components/shared/product/wishlist-button";
 import ProductDetailTabs from "@/components/shared/product/product-detail-tabs";
-import { isInWishlist } from "@/lib/actions/wishlist.actions";
 import { Truck, Shield, RotateCcw } from "lucide-react";
+import { prisma } from "@/db/prisma";
+
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    select: { slug: true },
+    where: { deletedAt: null },
+    take: 100,
+  });
+  return products.map((p) => ({ slug: p.slug }));
+}
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await props.params;
+  const product = await getProductBySlug(slug);
+  if (!product) return { title: "Product Not Found" };
+
+  return {
+    title: product.name,
+    description: product.description.slice(0, 160),
+    openGraph: {
+      title: product.name,
+      description: product.description.slice(0, 160),
+      images: product.images[0] ? [{ url: product.images[0] }] : [],
+    },
+  };
+}
 
 export default async function ProductDetailsPage(props: {
   params: Promise<{ slug: string }>;
@@ -26,11 +54,12 @@ export default async function ProductDetailsPage(props: {
     notFound();
   }
 
-  const session = await auth();
+  const [session, cart, reviewsData] = await Promise.all([
+    getAuthSession(),
+    getMyCart(),
+    getReviews({ productId: product.id, page: 1, limit: 10 }),
+  ]);
   const userId = session?.user?.id;
-
-  const cart = await getMyCart();
-  const inWishlist = await isInWishlist(product.id);
 
   const t = await getTranslations("Product");
   const tv = await getTranslations("ValueProps");
@@ -64,7 +93,7 @@ export default async function ProductDetailsPage(props: {
                   {product.name}
                 </h1>
                 <div className="flex-shrink-0 mt-1 rounded-lg border border-border/50 p-2">
-                  <WishlistButton productId={product.id} isInWishlist={inWishlist} />
+                  <WishlistButton productId={product.id} />
                 </div>
               </div>
 
@@ -169,7 +198,13 @@ export default async function ProductDetailsPage(props: {
           <div className="divider-gradient mb-8" />
           <div className="text-label text-muted-foreground mb-2">{t("reviews")}</div>
           <h2 className="h2-bold mb-6">{t("reviews")}</h2>
-          <ReviewList userId={userId || ""} productId={product.id} productSlug={product.slug} />
+          <ReviewList
+            userId={userId || ""}
+            productId={product.id}
+            productSlug={product.slug}
+            initialReviews={reviewsData.data}
+            initialTotalPages={reviewsData.totalPages}
+          />
         </section>
       </ScrollFadeIn>
 

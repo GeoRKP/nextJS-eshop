@@ -4,6 +4,7 @@ import "../../assets/styles/globals.css";
 import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from "@/lib/constants";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
+import { WishlistProvider } from "@/components/shared/product/wishlist-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing, Locale } from "@/i18n/routing";
@@ -111,7 +112,9 @@ export default async function LocaleLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <WishlistProvider>
+              {children}
+            </WishlistProvider>
             <Toaster />
           </ThemeProvider>
         </NextIntlClientProvider>

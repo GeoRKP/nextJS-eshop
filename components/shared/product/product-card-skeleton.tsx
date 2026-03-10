@@ -1,7 +1,8 @@
+import { memo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function ProductCardSkeleton() {
+function ProductCardSkeleton() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="p-0">
@@ -18,3 +19,5 @@ export default function ProductCardSkeleton() {
     </Card>
   );
 }
+
+export default memo(ProductCardSkeleton);

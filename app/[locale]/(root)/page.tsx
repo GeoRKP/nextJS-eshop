@@ -1,71 +1,84 @@
-import ProductList from "@/components/shared/product/product-list";
-import ProductCard from "@/components/shared/product/product-card";
-import ProductScrollSection, {
-  ProductScrollItem,
-} from "@/components/shared/product/product-scroll-section";
-import {
-  getLatestProducts,
-  getFeaturedProducts,
-} from "@/lib/actions/product.actions";
-import { getAllBrands } from "@/lib/actions/brand.actions";
+import { Suspense } from "react";
 import ViewAllProductsButton from "@/components/view-all-products-button";
 import { getTranslations } from "next-intl/server";
-import HeroSection from "@/components/shared/hero-section";
 import ValuePropositions from "@/components/shared/value-propositions";
 import CategoryCards from "@/components/shared/category-cards";
 import PromoBanner from "@/components/shared/promo-banner";
-import BrandShowcase from "@/components/shared/brand-showcase";
 import TestimonialStrip from "@/components/shared/testimonial-strip";
 import HomepageNewsletter from "@/components/shared/homepage-newsletter";
 import ScrollFadeIn from "@/components/shared/scroll-fade-in";
-import { getWishlistProductIds } from "@/lib/actions/wishlist.actions";
+import ProductCardSkeleton from "@/components/shared/product/product-card-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
+import { APP_NAME, APP_DESCRIPTION } from "@/lib/constants";
+import {
+  HeroWithData,
+  TrendingProducts,
+  LatestProducts,
+  BrandShowcaseWithData,
+} from "./homepage-sections";
+
+export async function generateMetadata() {
+  const t = await getTranslations("HomePage");
+  return {
+    title: `${APP_NAME} — ${t("latestProducts")}`,
+    description: APP_DESCRIPTION,
+  };
+}
+
+function HeroSkeleton() {
+  return <Skeleton className="w-full h-[50vh] md:h-[60vh]" />;
+}
+
+function CategoryCardsSkeleton() {
+  return (
+    <div className="my-10">
+      <Skeleton className="h-6 w-48 mb-6" />
+      <div className="grid grid-cols-2 lg:grid-cols-12 gap-4 auto-rows-[200px]">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="rounded-xl lg:col-span-3" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProductGridSkeleton() {
+  return (
+    <div className="my-10">
+      <Skeleton className="h-6 w-48 mb-6" />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <ProductCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const HomePage = async () => {
-  const [latestProducts, featuredProducts, brands, wishlistIds] = await Promise.all([
-    getLatestProducts(8),
-    getFeaturedProducts(),
-    getAllBrands(),
-    getWishlistProductIds(),
-  ]);
-  const tHome = await getTranslations("HomePage");
-
   return (
     <>
-      {/* 1. Hero Carousel — Full-width cinematic */}
-      {featuredProducts.length > 0 && (
-        <HeroSection products={featuredProducts} />
-      )}
+      {/* 1. Hero Carousel */}
+      <Suspense fallback={<HeroSkeleton />}>
+        <HeroWithData />
+      </Suspense>
 
-      {/* 2. Trust Bar — Floating card overlapping hero */}
+      {/* 2. Trust Bar */}
       <ValuePropositions />
 
-      {/* 3. Category Cards — Bento grid */}
+      {/* 3. Category Cards */}
       <div className="wrapper">
-        <ScrollFadeIn>
-          <CategoryCards />
-        </ScrollFadeIn>
+        <Suspense fallback={<CategoryCardsSkeleton />}>
+          <ScrollFadeIn>
+            <CategoryCards />
+          </ScrollFadeIn>
+        </Suspense>
       </div>
 
-      {/* 4. Trending Products — Horizontal carousel */}
-      {featuredProducts.length > 0 && (
-        <div className="wrapper">
-          <ScrollFadeIn>
-            <ProductScrollSection
-              title={tHome("trendingProducts")}
-              labelText={tHome("trendingLabel")}
-              count={featuredProducts.length}
-              viewAllLabel={tHome("viewAll")}
-              viewAllHref="/search"
-            >
-              {featuredProducts.map((product) => (
-                <ProductScrollItem key={product.id}>
-                  <ProductCard product={product} isInWishlist={wishlistIds.has(product.id)} />
-                </ProductScrollItem>
-              ))}
-            </ProductScrollSection>
-          </ScrollFadeIn>
-        </div>
-      )}
+      {/* 4. Trending Products */}
+      <Suspense fallback={<div className="wrapper"><ProductGridSkeleton /></div>}>
+        <TrendingProducts />
+      </Suspense>
 
       {/* 5. Split Promo Banner */}
       <ScrollFadeIn>
@@ -73,25 +86,14 @@ const HomePage = async () => {
       </ScrollFadeIn>
 
       {/* 6. Latest Products Grid */}
-      <div className="wrapper">
-        <ScrollFadeIn>
-          <ProductList
-            data={latestProducts}
-            title={tHome("latestProducts")}
-            subtitle={tHome("latestLabel")}
-            limit={8}
-            viewAllLabel={tHome("viewAll")}
-            viewAllHref="/search"
-          />
-        </ScrollFadeIn>
-      </div>
+      <Suspense fallback={<div className="wrapper"><ProductGridSkeleton /></div>}>
+        <LatestProducts />
+      </Suspense>
 
-      {/* 7. Brand Showcase — Marquee */}
-      {brands.length > 0 && (
-        <ScrollFadeIn>
-          <BrandShowcase brands={brands} />
-        </ScrollFadeIn>
-      )}
+      {/* 7. Brand Showcase */}
+      <Suspense fallback={null}>
+        <BrandShowcaseWithData />
+      </Suspense>
 
       {/* 8. Testimonials */}
       <ScrollFadeIn>

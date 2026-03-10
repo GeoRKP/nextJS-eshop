@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import { getUserById } from "@/lib/actions/user.actions";
 import PaymentMethodForm from "./payment-method-form";
 import CheckoutSteps from "@/components/shared/checkout-steps";
@@ -12,7 +12,7 @@ export async function generateMetadata() {
 }
 
 export default async function PaymentMethodPage() {
-  const session = await auth();
+  const session = await getAuthSession();
   const userId = session?.user?.id;
 
   if (!userId) {

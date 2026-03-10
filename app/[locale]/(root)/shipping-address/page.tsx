@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import { getMyCart } from "@/lib/actions/cart.actions";
 import { redirect } from "next/navigation";
 import { ShippingAddress } from "@/types";
@@ -21,7 +21,7 @@ export default async function ShippingAddressPage() {
     redirect("/cart");
   }
 
-  const session = await auth();
+  const session = await getAuthSession();
 
   const userId = session?.user?.id;
 

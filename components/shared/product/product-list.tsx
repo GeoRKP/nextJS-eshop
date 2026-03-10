@@ -2,7 +2,6 @@ import { Product } from "@/types";
 import ProductCard from "./product-card";
 import { getTranslations } from "next-intl/server";
 import { AnimatedGrid, AnimatedGridItem } from "./animated-grid";
-import { getWishlistProductIds } from "@/lib/actions/wishlist.actions";
 import { Link } from "@/i18n/navigation";
 import { ArrowRight } from "lucide-react";
 
@@ -22,10 +21,7 @@ export default async function ProductList({
   viewAllLabel?: string;
 }) {
   const limitedData = limit ? data.slice(0, limit) : data;
-  const [t, wishlistIds] = await Promise.all([
-    getTranslations("Product"),
-    getWishlistProductIds(),
-  ]);
+  const t = await getTranslations("Product");
 
   return (
     <div className="my-10">
@@ -52,7 +48,7 @@ export default async function ProductList({
         <AnimatedGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 md:gap-4">
           {limitedData.map((product: Product) => (
             <AnimatedGridItem key={product.slug}>
-              <ProductCard product={product} isInWishlist={wishlistIds.has(product.id)} />
+              <ProductCard product={product} />
             </AnimatedGridItem>
           ))}
         </AnimatedGrid>

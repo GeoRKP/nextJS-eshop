@@ -21,14 +21,18 @@ export async function getLatestProducts(limit?: number) {
   return toPlainObject(data);
 }
 
-export async function getProductBySlug(slug: string) {
-  return await prisma.product.findFirst({
-    where: {
-      slug: slug,
-      deletedAt: null,
-    },
-  });
-}
+export const getProductBySlug = unstable_cache(
+  async (slug: string) => {
+    return await prisma.product.findFirst({
+      where: {
+        slug: slug,
+        deletedAt: null,
+      },
+    });
+  },
+  ["getProductBySlug"],
+  { revalidate: 300, tags: ["products"] }
+);
 
 export async function getProductById(productId: string) {
   const data = await prisma.product.findFirst({
@@ -300,6 +304,7 @@ export async function deleteProduct(id: string) {
 
     revalidatePath("/admin/products");
     revalidatePath("/products");
+    revalidatePath("/en/products");
     revalidateTag("products");
     revalidateTag("categories");
 
@@ -322,6 +327,7 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
 
     revalidatePath("/admin/products");
     revalidatePath("/products");
+    revalidatePath("/en/products");
     revalidateTag("products");
     revalidateTag("categories");
 
@@ -356,6 +362,7 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
 
     revalidatePath("/admin/products");
     revalidatePath("/products");
+    revalidatePath("/en/products");
     revalidateTag("products");
     revalidateTag("categories");
 
@@ -401,7 +408,7 @@ export const getAllCategories = unstable_cache(
     });
   },
   ["getAllCategories"],
-  { revalidate: 3600, tags: ["categories"] }
+  { revalidate: 300, tags: ["categories"] }
 );
 
 // Get "Did you mean?" suggestions using pg_trgm similarity
@@ -468,27 +475,27 @@ export const getProductPriceRange = unstable_cache(
     };
   },
   ["getProductPriceRange"],
-  { revalidate: 3600, tags: ["products"] }
+  { revalidate: 300, tags: ["products"] }
 );
 
 // Get related products by category
-export async function getRelatedProducts(
-  category: string,
-  excludeId: string,
-  limit = 4
-) {
-  const data = await prisma.product.findMany({
-    where: {
-      category,
-      id: { not: excludeId },
-      deletedAt: null,
-    },
-    orderBy: { createdAt: "desc" },
-    take: limit,
-  });
+export const getRelatedProducts = unstable_cache(
+  async (category: string, excludeId: string, limit = 4) => {
+    const data = await prisma.product.findMany({
+      where: {
+        category,
+        id: { not: excludeId },
+        deletedAt: null,
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
 
-  return toPlainObject(data);
-}
+    return toPlainObject(data);
+  },
+  ["getRelatedProducts"],
+  { revalidate: 300, tags: ["products"] }
+);
 
 // Get featured products
 export const getFeaturedProducts = unstable_cache(

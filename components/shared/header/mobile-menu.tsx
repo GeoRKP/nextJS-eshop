@@ -50,7 +50,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const toggleCategory = (id: string) => {
+  const toggleCategory = useCallback((id: string) => {
     setExpandedCategories((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -60,7 +60,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
       }
       return next;
     });
-  };
+  }, []);
 
   const closeMenu = () => setOpen(false);
 

@@ -24,6 +24,12 @@ type Props = {
   };
 };
 
+// Module-level style constants to avoid creating new objects on every render
+const ANIMATION_STYLE_0 = { animationDelay: "0ms", animationFillMode: "forwards" } as const;
+const ANIMATION_STYLE_100 = { animationDelay: "100ms", animationFillMode: "forwards" } as const;
+const ANIMATION_STYLE_200 = { animationDelay: "200ms", animationFillMode: "forwards" } as const;
+const ANIMATION_STYLE_300 = { animationDelay: "300ms", animationFillMode: "forwards" } as const;
+
 export default function HeroCarousel({ products, translations }: Props) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -89,7 +95,7 @@ export default function HeroCarousel({ products, translations }: Props) {
                       {/* Label badge */}
                       <span
                         className="inline-block text-label text-brand-accent mb-4 opacity-0 animate-fade-up"
-                        style={{ animationDelay: "0ms", animationFillMode: "forwards" }}
+                        style={ANIMATION_STYLE_0}
                       >
                         {translations.label}
                       </span>
@@ -97,7 +103,7 @@ export default function HeroCarousel({ products, translations }: Props) {
                       {/* Main heading */}
                       <h1
                         className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white max-w-3xl leading-[0.92] tracking-tight uppercase opacity-0 animate-fade-up"
-                        style={{ animationDelay: "100ms", animationFillMode: "forwards" }}
+                        style={ANIMATION_STYLE_100}
                       >
                         {translations.tagline}
                       </h1>
@@ -105,7 +111,7 @@ export default function HeroCarousel({ products, translations }: Props) {
                       {/* Subtitle */}
                       <p
                         className="text-lg md:text-xl text-white/80 max-w-xl font-light mt-4 opacity-0 animate-fade-up"
-                        style={{ animationDelay: "200ms", animationFillMode: "forwards" }}
+                        style={ANIMATION_STYLE_200}
                       >
                         {translations.subtitle}
                       </p>
@@ -113,7 +119,7 @@ export default function HeroCarousel({ products, translations }: Props) {
                       {/* CTAs */}
                       <div
                         className="flex flex-col sm:flex-row gap-3 mt-6 opacity-0 animate-fade-up"
-                        style={{ animationDelay: "300ms", animationFillMode: "forwards" }}
+                        style={ANIMATION_STYLE_300}
                       >
                         <Button
                           size="lg"

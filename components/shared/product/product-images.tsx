@@ -1,18 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function ProductImages({ images }: { images: string[] }) {
+function ProductImages({ images }: { images: string[] }) {
   const [current, setCurrent] = useState(0);
 
-  const goTo = (index: number) => {
+  const goTo = useCallback((index: number) => {
     if (index < 0) setCurrent(images.length - 1);
     else if (index >= images.length) setCurrent(0);
     else setCurrent(index);
-  };
+  }, [images.length]);
 
   return (
     <div className="space-y-4">
@@ -83,3 +83,5 @@ export default function ProductImages({ images }: { images: string[] }) {
     </div>
   );
 }
+
+export default memo(ProductImages);

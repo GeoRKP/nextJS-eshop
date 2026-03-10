@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/db/prisma";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import { formatError, toPlainObject } from "../utils";
 import { revalidatePath } from "next/cache";
 import { createInsertCouponSchema, createUpdateCouponSchema } from "../validators";
@@ -14,7 +14,7 @@ import { getTranslations } from "next-intl/server";
 export async function validateCoupon(code: string) {
   try {
     const t = await getTranslations("Actions");
-    const session = await auth();
+    const session = await getAuthSession();
 
     const coupon = await prisma.coupon.findUnique({
       where: { code: code.toUpperCase() },

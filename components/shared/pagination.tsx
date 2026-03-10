@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
@@ -54,8 +55,8 @@ export default function Pagination({
     return pages;
   };
 
-  const mobilePages = getPageNumbers(5);
-  const desktopPages = getPageNumbers(7);
+  const mobilePages = useMemo(() => getPageNumbers(5), [currentPage, totalPages]);
+  const desktopPages = useMemo(() => getPageNumbers(7), [currentPage, totalPages]);
 
   return (
     <nav aria-label="Pagination">

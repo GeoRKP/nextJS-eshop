@@ -1,96 +1,43 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "@/i18n/navigation";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, SearchIcon, X, Clock, ArrowRight } from "lucide-react";
-import { useRecentSearches } from "@/hooks/use-recent-searches";
+import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
-import type {
-  ProductSuggestion,
-  CategorySuggestion,
-  SuggestionsResponse,
-} from "@/types/search";
 
 type Props = {
   onClose: () => void;
 };
 
 export default function MobileSearch({ onClose }: Props) {
-  const router = useRouter();
-  const { searches, addSearch, removeSearch, clearAll } = useRecentSearches();
   const inputRef = useRef<HTMLInputElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [query, setQuery] = useState("");
-  const [products, setProducts] = useState<ProductSuggestion[]>([]);
-  const [categoryResults, setCategoryResults] = useState<CategorySuggestion[]>([]);
+  const {
+    query,
+    products,
+    categories,
+    recentSearches,
+    handleInputChange,
+    handleSubmit,
+    handleSelectProduct,
+    handleSelectCategory,
+    handleSelectSearch,
+    handleRemoveRecent,
+    handleClearRecents,
+    clearResults,
+  } = useSearchSuggestions({ onNavigate: onClose });
 
   // Auto-focus on mount
   useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100);
-    return () => {
-      abortRef.current?.abort();
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
   }, []);
 
-  const fetchSuggestions = useCallback((q: string) => {
-    abortRef.current?.abort();
-    if (!q.trim()) {
-      setProducts([]);
-      setCategoryResults([]);
-      return;
-    }
-    const controller = new AbortController();
-    abortRef.current = controller;
-    fetch(`/api/search/suggestions?q=${encodeURIComponent(q.trim())}`, {
-      signal: controller.signal,
-    })
-      .then((res) => res.json())
-      .then((data: SuggestionsResponse) => {
-        setProducts(data.products);
-        setCategoryResults(data.categories);
-      })
-      .catch(() => {});
-  }, []);
-
-  const handleInputChange = useCallback(
-    (value: string) => {
-      setQuery(value);
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => fetchSuggestions(value), 250);
-    },
-    [fetchSuggestions]
-  );
-
-  const navigateToSearch = (term: string) => {
-    addSearch(term);
-    onClose();
-    router.push(`/search?q=${encodeURIComponent(term)}`);
-  };
-
-  const navigateToProduct = (slug: string) => {
-    onClose();
-    router.push(`/product/${slug}`);
-  };
-
-  const navigateToCategory = (category: string) => {
-    onClose();
-    router.push(`/search?category=${encodeURIComponent(category)}`);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (query.trim()) navigateToSearch(query.trim());
-  };
-
-  const showRecents = !query && searches.length > 0;
+  const showRecents = !query && recentSearches.length > 0;
   const showProducts = query && products.length > 0;
-  const showCategories = query && categoryResults.length > 0;
+  const showCategories = query && categories.length > 0;
 
   return (
     <motion.div
@@ -120,9 +67,7 @@ export default function MobileSearch({ onClose }: Props) {
               <button
                 type="button"
                 onClick={() => {
-                  setQuery("");
-                  setProducts([]);
-                  setCategoryResults([]);
+                  clearResults();
                   inputRef.current?.focus();
                 }}
                 className="text-primary-foreground/60 hover:text-primary-foreground"
@@ -147,26 +92,26 @@ export default function MobileSearch({ onClose }: Props) {
                 Recent Searches
               </span>
               <button
-                onClick={clearAll}
+                onClick={handleClearRecents}
                 className="text-xs text-brand-accent hover:underline"
               >
                 Clear all
               </button>
             </div>
-            {searches.map((term) => (
+            {recentSearches.map((term) => (
               <div
                 key={term}
                 className="flex items-center justify-between py-2"
               >
                 <button
-                  onClick={() => navigateToSearch(term)}
+                  onClick={() => handleSelectSearch(term)}
                   className="flex items-center gap-2 text-sm"
                 >
                   <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                   {term}
                 </button>
                 <button
-                  onClick={() => removeSearch(term)}
+                  onClick={() => handleRemoveRecent(term)}
                   className="text-muted-foreground p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
                   <X className="h-4 w-4" />
@@ -185,7 +130,7 @@ export default function MobileSearch({ onClose }: Props) {
             {products.map((product) => (
               <button
                 key={product.id}
-                onClick={() => navigateToProduct(product.slug)}
+                onClick={() => handleSelectProduct(product.slug)}
                 className="flex items-center gap-3 w-full py-2.5 text-left hover:bg-accent/50 rounded-lg px-1 transition-colors"
               >
                 <Image
@@ -214,10 +159,10 @@ export default function MobileSearch({ onClose }: Props) {
             <span className="text-label text-muted-foreground">
               Categories
             </span>
-            {categoryResults.map((cat) => (
+            {categories.map((cat) => (
               <button
                 key={cat.category}
-                onClick={() => navigateToCategory(cat.category)}
+                onClick={() => handleSelectCategory(cat.category)}
                 className="flex items-center gap-2 w-full py-2.5 text-sm text-left hover:text-brand-accent transition-colors"
               >
                 {cat.category}
@@ -233,7 +178,7 @@ export default function MobileSearch({ onClose }: Props) {
         {query && (
           <div className="p-3 border-t">
             <button
-              onClick={() => navigateToSearch(query)}
+              onClick={() => handleSelectSearch(query)}
               className="flex items-center gap-2 w-full py-3 px-3 text-sm bg-brand-accent/10 hover:bg-brand-accent/20 rounded-lg transition-colors font-medium"
             >
               <SearchIcon className="h-4 w-4 text-brand-accent" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import { Category } from "@/types";
@@ -366,14 +366,16 @@ function BrandsMegaMenu({
   const popularBrands = brands.slice(0, 8);
   const jumpBarRef = useRef<HTMLDivElement>(null);
 
-  // Group brands alphabetically
-  const grouped: Record<string, BrandItem[]> = {};
-  for (const b of brands) {
-    const letter = b.brand.charAt(0).toUpperCase();
-    if (!grouped[letter]) grouped[letter] = [];
-    grouped[letter].push(b);
-  }
-  const sortedLetters = Object.keys(grouped).sort();
+  // Group brands alphabetically (memoized to avoid recalculation on every render)
+  const { grouped, sortedLetters } = useMemo(() => {
+    const g: Record<string, BrandItem[]> = {};
+    for (const b of brands) {
+      const letter = b.brand.charAt(0).toUpperCase();
+      if (!g[letter]) g[letter] = [];
+      g[letter].push(b);
+    }
+    return { grouped: g, sortedLetters: Object.keys(g).sort() };
+  }, [brands]);
 
   const scrollToLetter = (letter: string) => {
     const el = document.getElementById(`brand-letter-${letter}`);

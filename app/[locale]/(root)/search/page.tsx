@@ -13,7 +13,6 @@ import SearchFilters from "./search-filters";
 import ViewToggle from "./view-toggle";
 import Pagination from "@/components/shared/pagination";
 import { SearchX } from "lucide-react";
-import { getWishlistProductIds } from "@/lib/actions/wishlist.actions";
 
 const ratings = [4, 3, 2, 1];
 
@@ -123,10 +122,9 @@ export default async function SearchPage(props: {
     page: parseInt(page),
   });
 
-  const [categories, priceRange, wishlistIds] = await Promise.all([
+  const [categories, priceRange] = await Promise.all([
     getAllCategories(),
     getProductPriceRange(),
-    getWishlistProductIds(),
   ]);
 
   // Parse current price filter values for the slider
@@ -341,7 +339,6 @@ export default async function SearchPage(props: {
                   key={product.id}
                   product={product}
                   searchQuery={q !== "all" ? q : undefined}
-                  isInWishlist={wishlistIds.has(product.id)}
                   variant="list"
                 />
               ))}
@@ -353,7 +350,6 @@ export default async function SearchPage(props: {
                   key={product.id}
                   product={product}
                   searchQuery={q !== "all" ? q : undefined}
-                  isInWishlist={wishlistIds.has(product.id)}
                 />
               ))}
             </div>

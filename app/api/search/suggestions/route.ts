@@ -100,7 +100,15 @@ export async function GET(request: NextRequest) {
           LIMIT 3
         `;
 
-    return NextResponse.json({ products, categories });
+    return NextResponse.json(
+      { products, categories },
+      {
+        headers: {
+          "Cache-Control":
+            "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      }
+    );
   } catch (error) {
     console.error("Search suggestions error:", error);
     return NextResponse.json({ products: [], categories: [] });

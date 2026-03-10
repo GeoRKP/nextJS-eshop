@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslations } from "next-intl";
 
@@ -11,7 +12,7 @@ type ProductDetailTabsProps = {
   stock: number;
 };
 
-export default function ProductDetailTabs({
+function ProductDetailTabs({
   description,
   slug,
   brand,
@@ -68,3 +69,5 @@ export default function ProductDetailTabs({
     </Tabs>
   );
 }
+
+export default memo(ProductDetailTabs);

@@ -1,6 +1,6 @@
 import { getCategoryTree } from "@/lib/actions/category.actions";
 import { getAllBrands } from "@/lib/actions/brand.actions";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-session";
 import MobileMenu from "./mobile-menu";
 import { Category } from "@/types";
 
@@ -17,7 +17,7 @@ export default async function MobileMenuWrapper() {
     // Tables might not exist yet
   }
 
-  const session = await auth();
+  const session = await getAuthSession();
 
   return (
     <MobileMenu

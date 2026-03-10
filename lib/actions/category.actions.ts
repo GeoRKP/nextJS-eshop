@@ -2,7 +2,8 @@
 
 import { prisma } from "@/db/prisma";
 import { formatError, toPlainObject } from "../utils";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { unstable_cache } from "next/cache";
 import { createInsertCategorySchema, createUpdateCategorySchema } from "../validators";
 import { z } from "zod";
 import { insertCategorySchema, updateCategorySchema } from "../validators";
@@ -21,32 +22,36 @@ export async function getAllCategoriesFlat() {
   return toPlainObject(data);
 }
 
-// Get categories as a hierarchical tree
-export async function getCategoryTree() {
-  const data = await prisma.category.findMany({
-    where: { isActive: true, parentId: null },
-    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    include: {
-      _count: { select: { products: true } },
-      children: {
-        where: { isActive: true },
-        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-        include: {
-          _count: { select: { products: true } },
-          children: {
-            where: { isActive: true },
-            orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-            include: {
-              _count: { select: { products: true } },
+// Get categories as a hierarchical tree (cached)
+export const getCategoryTree = unstable_cache(
+  async () => {
+    const data = await prisma.category.findMany({
+      where: { isActive: true, parentId: null },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      include: {
+        _count: { select: { products: true } },
+        children: {
+          where: { isActive: true },
+          orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+          include: {
+            _count: { select: { products: true } },
+            children: {
+              where: { isActive: true },
+              orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+              include: {
+                _count: { select: { products: true } },
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  return toPlainObject(data);
-}
+    return toPlainObject(data);
+  },
+  ["category-tree"],
+  { revalidate: 300, tags: ["categories"] }
+);
 
 // Get a single category by slug
 export async function getCategoryBySlug(slug: string) {
@@ -80,17 +85,28 @@ export async function getCategoryById(id: string) {
   return data ? toPlainObject(data) : null;
 }
 
-// Admin: Get all categories including inactive
-export async function getAdminCategories() {
-  const data = await prisma.category.findMany({
-    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    include: {
-      parent: { select: { id: true, name: true } },
-      _count: { select: { products: true, children: true } },
-    },
-  });
+// Admin: Get all categories including inactive (with pagination)
+export async function getAdminCategories({
+  page = 1,
+  limit = 50,
+}: { page?: number; limit?: number } = {}) {
+  const [data, totalCount] = await Promise.all([
+    prisma.category.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      include: {
+        parent: { select: { id: true, name: true } },
+        _count: { select: { products: true, children: true } },
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+    }),
+    prisma.category.count(),
+  ]);
 
-  return toPlainObject(data);
+  return {
+    data: toPlainObject(data),
+    totalPages: Math.ceil(totalCount / limit),
+  };
 }
 
 // Create category
@@ -114,6 +130,8 @@ export async function createCategory(data: z.infer<typeof insertCategorySchema>)
 
     revalidatePath("/admin/categories");
     revalidatePath("/");
+    revalidatePath("/en");
+    revalidateTag("categories");
 
     return { success: true, message: t("categoryCreatedSuccessfully") };
   } catch (error) {
@@ -149,6 +167,8 @@ export async function updateCategory(data: z.infer<typeof updateCategorySchema>)
 
     revalidatePath("/admin/categories");
     revalidatePath("/");
+    revalidatePath("/en");
+    revalidateTag("categories");
 
     return { success: true, message: t("categoryUpdatedSuccessfully") };
   } catch (error) {
@@ -174,6 +194,8 @@ export async function deleteCategory(id: string) {
 
     revalidatePath("/admin/categories");
     revalidatePath("/");
+    revalidatePath("/en");
+    revalidateTag("categories");
 
     return { success: true, message: t("categoryDeletedSuccessfully") };
   } catch (error) {
@@ -199,6 +221,8 @@ export async function updateCategorySortOrder(
 
     revalidatePath("/admin/categories");
     revalidatePath("/");
+    revalidatePath("/en");
+    revalidateTag("categories");
 
     return { success: true, message: t("categorySortUpdatedSuccessfully") };
   } catch (error) {

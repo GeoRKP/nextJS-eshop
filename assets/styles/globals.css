@@ -329,115 +329,27 @@ html.dark .upload-field .text-white {
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
-/* Fade up entrance animation */
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Slide in from right */
-@keyframes slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Slide in from left */
-@keyframes slide-in-left {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Scale in entrance */
-@keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Glow pulse for badges and CTAs */
-@keyframes glow-pulse {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 0; transform: scale(1.4); }
-}
-
-/* Count-up number flash */
-@keyframes count-up {
-  0% { opacity: 0; transform: translateY(6px); }
-  60% { opacity: 1; transform: translateY(-1px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-/* Engine rev entrance */
-@keyframes engine-rev {
-  0% { opacity: 0; transform: translateX(-8px) scale(0.98); }
-  50% { opacity: 1; transform: translateX(2px) scale(1.01); }
-  100% { opacity: 1; transform: translateX(0) scale(1); }
-}
-
-/* Progress fill for announcement bar timer */
-@keyframes progress-fill {
-  from { width: 0%; }
-  to { width: 100%; }
-}
-
-/* Mega-menu reveal with clip-path */
-@keyframes mega-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-/* Badge bounce for cart count changes */
-@keyframes badge-bounce {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-/* Marquee scroll for brand showcase */
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
+/* Marquee utility class (keyframes in tailwind.config.ts) */
 .animate-marquee {
   animation: marquee 40s linear infinite;
 }
 
-/* Slow spin for decorative gear icon */
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
+/* Slow spin utility class (keyframes in tailwind.config.ts) */
 .animate-spin-slow {
   animation: spin-slow 20s linear infinite;
 }
+
+/* Grid item stagger animation (keyframes in tailwind.config.ts) */
+.stagger-grid > .animate-grid-item-in {
+  opacity: 0;
+  animation: grid-item-in 0.4s ease-out both;
+}
+.stagger-grid > .animate-grid-item-in:nth-child(1) { animation-delay: 0ms; }
+.stagger-grid > .animate-grid-item-in:nth-child(2) { animation-delay: 100ms; }
+.stagger-grid > .animate-grid-item-in:nth-child(3) { animation-delay: 200ms; }
+.stagger-grid > .animate-grid-item-in:nth-child(4) { animation-delay: 300ms; }
+.stagger-grid > .animate-grid-item-in:nth-child(5) { animation-delay: 400ms; }
+.stagger-grid > .animate-grid-item-in:nth-child(6) { animation-delay: 500ms; }
+.stagger-grid > .animate-grid-item-in:nth-child(7) { animation-delay: 600ms; }
+.stagger-grid > .animate-grid-item-in:nth-child(8) { animation-delay: 700ms; }
+.stagger-grid > .animate-grid-item-in:nth-child(n+9) { animation-delay: 800ms; }

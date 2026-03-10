@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import type { ProductSuggestion, CategorySuggestion } from "@/types/search";
@@ -18,7 +19,7 @@ type Props = {
   onClearRecents: () => void;
 };
 
-export default function SearchDropdown({
+function SearchDropdown({
   query,
   products,
   categories,
@@ -234,6 +235,8 @@ export default function SearchDropdown({
 /**
  * Calculate total number of selectable items for keyboard navigation.
  */
+export default memo(SearchDropdown);
+
 export function getItemCount(
   query: string,
   products: ProductSuggestion[],

@@ -2,7 +2,7 @@
 
 import { Review } from "@/types";
 import { Link } from "@/i18n/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ReviewForm from "./review-form";
 
 import { getReviews } from "@/lib/actions/review-actions";
@@ -10,33 +10,45 @@ import { Calendar, Star } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import Rating from "@/components/shared/product/rating";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+
+const REVIEWS_PER_PAGE = 10;
 
 export default function ReviewList({
   userId,
   productId,
   productSlug,
+  initialReviews,
+  initialTotalPages,
 }: {
   userId: string;
   productId: string;
   productSlug: string;
+  initialReviews?: Review[];
+  initialTotalPages?: number;
 }) {
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<Review[]>(initialReviews ?? []);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(initialTotalPages ?? 1);
   const t = useTranslations("Product");
   const tCommon = useTranslations("Common");
 
-  useEffect(() => {
-    const loadReviews = async () => {
-      const res = await getReviews({ productId });
-      setReviews(res.data);
-    };
-
-    loadReviews();
+  const loadReviews = useCallback(async (pageNum: number) => {
+    const res = await getReviews({ productId, page: pageNum, limit: REVIEWS_PER_PAGE });
+    setReviews(res.data);
+    setTotalPages(res.totalPages);
   }, [productId]);
+
+  useEffect(() => {
+    // Skip initial load if we have server-provided data
+    if (page === 1 && initialReviews) return;
+    loadReviews(page);
+  }, [page, loadReviews, initialReviews]);
 
   //  Reload when updated or created
   const reload = async () => {
-    const res = await getReviews({ productId });
-    setReviews([...res.data]);
+    setPage(1);
+    await loadReviews(1);
   };
 
   // Calculate rating distribution
@@ -155,6 +167,31 @@ export default function ReviewList({
           </div>
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            {tCommon("previous")}
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            {page} / {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            {tCommon("next")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
