@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Link } from "@/i18n/navigation";
-import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import {
   Sheet,
@@ -22,10 +21,16 @@ import {
   Package,
   SearchIcon,
   Layers,
+  Clock,
+  Tag,
+  ArrowRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
+import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
+import { formatCurrency } from "@/lib/utils";
 import ModeToggle from "./mode-toggle";
 import LanguageSwitcher from "./language-switcher";
 import { LanguageToggle } from "./language-switcher";
@@ -41,14 +46,30 @@ type Props = {
 export default function MobileMenu({ categories, brands, userName }: Props) {
   const t = useTranslations("MobileNav");
   const tMenu = useTranslations("MegaMenu");
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set()
   );
   const [brandsExpanded, setBrandsExpanded] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const closeMenu = () => setOpen(false);
+
+  const {
+    query,
+    products,
+    categories: searchCategories,
+    recentSearches,
+    handleInputChange,
+    handleSubmit,
+    handleSelectProduct,
+    handleSelectCategory,
+    handleSelectSearch,
+    handleRemoveRecent,
+    handleClearRecents,
+    clearResults,
+  } = useSearchSuggestions({ onNavigate: closeMenu });
 
   const toggleCategory = useCallback((id: string) => {
     setExpandedCategories((prev) => {
@@ -62,28 +83,21 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
     });
   }, []);
 
-  const closeMenu = () => setOpen(false);
-
-  const handleSearch = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (searchQuery.trim()) {
-        closeMenu();
-        router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      }
-    },
-    [searchQuery, router]
-  );
-
-  // Focus search input when menu opens
+  // Focus search input when menu opens; reset state when closed
   useEffect(() => {
     if (open) {
       const timer = setTimeout(() => searchInputRef.current?.focus(), 300);
       return () => clearTimeout(timer);
     } else {
-      setSearchQuery("");
+      clearResults();
+      setSearchFocused(false);
     }
-  }, [open]);
+  }, [open, clearResults]);
+
+  const showRecents = searchFocused && !query && recentSearches.length > 0;
+  const showProducts = !!query && products.length > 0;
+  const showSearchCategories = !!query && searchCategories.length > 0;
+  const showSuggestions = showRecents || showProducts || showSearchCategories || !!query;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -112,24 +126,143 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
           </div>
         </div>
 
-        {/* Search bar with premium styling */}
+        {/* Search bar with autocomplete */}
         <div className="px-4 py-3 border-b">
-          <form onSubmit={handleSearch} className="search-premium flex items-center bg-muted/30">
+          <form onSubmit={handleSubmit} className="search-premium flex items-center bg-muted/30">
             <SearchIcon className="h-4 w-4 text-muted-foreground/60 ml-3 shrink-0" />
             <input
               ref={searchInputRef}
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={query}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
               placeholder={t("search") + "..."}
               className="flex-1 h-10 bg-transparent pl-2 pr-2 text-sm focus:outline-none"
               autoComplete="off"
             />
+            {query && (
+              <button
+                type="button"
+                onClick={() => {
+                  clearResults();
+                  searchInputRef.current?.focus();
+                }}
+                className="p-1.5 text-muted-foreground hover:text-foreground shrink-0"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
             <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-white flex items-center justify-center shrink-0 mr-1">
               <SearchIcon className="h-3.5 w-3.5" />
             </button>
           </form>
         </div>
+
+        {/* Inline search suggestions */}
+        {showSuggestions && (
+          <div className="border-b bg-background">
+            {/* Recent searches */}
+            {showRecents && (
+              <div className="px-4 py-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    {t("recentSearches")}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleClearRecents}
+                    className="text-xs text-brand-accent hover:underline"
+                  >
+                    {t("clearAll")}
+                  </button>
+                </div>
+                {recentSearches.map((term) => (
+                  <div key={term} className="flex items-center justify-between">
+                    <button
+                      onClick={() => handleSelectSearch(term)}
+                      className="flex items-center gap-2 py-2 text-sm flex-1 min-w-0"
+                    >
+                      <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span className="truncate">{term}</span>
+                    </button>
+                    <button
+                      onClick={() => handleRemoveRecent(term)}
+                      className="p-2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Product suggestions */}
+            {showProducts && (
+              <div className="px-4 py-2">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  {t("products")}
+                </span>
+                {products.map((product) => (
+                  <button
+                    key={product.id}
+                    onClick={() => handleSelectProduct(product.slug)}
+                    className="flex items-center gap-3 w-full py-2 text-left hover:bg-accent/50 rounded-lg px-1 transition-colors"
+                  >
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      width={44}
+                      height={44}
+                      className="rounded-lg object-cover border shrink-0"
+                      sizes="44px"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{product.name}</p>
+                      <p className="text-xs text-brand-accent">{product.brand}</p>
+                    </div>
+                    <span className="text-sm font-bold whitespace-nowrap shrink-0">
+                      {formatCurrency(product.price)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Category suggestions */}
+            {showSearchCategories && (
+              <div className="px-4 py-2 border-t">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  {t("categoriesLabel")}
+                </span>
+                {searchCategories.map((cat) => (
+                  <button
+                    key={cat.category}
+                    onClick={() => handleSelectCategory(cat.category)}
+                    className="flex items-center gap-2 w-full py-2 text-sm text-left hover:text-brand-accent transition-colors"
+                  >
+                    <Tag className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <span>{cat.category}</span>
+                    <span className="text-xs text-muted-foreground">({cat.count})</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* "Search for ..." CTA */}
+            {query && (
+              <div className="px-4 py-2 border-t">
+                <button
+                  onClick={() => handleSelectSearch(query)}
+                  className="flex items-center gap-2 w-full py-2.5 px-3 text-sm bg-brand-accent/10 hover:bg-brand-accent/20 rounded-lg transition-colors font-medium"
+                >
+                  <SearchIcon className="h-4 w-4 text-brand-accent shrink-0" />
+                  <span className="truncate">{t("searchFor")} &quot;{query}&quot;</span>
+                  <ArrowRight className="h-4 w-4 ml-auto text-brand-accent shrink-0" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* User section — card-like */}
         <div className="px-4 py-3 border-b bg-muted/30">

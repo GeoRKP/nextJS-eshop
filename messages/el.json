@@ -566,7 +566,12 @@
     "wishlist": "Λίστα Επιθυμιών",
     "closeMenu": "Κλείσιμο μενού",
     "brands": "Μάρκες",
-    "popularBrands": "Δημοφιλείς Μάρκες"
+    "popularBrands": "Δημοφιλείς Μάρκες",
+    "recentSearches": "Πρόσφατες Αναζητήσεις",
+    "clearAll": "Εκκαθάριση",
+    "products": "Προϊόντα",
+    "categoriesLabel": "Κατηγορίες",
+    "searchFor": "Αναζήτηση για"
   },
   "HomePage": {
     "trendingProducts": "Δημοφιλή Προϊόντα",

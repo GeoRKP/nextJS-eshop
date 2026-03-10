@@ -566,7 +566,12 @@
     "wishlist": "Wishlist",
     "closeMenu": "Close menu",
     "brands": "Brands",
-    "popularBrands": "Popular Brands"
+    "popularBrands": "Popular Brands",
+    "recentSearches": "Recent Searches",
+    "clearAll": "Clear all",
+    "products": "Products",
+    "categoriesLabel": "Categories",
+    "searchFor": "Search for"
   },
   "HomePage": {
     "trendingProducts": "Trending Products",

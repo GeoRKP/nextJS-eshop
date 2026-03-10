@@ -1,5 +1,6 @@
 import { getAuthSession } from "@/lib/auth-session";
 import { getUserById } from "@/lib/actions/user.actions";
+import { redirect } from "next/navigation";
 import PaymentMethodForm from "./payment-method-form";
 import CheckoutSteps from "@/components/shared/checkout-steps";
 import { getTranslations } from "next-intl/server";
@@ -15,9 +16,7 @@ export default async function PaymentMethodPage() {
   const session = await getAuthSession();
   const userId = session?.user?.id;
 
-  if (!userId) {
-    throw new Error("User not found");
-  }
+  if (!userId) redirect("/sign-in?callbackUrl=/payment-method");
 
   const user = await getUserById(userId);
 

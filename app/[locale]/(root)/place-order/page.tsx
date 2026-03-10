@@ -27,7 +27,7 @@ export default async function PlaceOrderPage() {
   const [cart, session] = await Promise.all([getMyCart(), getAuthSession()]);
   const userid = session?.user?.id;
 
-  if (!userid) throw new Error("User not found");
+  if (!userid) redirect("/sign-in?callbackUrl=/place-order");
 
   const user = await getUserById(userid);
 

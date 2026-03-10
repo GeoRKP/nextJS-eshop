@@ -183,9 +183,58 @@ export async function getMyCart() {
   const session = await getAuthSession();
   const userId = session?.user?.id ? (session.user.id as string) : undefined;
 
-  const cart = await prisma.cart.findFirst({
-    where: userId ? { userId: userId } : { sessionCartId: sessionCartId },
-  });
+  let cart;
+
+  if (userId) {
+    // Logged-in user: look for their cart first
+    cart = await prisma.cart.findFirst({ where: { userId } });
+
+    // Check for a guest cart that should be claimed/merged
+    const guestCart = await prisma.cart.findFirst({
+      where: { sessionCartId, userId: null },
+    });
+
+    if (guestCart) {
+      if (!cart) {
+        // No user cart exists — claim the guest cart
+        cart = await prisma.cart.update({
+          where: { id: guestCart.id },
+          data: { userId },
+        });
+      } else {
+        // Both exist — merge guest items into user cart
+        const userItems = cart.items as CartItem[];
+        const guestItems = guestCart.items as CartItem[];
+
+        for (const guestItem of guestItems) {
+          const existing = userItems.find(
+            (i) => i.productId === guestItem.productId
+          );
+          if (existing) {
+            existing.qty += guestItem.qty;
+          } else {
+            userItems.push(guestItem);
+          }
+        }
+
+        const couponData = await getCouponData(cart.couponCode);
+
+        cart = await prisma.cart.update({
+          where: { id: cart.id },
+          data: {
+            items: userItems as Prisma.CartUpdateitemsInput[],
+            ...calcPrice(userItems, couponData),
+          },
+        });
+
+        // Delete the guest cart
+        await prisma.cart.delete({ where: { id: guestCart.id } });
+      }
+    }
+  } else {
+    // Guest user: find by sessionCartId
+    cart = await prisma.cart.findFirst({ where: { sessionCartId } });
+  }
 
   if (!cart) return undefined;
 

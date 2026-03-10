@@ -25,7 +25,7 @@ export default async function ShippingAddressPage() {
 
   const userId = session?.user?.id;
 
-  if (!userId) throw new Error("No user id");
+  if (!userId) redirect("/sign-in?callbackUrl=/shipping-address");
 
   const user = await getUserById(userId);
 
