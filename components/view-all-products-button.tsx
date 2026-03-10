@@ -11,7 +11,7 @@ export default async function ViewAllProductsButton() {
       <Button
         size="lg"
         variant="outline"
-        className="px-10 py-5 text-lg font-bold gap-2 uppercase tracking-wide rounded-md border-2 border-border hover:border-brand-accent hover:bg-brand-accent hover:text-white transition-all group"
+        className="px-10 py-5 text-lg font-bold gap-2 uppercase tracking-wide rounded-md border-2 border-border hover:border-brand-accent hover:bg-brand-accent hover:text-accent-foreground transition-all group"
         asChild
       >
         <Link href="/search">

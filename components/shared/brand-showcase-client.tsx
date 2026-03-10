@@ -38,14 +38,14 @@ export default function BrandShowcaseClient({
               href={`/search?q=all&category=all&brand=${encodeURIComponent(b.brand)}`}
               className="flex flex-col items-center mx-4 md:mx-6 shrink-0"
             >
-              <div className="h-16 w-28 md:h-20 md:w-36 rounded-lg bg-card border border-border/60 flex items-center justify-center hover:border-brand-accent/50 hover:shadow-md transition-all p-2">
+              <div className="h-16 w-28 md:h-20 md:w-36 rounded-lg bg-card border border-border/60 flex items-center justify-center hover:border-brand-accent/50 hover:shadow-card transition-all p-2">
                 {logoSrc ? (
                   <Image
                     src={logoSrc}
                     alt={`${b.brand} logo`}
                     width={200}
                     height={80}
-                    className="h-full w-auto object-contain dark:invert"
+                    className="h-full w-auto object-contain dark:brightness-[0.87] dark:contrast-[1.15]"
                   />
                 ) : (
                   <span className="text-2xl md:text-3xl font-black text-brand-accent">

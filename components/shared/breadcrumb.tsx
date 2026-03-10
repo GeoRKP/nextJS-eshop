@@ -28,7 +28,7 @@ export default async function Breadcrumb({
         </li>
         {items.map((item, index) => (
           <li key={index} className="flex items-center gap-1.5">
-            <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground/70" />
             {item.href ? (
               <Link
                 href={item.href}

@@ -1,305 +1,618 @@
-# Navbar Issues - PC Screens Only
+# Dark/Light Mode - Complete Issue List
 
-> Generated from deep analysis of 30 agents across 22+ header component files.
-> All issues are specific to desktop/PC screens (md breakpoint and above).
-> Focused on `category-nav-client.tsx`, `mega-menu.tsx`, and related header components.
-
----
-
-## Phase 0: HIGHEST PRIORITY — "Όλες οι Κατηγορίες" Instant Hover Drill-Down
-
-### 0.1 Redesign AllCategoriesMegaMenu — Replace Instant Hover Drill-Down with Two-Panel Layout
-- [x] **File**: `components/shared/header/mega-menu.tsx` (lines 242-350, function `AllCategoriesMegaMenu`)
-- **Problem**: When hovering "Όλες οι Κατηγορίες", a grid of category cards appears. Moving the mouse over ANY card instantly triggers `onMouseEnter={() => setActiveRoot(cat.id)}` (line 274) which **replaces the entire grid** with a drill-down subcategory view. There is NO delay. This makes it impossible to browse the grid — the view changes the moment the cursor touches a card.
-- **Root cause**: Line 274 uses `onMouseEnter` with no delay, and lines 264-347 use a conditional render (`{!activeCat ? grid : expanded}`) that swaps the entire content.
-- **UX research findings** (Baymard Institute, Nielsen Norman Group):
-  - Hover delay of **300ms** is mandatory before expanding (60% of sites fail this)
-  - Amazon-style **two-panel layout** is best practice: left panel always shows categories, right panel shows subcategories of hovered item
-  - Click should navigate to category page, hover should only preview subcategories
-  - Default state should show first category's subcategories (not empty right panel)
-
-#### Solution: Two-Panel Layout (Amazon-style)
-
-**Replace the current toggle view with a side-by-side layout:**
-
-```
-┌──────────────────────────────────────────────────┐
-│ LEFT (w-2/5)            │ RIGHT (flex-1)          │
-├─────────────────────────┼────────────────────────┤
-│ ■ Γρανάζια ABS      →  │ ▸ Γρανάζια DAF/MAN     │
-│   Ειδικές Κατασκευές    │ ▸ Γρανάζια Mercedes    │
-│   Εξαρτήματα Αεροφρένων │ ▸ Γρανάζια Volvo       │
-│   Εξαρτ. Σωληνώσεων    │                        │
-│   Κατασκ. Σωλήνων       │   View All →           │
-└─────────────────────────┴────────────────────────┘
-```
-
-**Implementation steps:**
-
-1. **Change state initialization**: `useState<string | null>(categories[0]?.id ?? null)` — default to first category
-2. **Add hover delay ref**: `const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)`
-3. **Replace `onMouseEnter`** on category buttons with delayed handler:
-   ```tsx
-   onMouseEnter={() => {
-     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-     hoverTimerRef.current = setTimeout(() => setActiveRoot(cat.id), 300);
-   }}
-   onMouseLeave={() => {
-     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-   }}
-   ```
-4. **Add `onClick`** to navigate: `onClick={() => { onClose(); /* navigate via Link */ }}`
-5. **Replace conditional render** (`{!activeCat ? ... : ...}`) with **flex side-by-side**:
-   ```tsx
-   <div className="flex gap-6 min-h-[300px]">
-     {/* LEFT: Category list — always visible */}
-     <div className="w-2/5 max-h-[480px] overflow-y-auto border-r border-border pr-4">
-       {categories.map((cat) => (
-         <button
-           key={cat.id}
-           className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
-             activeRoot === cat.id
-               ? "bg-brand-accent/10 border-l-2 border-brand-accent"
-               : "hover:bg-muted/50"
-           }`}
-           onMouseEnter={/* delayed handler, 300ms */}
-           onMouseLeave={/* clear timer */}
-           onClick={/* navigate to category */}
-         >
-           <Icon /> <span>{cat.name}</span> <ChevronRight />
-         </button>
-       ))}
-     </div>
-     {/* RIGHT: Subcategories of active category */}
-     <div className="flex-1 min-w-0 max-h-[480px] overflow-y-auto">
-       {activeCat ? (
-         <>
-           <h4>{activeCat.name}</h4>
-           <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
-             {/* Reuse existing subcategory rendering from lines 315-344 */}
-           </div>
-         </>
-       ) : null}
-     </div>
-   </div>
-   ```
-6. **Cleanup timer** on unmount with useEffect
-7. **Keep existing subcategory rendering** (lines 315-344) — just move it into right panel
-
-**Key design principles:**
-- Left panel: Always visible, scrollable if many categories, active item highlighted
-- Right panel: Shows subcategories with existing grid styling
-- 300ms hover delay prevents accidental switches
-- Click on category name navigates to `/search?category=...`
-- First category selected by default when menu opens
-- Both panels independently scrollable within max-h-[480px]
-
-**Files to modify:**
-- `components/shared/header/mega-menu.tsx` — AllCategoriesMegaMenu function (lines 242-350)
-
-**Files for reference (do NOT modify):**
-- `components/shared/header/category-nav-client.tsx` — hover delay pattern (lines 39-51)
-- `components/shared/header/mega-menu.tsx` — BrandsMegaMenu has correct click-only behavior (lines 352-465)
-- `components/shared/header/mobile-menu.tsx` — mobile accordion uses click-only (correct pattern)
+> Generated by 50+ parallel analysis agents scanning the entire codebase.
+> **Priority**: Make **light mode the default** theme and fix all dark/light mode issues.
 
 ---
 
-## Phase 1: Critical Visual Issues (User-Facing Bugs)
+## 0. GLOBAL CONFIG: Change Default Theme to Light
 
-### 1.1 Category Nav Overflow Clipping — Items Hidden on PC
-- [x] **File**: `components/shared/header/category-nav-client.tsx` (line 79)
-- **Problem**: The wrapper div has `overflow-hidden` which clips any category buttons that don't fit horizontally. With long Greek names like "Εξαρτήματα Σωληνώσεων / Ρακόρ" plus "Αγορές ανά Μάρκα" plus quick links (New Arrivals, Deals), the bar overflows and some buttons become **invisible** — especially on screens 768px-1280px.
-- **Root cause**: `overflow-hidden` on `<div className="wrapper flex items-center gap-0 h-11 !py-0 overflow-hidden">`
-- **Fix options**:
-  1. Replace `overflow-hidden` with `overflow-x-auto` and add horizontal scroll with subtle scroll indicators (fade gradients like mobile chips)
-  2. Add a "More" dropdown button that collects overflow categories
-  3. Dynamically measure available width and move excess items into an overflow menu
-- **Recommended**: Option 2 (overflow menu) — more professional for desktop e-commerce
+### 0.1 ThemeProvider defaultTheme
+- [x] **File**: `app/[locale]/layout.tsx` (line 111)
+- **Current**: `defaultTheme="system"`
+- **Fix**: Change to `defaultTheme="light"`
+- **Reason**: User requested light mode as default instead of system preference
 
-### 1.2 Layout Shift on Hover — 2px Content Jump
-- [x] **File**: `components/shared/header/category-nav-client.tsx` (lines 105-108, 128-131, 82-85)
-- **Problem**: Category buttons use `hover:border-b-2 hover:border-brand-accent/50` which adds a 2px border on hover. With `box-sizing: border-box`, this shrinks content area by 2px, causing a visible **jump/shift** of text and icons.
-- **Fix**: Always render `border-b-2 border-transparent` on all buttons, and only change the border **color** on hover/active:
-  ```tsx
-  // Before (causes shift):
-  "hover:border-b-2 hover:border-brand-accent/50"
-  // After (no shift):
-  "border-b-2 border-transparent hover:border-brand-accent/50"
-  ```
-- **Apply to**: All category buttons, "Αγορές ανά Μάρκα" button, quick links (New Arrivals, Deals)
-
-### 1.3 Category Labels Invisible at md Breakpoint (768-1024px)
-- [x] **File**: `components/shared/header/category-nav-client.tsx` (line 115)
-- **Problem**: Category text uses `hidden lg:inline` — hidden until `lg` (1024px). But the category nav bar shows at `md` (768px). Between 768-1024px, users see **icons without any labels** — confusing navigation that looks broken.
-- **Also affected**: ChevronDown icons (`hidden lg:block`, line 117), "New Arrivals" text (`hidden lg:inline`, line 153), "Deals" text (`hidden lg:inline`, line 163)
-- **Fix options**:
-  1. Change `hidden lg:inline` to `hidden md:inline` so text shows when nav bar appears
-  2. Show abbreviated text on md (first word only) and full text on lg
-  3. Use a different nav layout for md (simpler horizontal scroll with full labels)
-- **Recommended**: Option 1 — show labels at same breakpoint as nav bar
-
-### 1.4 Active State Border May Be Clipped
-- [x] **File**: `components/shared/header/category-nav-client.tsx` (lines 84, 107)
-- **Problem**: Active buttons have `border-b-2 border-brand-accent` (the amber bottom indicator). The wrapper has `overflow-hidden` and `h-11`. If the button's bottom border is at the absolute edge, `overflow-hidden` may partially clip the 2px border.
-- **Fix**: Addressed by fixing 1.1 (remove `overflow-hidden`) and 1.2 (always have border-b-2)
+### 0.2 MEMORY.md Update
+- [x] **File**: `.claude/projects/.../memory/MEMORY.md`
+- **Current**: `"system" (respects OS preference)`
+- **Fix**: Update to reflect `"light"` as default theme
 
 ---
 
-## Phase 2: Interaction & UX Issues (Desktop)
+## 1. CSS VARIABLES & GLOBAL STYLES
 
-### 2.1 No Keyboard Navigation for Category Mega Menu
-- [x] **File**: `components/shared/header/category-nav-client.tsx` (lines 81-141)
-- **Problem**: Category buttons only have `onMouseEnter`, `onMouseLeave`, and `onClick` handlers. No keyboard support:
-  - No `onKeyDown` for Enter/Space to open menu
-  - No Escape to close menu
-  - No Arrow Left/Right to navigate between categories
-  - No Tab trapping when mega menu is open
-- **Fix**: Add keyboard event handlers:
-  ```tsx
-  onKeyDown={(e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleClick(categoryId);
-    }
-    if (e.key === 'Escape') setActiveCategory(null);
-  }}
-  ```
+### 1.1 Missing --radius in .dark selector
+- [x] **File**: `assets/styles/globals.css` (line 229 defined, missing in lines 247-288)
+- **Issue**: `--radius: 0.375rem` only in `:root`, not in `.dark`
+- **Fix**: Add `--radius: 0.375rem;` inside `.dark` block
 
-### 2.2 No Exit Animation on Mega Menu
-- [x] **File**: `components/shared/header/mega-menu.tsx` (line 114)
-- **Problem**: Mega menu has `animate-mega-reveal` enter animation (0.2s slide + fade + clipPath) but **disappears instantly** when closing (conditional render unmounts it). This creates a jarring experience.
-- **Fix options**:
-  1. Use CSS exit animation with `data-state` attribute and `animation-fill-mode`
-  2. Delay unmount by 150ms with exit transition
-  3. Use Framer Motion's `AnimatePresence` for exit animations (already installed as dependency)
-- **Recommended**: Option 1 (CSS-only) to keep bundle size minimal
+### 1.2 Hardcoded color in .bg-gradient-industrial
+- [x] **File**: `assets/styles/globals.css` (line 62)
+- **Issue**: `hsl(222 47% 20%)` hardcoded middle stop
+- **Fix**: Replace with `hsl(var(--primary) / 0.8)` or create `--primary-dark` variable
 
-### 2.3 Mega Menu Backdrop Too Subtle in Dark Mode
-- [x] **File**: `components/shared/header/mega-menu.tsx` (line 112)
-- **Problem**: Backdrop overlay uses `bg-black/20` (20% opacity black). In dark mode, the page is already dark, making the overlay nearly invisible. Users may not realize the mega menu has a clickable backdrop.
-- **Fix**: Use a dynamic opacity: `bg-black/20 dark:bg-black/40` or use the semantic backdrop variable
+### 1.3 Hardcoded white in .footer-divider
+- [x] **File**: `assets/styles/globals.css` (line 91)
+- **Issue**: `hsl(0 0% 100% / 0.15)` hardcoded white
+- **Fix**: Replace with `hsl(var(--foreground) / 0.15)` to adapt per theme
 
-### 2.4 No Focus Management in Mega Menu
-- [x] **File**: `components/shared/header/mega-menu.tsx`
-- **Problem**: When mega menu opens, focus stays on the trigger button. Users can Tab out of the mega menu into page content behind the backdrop.
-- **Fix**: Auto-focus the first link in the mega menu when it opens, and trap focus within the menu panel
+### 1.4 Hardcoded white border in .glass-card
+- [x] **File**: `assets/styles/globals.css` (line 148)
+- **Issue**: `border border-white/10` hardcoded
+- **Fix**: Change to `border border-foreground/10` or add dark mode handling
 
-### 2.5 Hover Grace Period Inconsistency
-- [x] **File**: `components/shared/header/category-nav-client.tsx` (lines 48-50, 68-71)
-- **Problem**: Mouse leave from nav button = 300ms delay, but mouse leave from mega menu = 200ms delay. If a user leaves the button downward toward the mega menu, they have 300ms, but if they return upward from mega menu to nav, they only have 200ms.
-- **Fix**: Use consistent delay (250ms for both) or increase mega menu leave to 300ms
+### 1.5 UploadThing text color overrides
+- [x] **File**: `assets/styles/globals.css` (lines 305-311)
+- **Issue**: Hardcoded `#ffffff` and `#000000`
+- **Fix**: Use `hsl(var(--foreground))` and `hsl(var(--background))` instead
+
+### 1.6 Warning foreground contrast in dark mode
+- [x] **File**: `assets/styles/globals.css` (line 285)
+- **Issue**: `--warning-foreground: 222 47% 11%` too dark on amber warning bg
+- **Fix**: Change dark mode warning-foreground to lighter value for contrast
 
 ---
 
-## Phase 3: Accessibility Issues (Desktop)
+## 2. HEADER COMPONENTS
 
-### 3.1 Missing ARIA Attributes on Category Buttons
-- [x] **File**: `components/shared/header/category-nav-client.tsx` (lines 81-141)
-- **Problem**: Category trigger buttons lack:
-  - `aria-expanded={isActive}` to indicate menu state
-  - `aria-haspopup="menu"` to indicate dropdown behavior
-  - `aria-controls` pointing to mega menu panel id
-- **Fix**: Add attributes to each category button:
-  ```tsx
-  <button
-    aria-expanded={activeCategory === categoryId}
-    aria-haspopup="menu"
-    ...
-  >
-  ```
+### 2.1 Category nav active items - hardcoded text-white
+- [x] **File**: `components/shared/header/category-nav-client.tsx` (lines 87, 119, 151)
+- **Issue**: Active state uses `text-white` hardcoded
+- **Fix**: Use `text-primary-foreground` or add `dark:text-foreground`
 
-### 3.2 Icon-Only Buttons Missing Accessible Names
-- [x] **Files**:
-  - `components/shared/header/menu.tsx` — Heart/Wishlist icon (line ~19): Missing `aria-label`
-  - `components/shared/header/menu.tsx` — Cart icon (line ~25): Missing `aria-label`
-  - `components/shared/header/user-button.tsx` — User avatar button: Missing `aria-label`
-  - `components/shared/header/mode-toggle.tsx` — Theme toggle: Missing `aria-label`
-  - `components/shared/header/search-autocomplete.tsx` — Search submit button: Missing `aria-label`
-- **Fix**: Add `aria-label` to each:
-  ```tsx
-  <Link href="/wishlist" aria-label="Wishlist">
-  <Link href="/cart" aria-label="Cart">
-  ```
+### 2.2 Category nav dividers nearly invisible in dark mode
+- [x] **File**: `components/shared/header/category-nav-client.tsx` (lines 106, 145)
+- **Issue**: `bg-primary-foreground/20` too faint
+- **Fix**: Increase opacity or use `bg-primary-foreground/30`
 
-### 3.3 Missing Menu Roles on Mega Menu Items
-- [x] **File**: `components/shared/header/mega-menu.tsx`
-- **Problem**: Mega menu links don't have `role="menuitem"` and the mega menu container doesn't have `role="menu"`
-- **Fix**: Add roles to the menu panel and individual links
+### 2.3 Mega menu "View All" button
+- [x] **File**: `components/shared/header/mega-menu.tsx` (line 245)
+- **Issue**: `text-white` hardcoded on `bg-brand-accent`
+- **Fix**: Use `text-accent-foreground`
 
----
+### 2.4 Mega menu overlay
+- [x] **File**: `components/shared/header/mega-menu.tsx` (line 132)
+- **Issue**: `bg-black/20 dark:bg-black/40` - use semantic overlay
+- **Fix**: Consider using CSS variable for overlay
 
-## Phase 4: Desktop Layout Issues
+### 2.5 Mega menu inline boxShadow
+- [x] **File**: `components/shared/header/mega-menu.tsx` (line 137)
+- **Issue**: Inline style `boxShadow` with hardcoded hsl color
+- **Fix**: Move to Tailwind class or CSS variable
 
-### 4.1 No 2xl Responsive Design — Wasted Space on Large Screens
-- [x] **Files**: `components/shared/header/index.tsx`, `category-nav-client.tsx`, `mega-menu.tsx`
-- **Problem**: All header elements max out at `max-w-7xl` (1280px). On 1920px+ screens, significant whitespace on both sides. The `2xl:` Tailwind breakpoint is never used anywhere in the codebase.
-- **Fix**: Consider upgrading wrapper to `max-w-[1440px]` for header, or use `2xl:max-w-[1440px]` responsive variant. The `wrapper-wide` class already exists in globals.css but is unused.
+### 2.6 Cart badge text-white
+- [x] **File**: `components/shared/header/menu.tsx` (lines 33, 50)
+- **Issue**: `text-white` hardcoded on badge
+- **Fix**: Use `text-accent-foreground`
 
-### 4.2 Search Bar Too Narrow on Large Screens
-- [x] **File**: `components/shared/header/index.tsx` (line ~41)
-- **Problem**: Search bar container has `max-w-2xl` (672px). On 1920px+ screens, the search bar looks small and underutilized compared to available space.
-- **Fix**: Increase to `max-w-3xl` or use responsive: `max-w-2xl xl:max-w-3xl 2xl:max-w-4xl`
+### 2.7 Mobile bottom nav search button
+- [x] **File**: `components/shared/header/mobile-bottom-nav.tsx` (line 71)
+- **Issue**: `text-white` hardcoded
+- **Fix**: Use `text-accent-foreground`
 
-### 4.3 Category Name Truncation Too Aggressive
-- [x] **File**: `components/shared/header/category-nav-client.tsx` (line 115)
-- **Problem**: Category names truncated at `max-w-[140px] xl:max-w-[180px]`. Greek names like "Εξαρτήματα Σωληνώσεων" are often cut off mid-word.
-- **Fix**: Increase limits: `max-w-[180px] xl:max-w-[220px]` or `2xl:max-w-[260px]`. Consider tooltip on truncated text.
+### 2.8 Mobile category chips
+- [x] **File**: `components/shared/header/mobile-category-chips-client.tsx` (line 27)
+- **Issue**: `text-white` hardcoded on "All" chip
+- **Fix**: Use `text-accent-foreground`
 
-### 4.4 Separator Dividers Hard to See
-- [x] **File**: `components/shared/header/category-nav-client.tsx` (lines 96, 126)
-- **Problem**: Dividers use `bg-primary-foreground/10` (10% opacity) — barely visible between category groups
-- **Fix**: Increase to `bg-primary-foreground/20` or `bg-primary-foreground/15`
+### 2.9 Mobile search - hardcoded white
+- [x] **File**: `components/shared/header/mobile-search.tsx` (lines 51, 55, 79)
+- **Issue**: `hover:bg-white/10`, `bg-white/10`, `border-white/20`, `text-white`
+- **Fix**: Use semantic colors or add `dark:` variants
 
----
+### 2.10 Mobile menu close button hover
+- [x] **File**: `components/shared/header/mobile-menu.tsx` (line 108)
+- **Issue**: `hover:bg-white/10` barely visible in light mode
+- **Fix**: Use `hover:bg-primary-foreground/10`
 
-## Phase 5: Minor Desktop Issues
+### 2.11 Mobile menu sign in button
+- [x] **File**: `components/shared/header/mobile-menu.tsx` (line 150)
+- **Issue**: `text-white` hardcoded
+- **Fix**: Use `text-accent-foreground`
 
-### 5.1 Search Dropdown z-index Conflict with Mega Menu
-- [x] **Files**: `components/shared/header/search-dropdown.tsx` (line 44), `mega-menu.tsx` (line 114)
-- **Problem**: Both search dropdown and mega menu use `z-50`. If both are somehow open simultaneously (edge case), they would overlap.
-- **Fix**: Ensure mutual exclusivity (close mega menu when search focuses, and vice versa), or differentiate z-index values
+### 2.12 Search autocomplete submit button
+- [x] **File**: `components/shared/header/search-autocomplete.tsx` (line 85)
+- **Issue**: `text-white` hardcoded
+- **Fix**: Use `text-accent-foreground`
 
-### 5.2 Utility Bar Contrast Issues in Dark Mode
-- [x] **File**: `components/shared/header/utility-bar.tsx`
-- **Problem**: Some utility bar elements use opacity-based text (e.g., `opacity-40`) which may have poor contrast in dark mode
-- **Fix**: Use semantic color tokens instead of opacity for text colors
-
-### 5.3 Mobile Menu Shows Fewer Brands Than Desktop
-- [x] **Files**: `components/shared/header/mobile-menu-wrapper.tsx` (line 25: 10 brands), `category-nav-bar.tsx` (line 25: 15 brands)
-- **Problem**: Mobile menu shows top 10 brands, desktop shows top 15 — inconsistent experience
-- **Fix**: Use consistent count (15) or make it configurable
-
-### 5.4 setTimeout in useEffect Without Cleanup
-- [x] **File**: `components/shared/header/mobile-menu.tsx` (lines 79-85)
-- **Problem**: `setTimeout(() => searchInputRef.current?.focus(), 300)` in useEffect has no cleanup — could cause memory leak if component unmounts during timeout
-- **Fix**: Store timeout ref and clear on cleanup:
-  ```tsx
-  useEffect(() => {
-    const timer = setTimeout(...);
-    return () => clearTimeout(timer);
-  }, [open]);
-  ```
-
-### 5.5 Manual Index Tracking in SearchDropdown
-- [x] **File**: `components/shared/header/search-dropdown.tsx` (lines 39, 66-67)
-- **Problem**: Uses mutable `itemIndex++` variable during render for keyboard navigation. This is an anti-pattern that can cause hydration mismatches.
-- **Fix**: Pre-calculate item indices with `useMemo` or restructure the data before rendering
+### 2.13 Mobile menu search submit
+- [x] **File**: `components/shared/header/mobile-menu.tsx` (line 128)
+- **Issue**: `text-white` hardcoded
+- **Fix**: Use `text-accent-foreground`
 
 ---
 
-## Files Reference
+## 3. FOOTER COMPONENT
 
-| File | Issues |
-|------|--------|
-| `components/shared/header/category-nav-client.tsx` | 1.1, 1.2, 1.3, 1.4, 2.1, 2.5, 3.1, 4.3, 4.4 |
-| `components/shared/header/mega-menu.tsx` | 2.2, 2.3, 2.4, 3.3, 5.1 |
-| `components/shared/header/menu.tsx` | 3.2 |
-| `components/shared/header/user-button.tsx` | 3.2 |
-| `components/shared/header/mode-toggle.tsx` | 3.2 |
-| `components/shared/header/search-autocomplete.tsx` | 3.2 |
-| `components/shared/header/index.tsx` | 4.1, 4.2 |
-| `components/shared/header/search-dropdown.tsx` | 5.1, 5.5 |
-| `components/shared/header/utility-bar.tsx` | 5.2 |
-| `components/shared/header/mobile-menu.tsx` | 5.4 |
-| `components/shared/header/mobile-menu-wrapper.tsx` | 5.3 |
-| `components/shared/header/category-nav-bar.tsx` | 5.3 |
+### 3.1 Multiple hover:text-white without dark variants
+- [x] **File**: `components/footer.tsx` (lines 110, 115, 120, 137, 153, 158, 163, 168, 220, 221, 222, 227)
+- **Issue**: 12 instances of `hover:text-white` hardcoded
+- **Fix**: Replace with `hover:text-primary-foreground`
+
+### 3.2 Social icon backgrounds
+- [x] **File**: `components/footer.tsx` (line 94)
+- **Issue**: `bg-white/10` hardcoded
+- **Fix**: Use `bg-primary-foreground/10`
+
+### 3.3 Border hardcoded white
+- [x] **File**: `components/footer.tsx` (lines 57, 203)
+- **Issue**: `border-white/5` and `border-white/10`
+- **Fix**: Use `border-primary-foreground/5` and `border-primary-foreground/10`
+
+---
+
+## 4. PRODUCT COMPONENTS
+
+### 4.1 Rating stars hardcoded yellow
+- [x] **File**: `components/shared/product/rating.tsx` (lines 7, 16, 25)
+- **Issue**: `text-yellow-500` hardcoded (3 SVG star variants)
+- **Fix**: Use `text-brand-accent` for consistency with design system
+
+### 4.2 Product card low stock badge
+- [x] **File**: `components/shared/product/product-card.tsx` (lines 85, 163)
+- **Issue**: `bg-orange-500 hover:bg-orange-600` no dark variants
+- **Fix**: Add `dark:bg-orange-600 dark:hover:bg-orange-700` or use semantic warning color
+
+### 4.3 Product card hover gradient invisible in dark mode
+- [x] **File**: `components/shared/product/product-card.tsx` (line 145)
+- **Issue**: `from-black/10` too faint on dark cards
+- **Fix**: Add `dark:from-white/5`
+
+### 4.4 Product image counter pill
+- [x] **File**: `components/shared/product/product-images.tsx` (line 51)
+- **Issue**: `bg-black/60 text-white` hardcoded
+- **Fix**: Consider `bg-foreground/60 text-background`
+
+### 4.5 Add to cart toast hover
+- [x] **File**: `components/shared/product/add-to-cart.tsx` (lines 41, 61)
+- **Issue**: `hover:bg-gray-800` hardcoded (no dark variant)
+- **Fix**: Use `hover:bg-primary/90`
+
+### 4.6 Add to cart button text-white
+- [x] **File**: `components/shared/product/add-to-cart.tsx` (line 119)
+- **Issue**: `text-white` hardcoded on `bg-brand-accent`
+- **Fix**: Use `text-accent-foreground`
+
+### 4.7 Add to cart button success state bg
+- [x] **File**: `components/shared/product/add-to-cart-button.tsx` (line 50)
+- **Issue**: `bg-green-500/15` missing dark variant
+- **Fix**: Add `dark:bg-green-500/20`
+
+### 4.8 Add to cart button toast hover
+- [x] **File**: `components/shared/product/add-to-cart-button.tsx` (line 33)
+- **Issue**: `hover:bg-gray-800` hardcoded
+- **Fix**: Use `hover:bg-primary/90`
+
+### 4.9 Wishlist button hardcoded red
+- [x] **File**: `components/shared/product/wishlist-button.tsx` (line 47)
+- **Issue**: `fill-red-500 text-red-500` instead of semantic destructive color
+- **Fix**: Use `fill-destructive text-destructive`
+
+### 4.10 Product carousel overlay
+- [x] **File**: `components/shared/product/product-carousel.tsx` (line 44)
+- **Issue**: `bg-gray-900 bg-opacity-50 text-white` hardcoded
+- **Fix**: Use `bg-foreground/50 text-background`
+
+### 4.11 Product page stock indicator dots
+- [x] **File**: `app/[locale]/(root)/product/[slug]/page.tsx` (lines 132-133, 139, 144)
+- **Issue**: `bg-green-400`, `bg-green-500`, `bg-orange-500`, `bg-red-500` no dark variants
+- **Fix**: Add dark variants or use semantic success/warning/destructive colors
+
+---
+
+## 5. CART & CHECKOUT
+
+### 5.1 Cart discount text green
+- [x] **File**: `app/[locale]/(root)/cart/cart-table.tsx` (lines 185, 192)
+- **Issue**: `text-green-600` hardcoded, no dark variant
+- **Fix**: Use `text-success` or add `dark:text-green-400`
+
+### 5.2 Cart buttons text-white
+- [x] **File**: `app/[locale]/(root)/cart/cart-table.tsx` (lines 95, 111, 206)
+- **Issue**: `text-white` hardcoded on brand-accent buttons
+- **Fix**: Use `text-accent-foreground`
+
+### 5.3 Place order discount text green
+- [x] **File**: `app/[locale]/(root)/place-order/page.tsx` (line 132)
+- **Issue**: `text-green-600` hardcoded
+- **Fix**: Use `text-success` or add `dark:text-green-400`
+
+### 5.4 Checkout form buttons text-white
+- [x] **File**: `app/[locale]/(root)/shipping-address/shipping-address-form.tsx` (line 172)
+- [x] **File**: `app/[locale]/(root)/payment-method/payment-method-form.tsx` (lines 113, 129)
+- [x] **File**: `app/[locale]/(root)/place-order/place-order-form.tsx` (line 16)
+- **Issue**: `text-white` hardcoded on brand-accent buttons
+- **Fix**: Use Button component with accent variant or `text-accent-foreground`
+
+### 5.5 Coupon input badge opacity
+- [x] **File**: `components/shared/coupon-input.tsx` (line 48)
+- **Issue**: `bg-brand-accent/10` too subtle in dark mode
+- **Fix**: Add `dark:bg-brand-accent/20`
+
+### 5.6 Order details table green text
+- [x] **File**: `app/[locale]/(root)/order/[id]/order-details-table.tsx` (line 246)
+- **Issue**: `text-green-600` hardcoded for discount/paid status
+- **Fix**: Use `text-success` or add `dark:text-green-400`
+
+### 5.7 Order status timeline missing dark backgrounds
+- [x] **File**: `components/shared/order-status-timeline.tsx` (lines 25-50)
+- **Issue**: 8 status step backgrounds missing dark mode variants
+- **Fix**: Add dark bg variants (e.g., `dark:bg-green-900/30`, `dark:bg-blue-900/30`)
+
+---
+
+## 6. ADMIN PAGES
+
+### 6.1 Charts hardcoded color palette
+- [x] **File**: `app/[locale]/admin/overview/charts.tsx` (lines 26-31)
+- **Issue**: 6 hardcoded HSL chart colors (green, red, purple, cyan, pink, lime)
+- **Fix**: Use CSS variables `--chart-1` through `--chart-5` (already defined) + add more
+
+### 6.2 Charts missing useTheme for dynamic colors
+- [x] **File**: `app/[locale]/admin/overview/charts.tsx` (lines 23-32)
+- **Issue**: CHART_COLORS array doesn't adapt to theme changes
+- **Fix**: Add `useTheme()` hook and provide light/dark palettes
+
+### 6.3 Charts axis stroke contrast
+- [x] **File**: `app/[locale]/admin/overview/charts.tsx` (line 34)
+- **Issue**: `AXIS_STROKE` uses muted-foreground, poor contrast in dark mode
+- **Fix**: Use foreground with reduced opacity for better contrast
+
+### 6.4 Charts grid lines too faint
+- [x] **File**: `app/[locale]/admin/overview/charts.tsx` (lines 166, 329)
+- **Issue**: `stroke-muted` barely visible in both modes
+- **Fix**: Use `stroke-muted-foreground/20` for better visibility
+
+### 6.5 Charts tooltip inline styles
+- [x] **File**: `app/[locale]/admin/overview/charts.tsx` (lines 138-142)
+- **Issue**: Inline style object may not update on theme change
+- **Fix**: Use className-based approach or force re-render on theme change
+
+### 6.6 Charts revenue gradient
+- [x] **File**: `app/[locale]/admin/overview/charts.tsx` (lines 161-164)
+- **Issue**: Gradient opacity too faint in dark mode
+- **Fix**: Increase dark mode opacity
+
+### 6.7 Admin sidebar active state
+- [x] **File**: `app/[locale]/admin/main-nav.tsx` (lines 62, 69, 75)
+- **Issue**: `text-white` and `bg-white/20` hardcoded on active state
+- **Fix**: Use `text-accent-foreground` and `bg-accent-foreground/20`
+
+---
+
+## 7. AUTH PAGES
+
+### 7.1 Auth layout icon backgrounds
+- [x] **File**: `app/[locale]/(auth)/layout.tsx` (line 35)
+- **Issue**: `bg-white/10` hardcoded
+- **Fix**: Use `bg-primary-foreground/10`
+
+### 7.2 Auth layout gradient
+- [x] **File**: `app/[locale]/(auth)/layout.tsx` (line 16)
+- **Issue**: `bg-gradient-to-br from-primary via-primary to-brand-accent/20` no dark variant
+- **Fix**: Add dark variant or ensure gradient adapts via CSS variables
+
+---
+
+## 8. USER PAGES
+
+### 8.1 User sidebar active state
+- [x] **File**: `app/[locale]/(root)/user/main-nav.tsx` (lines 48, 56)
+- **Issue**: `text-white` and `bg-white/20` hardcoded on active state
+- **Fix**: Use `text-accent-foreground` and `bg-accent-foreground/20`
+
+### 8.2 User profile email field low contrast
+- [x] **File**: `app/[locale]/(root)/user/profile/profile-form.tsx` (line 78)
+- **Issue**: Disabled email field has very low contrast text in dark mode
+- **Fix**: Add `dark:text-muted-foreground` or increase opacity on disabled fields
+
+### 8.3 User orders empty state too faint
+- [x] **File**: `app/[locale]/(root)/user/orders/page.tsx` (lines 55-66)
+- **Issue**: Empty state text and table header borders are very faint in dark mode
+- **Fix**: Increase text opacity and use `border-border` instead of subtle borders
+
+---
+
+## 9. UI COMPONENTS (shadcn)
+
+### 9.1 Dialog/Sheet/AlertDialog/Drawer overlays
+- [x] **File**: `components/ui/dialog.tsx` (line 24)
+- [x] **File**: `components/ui/sheet.tsx` (line 24)
+- [x] **File**: `components/ui/alert-dialog.tsx` (line 21)
+- [x] **File**: `components/ui/drawer.tsx` (line 31)
+- **Issue**: `bg-black/80` hardcoded overlay in all 4 components
+- **Fix**: Consider `bg-black/60 dark:bg-black/80` or create `--overlay` variable
+
+### 9.2 Toast destructive close button colors
+- [x] **File**: `components/ui/toast.tsx` (line 80)
+- **Issue**: Hardcoded `text-red-300`, `hover:text-red-50`, `ring-red-400`, `ring-offset-red-600`
+- **Fix**: Use `text-destructive-foreground/50`, etc.
+
+### 9.3 Dropdown menu missing hover states
+- [x] **File**: `components/ui/dropdown-menu.tsx` (lines 29-30, 85-86, 101-102, 125-126)
+- **Issue**: Only `focus:bg-accent` but no `hover:` states
+- **Fix**: Add `hover:bg-accent hover:text-accent-foreground`
+
+### 9.4 Dropdown/Select separator too faint
+- [x] **File**: `components/ui/dropdown-menu.tsx` (line 165)
+- [x] **File**: `components/ui/select.tsx` (line 143)
+- **Issue**: `bg-muted` separator nearly invisible in dark mode
+- **Fix**: Use `bg-border` or `bg-muted-foreground/20`
+
+### 9.5 Select item focus state too faint
+- [x] **File**: `components/ui/select.tsx` (lines 120-122)
+- **Issue**: `focus:bg-accent/10` only 10% opacity
+- **Fix**: Change to `focus:bg-accent/20` or `focus:bg-accent`
+
+### 9.6 Drawer handle visibility
+- [x] **File**: `components/ui/drawer.tsx` (line 51)
+- **Issue**: `bg-muted` handle barely visible in dark mode
+- **Fix**: Use `bg-muted-foreground/30`
+
+### 9.7 Button outline variant border subtle
+- [x] **File**: `components/ui/button.tsx` (line 16)
+- **Issue**: `border-input` too subtle in dark mode
+- **Fix**: Ensure border has sufficient contrast or add `dark:border-border`
+
+### 9.8 Form input focus ring inconsistency
+- [x] **File**: `components/ui/input.tsx` (line 11) - `ring-ring/30`
+- [x] **File**: `components/ui/textarea.tsx` (line 12) - `ring-ring` (full)
+- [x] **File**: `components/ui/select.tsx` (line 22) - `ring-ring/30`
+- [x] **File**: `components/ui/checkbox.tsx` (line 16) - `ring-ring` (full)
+- **Issue**: Inconsistent focus ring opacity across form components
+- **Fix**: Standardize to same opacity (e.g., all `ring-ring/30` or all `ring-ring`)
+
+### 9.9 Textarea placeholder opacity mismatch
+- [x] **File**: `components/ui/textarea.tsx` (line 12)
+- **Issue**: `placeholder:text-muted-foreground` (full opacity) vs Input's `/60`
+- **Fix**: Change to `placeholder:text-muted-foreground/60` to match Input
+
+### 9.10 Slider focus ring color mismatch
+- [x] **File**: `components/ui/slider.tsx` (line 31)
+- **Issue**: Uses `ring-brand-accent/30` instead of `ring-ring`
+- **Fix**: Use `ring-ring` for consistency with other components
+
+---
+
+## 10. SKELETON / LOADING STATES
+
+### 10.1 Skeleton bg-muted too dark in dark mode
+- [x] **File**: `components/ui/skeleton.tsx` (line 9)
+- **Issue**: `bg-muted` in dark mode (`222 30% 16%`) nearly invisible on dark bg (`222 47% 6%`)
+- **Fix**: Use `bg-muted/80` or `bg-secondary` for better contrast in dark mode
+
+### 10.2 Spinner border-muted invisible
+- [x] **File**: `app/[locale]/loading.tsx` (line 4)
+- **Issue**: `border-muted` spinner track invisible in dark mode
+- **Fix**: Use `border-muted-foreground/20` for visible track
+
+---
+
+## 11. SHARED COMPONENTS
+
+### 11.1 Newsletter form hardcoded whites
+- [x] **File**: `components/shared/newsletter-form.tsx` (lines 20, 24, 42, 46)
+- **Issue**: `border-white/20`, `bg-white/10`, `text-white` hardcoded
+- **Fix**: Use `border-primary-foreground/20`, `bg-primary-foreground/10`, `text-primary-foreground`
+
+### 11.2 Hero carousel hardcoded overlays
+- [x] **File**: `components/shared/hero-carousel.tsx` (lines 88-89, 105, 113, 135, 161, 171)
+- **Issue**: Multiple `from-black/70`, `text-white`, `bg-white/10`, `bg-white/30` hardcoded
+- **Fix**: These are image overlays - consider if they need dark mode adjustment or are intentional
+
+### 11.3 Category cards hardcoded overlays
+- [x] **File**: `components/shared/category-cards.tsx` (lines 76, 80, 86, 90, 141, 143, 147)
+- **Issue**: `from-black/80`, `text-white` hardcoded on image overlays
+- **Fix**: Image overlays may be intentional, but verify contrast in dark mode
+
+### 11.4 Brand showcase dark:invert approach
+- [x] **File**: `components/shared/brand-showcase-client.tsx` (line 48)
+- **Issue**: `dark:invert` distorts colored logos
+- **Fix**: Consider `dark:brightness-[0.87] dark:contrast-[1.15]` or separate dark logo assets
+
+### 11.5 View all products button
+- [x] **File**: `components/view-all-products-button.tsx` (line 14)
+- **Issue**: `hover:text-white` hardcoded
+- **Fix**: Use `hover:text-accent-foreground`
+
+### 11.6 Promo banner hardcoded white
+- [x] **File**: `components/shared/promo-banner.tsx` (line 60)
+- **Issue**: `bg-gradient-to-br from-white/5` hardcoded
+- **Fix**: Use `from-primary-foreground/5`
+
+### 11.7 Homepage newsletter text-white
+- [x] **File**: `components/shared/homepage-newsletter.tsx` (line 24)
+- **Issue**: `text-white/60` hardcoded
+- **Fix**: Use `text-primary-foreground/60`
+
+### 11.8 Checkout steps shadow
+- [x] **File**: `components/shared/checkout-steps.tsx` (lines 37, 39)
+- **Issue**: `shadow-md` Tailwind default (doesn't adapt to dark)
+- **Fix**: Use custom `shadow-card` variable
+
+### 11.9 Order status badge missing dark backgrounds
+- [x] **File**: `components/shared/order-status-badge.tsx` (lines 5-12)
+- **Issue**: 8 status variants have `dark:text-*` but missing `dark:bg-*`
+- **Fix**: Add dark background variants for all 8 statuses
+
+### 11.10 Testimonial avatar background
+- [x] **File**: `components/shared/testimonial-strip.tsx` (line 39)
+- **Issue**: `bg-brand-accent/10` too subtle in dark mode
+- **Fix**: Add `dark:bg-brand-accent/20`
+
+---
+
+## 12. REVIEW COMPONENTS
+
+### 12.1 Review progress bar bg too dark
+- [x] **File**: `app/[locale]/(root)/product/[slug]/review-list.tsx` (line 109)
+- **Issue**: `bg-muted` progress track too dark in dark mode
+- **Fix**: Use `bg-muted-foreground/20` or `bg-secondary`
+
+### 12.2 Review card borders too subtle
+- [x] **File**: `app/[locale]/(root)/product/[slug]/review-list.tsx` (lines 91, 137)
+- **Issue**: `border-border/50` nearly invisible in dark mode
+- **Fix**: Use `border-border` (full opacity)
+
+### 12.3 Review sign-in prompt bg
+- [x] **File**: `app/[locale]/(root)/product/[slug]/review-list.tsx` (line 75)
+- **Issue**: `bg-muted/50` too dark in dark mode
+- **Fix**: Use `bg-muted` or `bg-card`
+
+### 12.4 Reviewer avatar bg opacity
+- [x] **File**: `app/[locale]/(root)/product/[slug]/review-list.tsx` (line 158)
+- **Issue**: `bg-brand-accent/10` too faint in dark mode
+- **Fix**: Add `dark:bg-brand-accent/20`
+
+---
+
+## 13. BREADCRUMB
+
+### 13.1 Separator nearly invisible in dark mode
+- [x] **File**: `components/shared/breadcrumb.tsx` (line 31)
+- **Issue**: `text-muted-foreground/50` too faint
+- **Fix**: Use `text-muted-foreground/70`
+
+---
+
+## 14. PAGINATION
+
+### 14.1 Inactive button hover too faint
+- [x] **File**: `components/shared/pagination.tsx` (lines 92-93, 119-120)
+- **Issue**: `hover:bg-brand-accent/10` nearly invisible in dark mode
+- **Fix**: Add `dark:hover:bg-brand-accent/20`
+
+### 14.2 Container border too subtle
+- [x] **File**: `components/shared/pagination.tsx` (line 63)
+- **Issue**: `border-border/50` too faint in dark mode
+- **Fix**: Use `border-border` (full opacity)
+
+---
+
+## 15. SHADOWS (Tailwind defaults don't adapt)
+
+### 15.1 Replace default Tailwind shadows with custom variables
+These files use `shadow-sm`, `shadow-md`, or `shadow-lg` which don't adapt to dark mode:
+
+- [x] `app/[locale]/not-found.tsx:21` - `shadow-md`
+- [x] `app/[locale]/(root)/place-order/place-order-form.tsx:16` - `shadow-md hover:shadow-lg`
+- [x] `components/shared/product/add-to-cart.tsx:119` - `shadow-md hover:shadow-lg`
+- [x] `components/shared/brand-showcase-client.tsx:41` - `hover:shadow-md`
+- [x] `components/shared/product/product-images.tsx:34,41` - `shadow-sm`
+- [x] `components/ui/dropdown-menu.tsx:50,68` - `shadow-lg`, `shadow-md`
+- [x] `components/ui/select.tsx:78` - `shadow-md`
+- [x] `components/ui/alert-dialog.tsx:39` - `shadow-lg`
+- [x] `components/ui/toast.tsx:28` - `shadow-lg`
+
+**Fix**: Replace with `shadow-card`, `shadow-card-subtle`, or `shadow-elevated` (project custom vars)
+
+---
+
+## 16. GRADIENTS
+
+### 16.1 Auth layout gradient
+- [x] **File**: `app/[locale]/(auth)/layout.tsx` (line 16)
+- **Issue**: `from-primary via-primary to-brand-accent/20` no dark variant
+- **Fix**: Verify gradient looks right in dark mode
+
+### 16.2 Search filters accent stripe
+- [x] **File**: `app/[locale]/(root)/search/search-filters.tsx` (line 379)
+- **Issue**: `from-brand-accent to-brand-accent-light` no dark variant
+- **Fix**: Verify contrast in dark mode
+
+### 16.3 Search page sort/view toggle containers invisible in dark
+- [x] **File**: `app/[locale]/(root)/search/page.tsx` (line 288)
+- [x] **File**: `app/[locale]/(root)/search/view-toggle.tsx` (line 22)
+- **Issue**: `bg-muted/50` nearly invisible in dark mode
+- **Fix**: Use `bg-muted` or `bg-card` for visible container
+
+### 16.4 Search filters faint borders and star colors
+- [x] **File**: `app/[locale]/(root)/search/search-filters.tsx` (line 66)
+- **Issue**: Filter section borders and star rating colors too faint in dark mode
+- **Fix**: Use `border-border` and increase star visibility
+
+### 16.5 Product detail tabs border and bg contrast
+- [x] **File**: `components/shared/product/product-detail-tabs.tsx` (lines 33, 48)
+- **Issue**: Tab border `border-border/50` and content area `bg-muted/30` have poor contrast in dark mode
+- **Fix**: Use `border-border` and `bg-muted/50` or `bg-card`
+
+### 16.6 Highlight text hardcoded colors
+- [x] **File**: `lib/highlight-text.tsx` (line 28)
+- **Issue**: `bg-yellow-200 dark:bg-yellow-800` hardcoded highlight colors
+- **Fix**: Use `bg-brand-accent/20 dark:bg-brand-accent/30` for consistency
+
+---
+
+## 17. STRIPE / PAYPAL
+
+### 17.1 Stripe theme mapping (OK but verify)
+- [x] **File**: `app/[locale]/(root)/order/[id]/stripe-payment.tsx` (lines 105-112)
+- **Issue**: Verify Stripe "night" theme matches app dark mode colors
+- **Fix**: Test visual consistency between Stripe elements and app theme
+
+### 17.2 PayPal buttons missing dark mode theme
+- [x] **File**: `app/[locale]/(root)/order/[id]/paypal-payment.tsx` (lines 62-72)
+- **Issue**: PayPal buttons have no dark mode theming at all
+- **Fix**: Use `useTheme()` hook and set PayPal `fundingSource` style color to adapt (dark background/light text)
+
+---
+
+## SUMMARY STATISTICS
+
+| Category | Issue Count |
+|----------|------------|
+| Global Config | 2 |
+| CSS Variables & Global Styles | 6 |
+| Header Components | 13 |
+| Footer Component | 3 |
+| Product Components | 11 |
+| Cart & Checkout | 7 |
+| Admin Pages | 7 |
+| Auth Pages | 2 |
+| User Pages | 3 |
+| UI Components (shadcn) | 10 |
+| Skeleton/Loading | 2 |
+| Shared Components | 10 |
+| Review Components | 4 |
+| Breadcrumb | 1 |
+| Pagination | 2 |
+| Shadows | 9 (batched) |
+| Gradients / Search / Tabs | 6 |
+| Stripe/PayPal | 2 |
+| **TOTAL** | **~100 issues** |
+
+---
+
+## APPROACH GUIDE FOR FIXING
+
+### Phase 1: Global Changes (High Impact)
+1. Change default theme to "light" (item 0.1)
+2. Fix CSS variables (items 1.1-1.6)
+3. Fix skeleton/loading contrast (items 10.1-10.2)
+
+### Phase 2: Systematic text-white Replacement
+Replace all hardcoded `text-white` on brand-accent backgrounds with `text-accent-foreground`:
+- Header buttons (items 2.1-2.13)
+- Footer links (item 3.1)
+- Cart/checkout buttons (items 5.2, 5.4)
+- Admin/User sidebar (items 6.7, 8.1)
+
+### Phase 3: Hardcoded Colors
+Replace all hardcoded colors (gray, green, orange, red, yellow) with semantic tokens:
+- Product stars: `text-yellow-500` -> `text-brand-accent` (item 4.1)
+- Discount text: `text-green-600` -> `text-success` (items 5.1, 5.3)
+- Stock indicators: use semantic colors (item 4.11)
+- Low stock badge: use warning color (item 4.2)
+
+### Phase 4: UI Component Improvements
+- Fix overlay opacities (item 9.1)
+- Add hover states to dropdowns (item 9.3)
+- Standardize focus rings (item 9.8)
+- Fix toast colors (item 9.2)
+
+### Phase 5: Subtle Contrast Fixes
+- Fix border opacities (items 12.2, 14.2)
+- Fix separator visibility (items 9.4, 13.1)
+- Replace default shadows (item 15.1)
+- Fix chart colors (items 6.1-6.6)

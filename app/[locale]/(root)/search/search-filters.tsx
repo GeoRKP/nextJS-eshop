@@ -63,7 +63,7 @@ function FilterSection({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-b border-border/30 pb-4 mb-4 last:border-0">
+    <div className="border-b border-border pb-4 mb-4 last:border-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-between w-full py-1 text-label text-foreground"

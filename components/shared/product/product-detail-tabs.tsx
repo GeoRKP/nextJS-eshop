@@ -30,7 +30,7 @@ function ProductDetailTabs({
 
   return (
     <Tabs defaultValue="description" className="w-full">
-      <TabsList className="bg-transparent border-b border-border/50 rounded-none h-auto p-0 w-full justify-start gap-0 overflow-x-auto">
+      <TabsList className="bg-transparent border-b border-border rounded-none h-auto p-0 w-full justify-start gap-0 overflow-x-auto">
         <TabsTrigger
           value="description"
           className="tab-indicator rounded-none bg-transparent shadow-none px-3 sm:px-4 md:px-6 py-3 text-sm font-semibold data-[state=active]:text-brand-accent data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground min-h-[44px] active:scale-95 transition-transform"
@@ -52,12 +52,12 @@ function ProductDetailTabs({
       </TabsContent>
 
       <TabsContent value="specifications" className="mt-6">
-        <div className="rounded-lg border border-border/50 overflow-hidden">
+        <div className="rounded-lg border border-border overflow-hidden">
           {specs.map((spec, i) => (
             <div
               key={spec.label}
               className={`flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 py-3 text-sm gap-1 ${
-                i % 2 === 0 ? "bg-muted/30" : "bg-transparent"
+                i % 2 === 0 ? "bg-muted/50" : "bg-transparent"
               }`}
             >
               <span className="font-medium text-muted-foreground">{spec.label}</span>

@@ -17,11 +17,11 @@ export default function NewsletterForm({ variant }: { variant?: "footer" | "foot
         <Input
           type="email"
           placeholder={t("emailPlaceholder")}
-          className="flex-1 h-12 sm:rounded-r-none rounded-b-none sm:rounded-bl-md border-white/20 bg-white/10 text-primary-foreground placeholder:text-primary-foreground/40 focus-visible:ring-brand-accent text-sm"
+          className="flex-1 h-12 sm:rounded-r-none rounded-b-none sm:rounded-bl-md border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/40 focus-visible:ring-brand-accent text-sm"
         />
         <Button
           type="submit"
-          className="h-12 sm:rounded-l-none rounded-t-none sm:rounded-tr-md bg-brand-accent hover:bg-brand-accent-dark text-white px-6 font-heading font-semibold uppercase tracking-wide"
+          className="h-12 sm:rounded-l-none rounded-t-none sm:rounded-tr-md bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground px-6 font-heading font-semibold uppercase tracking-wide"
         >
           <Send className="h-4 w-4 mr-2" />
           {t("subscribe")}
@@ -39,11 +39,11 @@ export default function NewsletterForm({ variant }: { variant?: "footer" | "foot
         <Input
           type="email"
           placeholder={t("emailPlaceholder")}
-          className="flex-1 rounded-r-none border-white/20 bg-white/10 text-primary-foreground placeholder:text-primary-foreground/40 focus-visible:ring-brand-accent"
+          className="flex-1 rounded-r-none border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/40 focus-visible:ring-brand-accent"
         />
         <Button
           type="submit"
-          className="rounded-l-none bg-brand-accent hover:bg-brand-accent-dark text-white"
+          className="rounded-l-none bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground"
         >
           <Send className="h-4 w-4" />
         </Button>

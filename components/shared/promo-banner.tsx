@@ -15,10 +15,10 @@ export default async function PromoBanner() {
             <span className="text-label text-brand-accent mb-3">
               {t("promoLabel")}
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight text-white mb-3 leading-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight text-primary-foreground mb-3 leading-tight">
               {t("promoTitle")}
             </h2>
-            <p className="text-white/60 mb-8 text-sm md:text-base max-w-lg">
+            <p className="text-primary-foreground/60 mb-8 text-sm md:text-base max-w-lg">
               {t("promoSubtitle")}
             </p>
 
@@ -35,7 +35,7 @@ export default async function PromoBanner() {
                     <p className="text-2xl md:text-3xl font-black text-brand-accent">
                       {number}
                     </p>
-                    <p className="text-xs text-white/50 uppercase tracking-wide mt-0.5">
+                    <p className="text-xs text-primary-foreground/50 uppercase tracking-wide mt-0.5">
                       {label}
                     </p>
                   </div>
@@ -47,7 +47,7 @@ export default async function PromoBanner() {
               <Button
                 asChild
                 size="lg"
-                className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold text-base px-8 rounded-md uppercase tracking-wide border-0"
+                className="bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-bold text-base px-8 rounded-md uppercase tracking-wide border-0"
               >
                 <Link href="/search?price=1-50">{t("shopDeals")}</Link>
               </Button>
@@ -57,7 +57,7 @@ export default async function PromoBanner() {
           {/* Right: Decorative panel (desktop only) */}
           <div className="hidden md:flex items-center justify-center relative">
             <div className="absolute inset-0 rounded-xl overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-foreground/5 to-transparent" />
               <div className="absolute inset-0 industrial-stripe" />
             </div>
             {/* Spinning gear icon */}

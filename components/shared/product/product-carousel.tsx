@@ -41,7 +41,7 @@ export default function ProductCarousel({ data }: { data: Product[] }) {
                   className="w-full h-auto object-cover"
                 />
                 <div className="absolute inset-0 flex items-end justify-end">
-                  <div className="h-2 bg-gray-900 bg-opacity-50 text-2xl font-bold px-2 text-white">
+                  <div className="h-2 bg-foreground/50 text-2xl font-bold px-2 text-background">
                     {product.name}
                   </div>
                 </div>

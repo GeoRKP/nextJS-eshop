@@ -31,14 +31,14 @@ function ProductImages({ images }: { images: string[] }) {
           <>
             <button
               onClick={(e) => { e.stopPropagation(); goTo(current - 1); }}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-white/80 dark:bg-card/80 backdrop-blur border border-border/50 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/image:opacity-100 transition-opacity duration-200 hover:bg-white dark:hover:bg-card shadow-sm"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-white/80 dark:bg-card/80 backdrop-blur border border-border/50 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/image:opacity-100 transition-opacity duration-200 hover:bg-white dark:hover:bg-card shadow-card-subtle"
               aria-label="Previous image"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); goTo(current + 1); }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-white/80 dark:bg-card/80 backdrop-blur border border-border/50 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/image:opacity-100 transition-opacity duration-200 hover:bg-white dark:hover:bg-card shadow-sm"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-white/80 dark:bg-card/80 backdrop-blur border border-border/50 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover/image:opacity-100 transition-opacity duration-200 hover:bg-white dark:hover:bg-card shadow-card-subtle"
               aria-label="Next image"
             >
               <ChevronRight className="w-5 h-5" />
@@ -48,7 +48,7 @@ function ProductImages({ images }: { images: string[] }) {
 
         {/* Centered counter pill */}
         {images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm tabular-nums">
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-foreground/60 text-background text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm tabular-nums">
             {current + 1} / {images.length}
           </div>
         )}

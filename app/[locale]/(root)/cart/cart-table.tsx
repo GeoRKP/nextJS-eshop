@@ -92,7 +92,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
         <ShoppingCart className="w-7 h-7" />
         <h1 className="h2-bold">{t("shoppingCart")}</h1>
         {cart && cart.items.length > 0 && (
-          <span className="bg-brand-accent text-white text-sm font-bold px-2.5 py-0.5 rounded-full">
+          <span className="bg-brand-accent text-accent-foreground text-sm font-bold px-2.5 py-0.5 rounded-full">
             {itemCount}
           </span>
         )}
@@ -108,7 +108,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
             <p className="text-muted-foreground text-sm mb-6">
               {t("cartEmptyDesc")}
             </p>
-            <Button asChild className="bg-brand-accent hover:bg-brand-accent-dark text-white rounded-lg px-8 uppercase tracking-wide active:scale-[0.98] transition-all">
+            <Button asChild className="bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground rounded-lg px-8 uppercase tracking-wide active:scale-[0.98] transition-all">
               <Link href="/">{tc("goShopping")}</Link>
             </Button>
           </div>
@@ -182,14 +182,14 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                   <span className="font-semibold">{formatCurrency(cart.itemsPrice)}</span>
                 </div>
                 {Number(cart.discountAmount) > 0 && (
-                  <div className="flex justify-between text-green-600">
+                  <div className="flex justify-between text-success dark:text-green-400">
                     <span>{t("discount")}</span>
                     <span>-{formatCurrency(cart.discountAmount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("estimatedShipping")}</span>
-                  <span className="text-green-600 font-medium">{t("free")}</span>
+                  <span className="text-success dark:text-green-400 font-medium">{t("free")}</span>
                 </div>
               </div>
 
@@ -203,7 +203,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
               </div>
 
               <Button
-                className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
+                className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
                 disabled={isPending}
                 onClick={() => {
                   startTransition(async () => {

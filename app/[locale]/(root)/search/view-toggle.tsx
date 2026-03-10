@@ -19,7 +19,7 @@ export default function ViewToggle({ currentView }: { currentView: string }) {
   };
 
   return (
-    <div className="flex items-center bg-muted/50 rounded-lg p-1">
+    <div className="flex items-center bg-muted rounded-lg p-1">
       <button
         onClick={() => handleToggle("grid")}
         className={cn(

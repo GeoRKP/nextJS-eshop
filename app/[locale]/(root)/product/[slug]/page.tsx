@@ -129,19 +129,19 @@ export default async function ProductDetailsPage(props: {
                   {product.stock > 5 ? (
                     <>
                       <span className="relative flex h-2.5 w-2.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success" />
                       </span>
                       <span className="text-sm font-medium text-green-600 dark:text-green-400">{t("inStock")}</span>
                     </>
                   ) : product.stock > 0 ? (
                     <>
-                      <span className="inline-flex rounded-full h-2.5 w-2.5 bg-orange-500" />
-                      <span className="text-sm font-medium text-orange-600 dark:text-orange-400">{t("lowStock", { count: product.stock })}</span>
+                      <span className="inline-flex rounded-full h-2.5 w-2.5 bg-warning" />
+                      <span className="text-sm font-medium text-warning-foreground dark:text-warning">{t("lowStock", { count: product.stock })}</span>
                     </>
                   ) : (
                     <>
-                      <span className="inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
+                      <span className="inline-flex rounded-full h-2.5 w-2.5 bg-destructive" />
                       <span className="text-sm font-medium text-destructive">{t("outOfStock")}</span>
                     </>
                   )}

@@ -30,7 +30,7 @@ export default async function Menu() {
         >
           <ShoppingCart className="h-[18px] w-[18px]" />
           {cartItemCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 bg-brand-accent text-white text-[10px] font-bold rounded-full h-[18px] w-[18px] flex items-center justify-center ring-2 ring-background animate-badge-bounce">
+            <span className="absolute -top-0.5 -right-0.5 bg-brand-accent text-accent-foreground text-[10px] font-bold rounded-full h-[18px] w-[18px] flex items-center justify-center ring-2 ring-background animate-badge-bounce">
               {cartItemCount > 9 ? "9+" : cartItemCount}
             </span>
           )}
@@ -47,7 +47,7 @@ export default async function Menu() {
         >
           <ShoppingCart className="h-5 w-5" />
           {cartItemCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 bg-brand-accent text-white text-[10px] font-bold rounded-full h-[18px] w-[18px] flex items-center justify-center ring-2 ring-background animate-badge-bounce">
+            <span className="absolute -top-0.5 -right-0.5 bg-brand-accent text-accent-foreground text-[10px] font-bold rounded-full h-[18px] w-[18px] flex items-center justify-center ring-2 ring-background animate-badge-bounce">
               {cartItemCount > 9 ? "9+" : cartItemCount}
             </span>
           )}

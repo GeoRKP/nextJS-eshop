@@ -84,7 +84,7 @@ export default function CategoryNavClient({
             aria-haspopup="menu"
             className={`flex items-center gap-1.5 px-4 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all border-b-2 ${
               activeCategory === "__all__"
-                ? "bg-brand-accent/15 border-brand-accent text-white"
+                ? "bg-brand-accent/15 border-brand-accent text-primary-foreground"
                 : "border-transparent hover:border-brand-accent/50"
             }`}
             onMouseEnter={() => handleMouseEnter("__all__")}
@@ -103,7 +103,7 @@ export default function CategoryNavClient({
             <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${activeCategory === "__all__" ? "rotate-180" : ""}`} />
           </button>
 
-          <div className="h-4 w-px bg-primary-foreground/20 mx-1" />
+          <div className="h-4 w-px bg-primary-foreground/30 mx-1" />
 
           {/* Root category items with icons */}
           {categories.map((category) => {
@@ -116,7 +116,7 @@ export default function CategoryNavClient({
                 aria-haspopup="menu"
                 className={`flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all border-b-2 ${
                   isActive
-                    ? "bg-brand-accent/15 border-brand-accent text-white"
+                    ? "bg-brand-accent/15 border-brand-accent text-primary-foreground"
                     : "border-transparent hover:border-brand-accent/50"
                 }`}
                 onMouseEnter={() => handleMouseEnter(category.id)}
@@ -142,13 +142,13 @@ export default function CategoryNavClient({
           {/* Shop by Brand button */}
           {brands.length > 0 && (
             <>
-              <div className="h-4 w-px bg-primary-foreground/20 mx-1" />
+              <div className="h-4 w-px bg-primary-foreground/30 mx-1" />
               <button
                 aria-expanded={activeCategory === "__brands__"}
                 aria-haspopup="menu"
                 className={`flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all border-b-2 ${
                   activeCategory === "__brands__"
-                    ? "bg-brand-accent/15 border-brand-accent text-white"
+                    ? "bg-brand-accent/15 border-brand-accent text-primary-foreground"
                     : "border-transparent hover:border-brand-accent/50"
                 }`}
                 onMouseEnter={() => handleMouseEnter("__brands__")}

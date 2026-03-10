@@ -38,7 +38,7 @@ export default function AddToCart({
         action: (
           <ToastAction
             altText={t("goToCart")}
-            className="bg-primary text-white hover:bg-gray-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={() => router.push("/cart")}
           >
             {t("goToCart")}
@@ -58,7 +58,7 @@ export default function AddToCart({
         action: (
           <ToastAction
             altText={t("goToCart")}
-            className="bg-primary text-white hover:bg-gray-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={() => router.push("/cart")}
           >
             {t("goToCart")}
@@ -116,7 +116,7 @@ export default function AddToCart({
     </div>
   ) : (
     <Button
-      className="w-full h-13 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide shadow-md hover:shadow-lg active:scale-[0.98] transition-all"
+      className="w-full h-13 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-semibold text-base uppercase tracking-wide shadow-card hover:shadow-card-hover active:scale-[0.98] transition-all"
       type="button"
       onClick={handleAddToCart}
     >

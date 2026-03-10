@@ -82,7 +82,7 @@ export default async function ProductCard({
                 </Badge>
               )}
               {isLowStock && (
-                <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-2 py-0 rounded-md font-bold">
+                <Badge className="bg-warning text-warning-foreground hover:bg-warning/90 text-xs px-2 py-0 rounded-md font-bold">
                   {tBadge("lowStock")}
                 </Badge>
               )}
@@ -142,7 +142,7 @@ export default async function ProductCard({
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
               {/* Subtle gradient overlay at bottom */}
-              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/10 dark:from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </Link>
           {/* Wishlist button - client-side state, always visible on mobile / when in wishlist */}
@@ -160,7 +160,7 @@ export default async function ProductCard({
               </Badge>
             )}
             {isLowStock && (
-              <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-2.5 py-0.5 rounded-md font-bold">
+              <Badge className="bg-warning text-warning-foreground hover:bg-warning/90 text-xs px-2.5 py-0.5 rounded-md font-bold">
                 {tBadge("lowStock")}
               </Badge>
             )}

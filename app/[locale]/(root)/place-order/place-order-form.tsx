@@ -13,7 +13,7 @@ function PlaceOrderButton() {
   return (
     <Button
       disabled={pending}
-      className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all shadow-md hover:shadow-lg"
+      className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all shadow-card hover:shadow-card-hover"
     >
       {pending ? (
         <Loader2 className="w-5 h-5 animate-spin mr-2" />

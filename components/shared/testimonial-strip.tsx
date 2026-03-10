@@ -36,7 +36,7 @@ export default async function TestimonialStrip() {
 
               {/* Author */}
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-brand-accent/10 flex items-center justify-center shrink-0">
+                <div className="h-10 w-10 rounded-full bg-brand-accent/10 dark:bg-brand-accent/20 flex items-center justify-center shrink-0">
                   <span className="text-sm font-bold text-brand-accent">
                     {(t(`name${num}`) as string).charAt(0)}
                   </span>

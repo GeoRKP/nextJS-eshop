@@ -285,7 +285,7 @@ export default async function SearchPage(props: {
         {/* Sort + View Toggle */}
         <div className="flex items-center gap-3">
           {/* Segmented sort */}
-          <div className="flex items-center bg-muted/50 rounded-lg p-1 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center bg-muted rounded-lg p-1 overflow-x-auto scrollbar-hide">
             {sortOrders.map((s) => (
               <Link
                 key={s}

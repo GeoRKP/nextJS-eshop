@@ -24,7 +24,7 @@ export default function MobileCategoryChipsClient({
           {/* All chip — larger with chevron */}
           <Link
             href="/search"
-            className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold bg-brand-accent text-white rounded-lg whitespace-nowrap shrink-0 shadow-sm scroll-snap-start"
+            className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold bg-brand-accent text-accent-foreground rounded-lg whitespace-nowrap shrink-0 shadow-sm scroll-snap-start"
           >
             <LayoutGrid className="h-3 w-3" />
             {allLabel}

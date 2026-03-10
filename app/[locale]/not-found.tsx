@@ -18,7 +18,7 @@ export default function NotFoundPage() {
         alt={`${APP_NAME} logo`}
         priority={true}
       />
-      <div className="p-6 w-1/3 rounded-lg  shadow-md text-center">
+      <div className="p-6 w-1/3 rounded-lg  shadow-card text-center">
         <h1 className="text-3xl font-bold mb-4">{t("title")}</h1>
         <p>{t("description")}</p>
         <Button

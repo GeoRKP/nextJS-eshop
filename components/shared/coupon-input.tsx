@@ -45,7 +45,7 @@ export default function CouponInput({
   if (appliedCode) {
     return (
       <div className="flex items-center gap-2 text-sm">
-        <div className="flex items-center gap-1.5 bg-brand-accent/10 text-brand-accent rounded-full px-3 py-1">
+        <div className="flex items-center gap-1.5 bg-brand-accent/10 dark:bg-brand-accent/20 text-brand-accent rounded-full px-3 py-1">
           <Tag className="w-3.5 h-3.5" />
           <span className="font-mono font-medium">
             {appliedCode}

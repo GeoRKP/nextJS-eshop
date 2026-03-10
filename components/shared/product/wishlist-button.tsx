@@ -44,7 +44,7 @@ export default function WishlistButton({
         className={cn(
           "w-5 h-5 transition-colors",
           isInWishlist
-            ? "fill-red-500 text-red-500"
+            ? "fill-destructive text-destructive"
             : "text-muted-foreground"
         )}
       />

@@ -11,6 +11,7 @@ import {
 } from "@/lib/actions/order.actions";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 
 function PrintLoadingState() {
   const [{ isPending, isRejected }] = usePayPalScriptReducer();
@@ -35,6 +36,8 @@ export default function PayPalPayment({
   orderId: string;
 }) {
   const { toast } = useToast();
+  const { theme, systemTheme } = useTheme();
+  const resolvedTheme = theme === "system" ? systemTheme : theme;
 
   const handleCreatePaypalOrder = async () => {
     const res = await createPaypalOrder(orderId);
@@ -68,6 +71,10 @@ export default function PayPalPayment({
       <PayPalButtons
         createOrder={handleCreatePaypalOrder}
         onApprove={handleApprovePaypalOrder}
+        style={{
+          color: resolvedTheme === "dark" ? "black" : "gold",
+          layout: "vertical",
+        }}
       />
     </PayPalScriptProvider>
   );

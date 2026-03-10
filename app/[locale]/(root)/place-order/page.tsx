@@ -129,7 +129,7 @@ export default async function PlaceOrderPage() {
                 <span>{formatCurrency(cart.itemsPrice)}</span>
               </div>
               {Number(cart.discountAmount) > 0 && (
-                <div className="flex justify-between text-green-600">
+                <div className="flex justify-between text-success dark:text-green-400">
                   <span>{tOrder("discount")}</span>
                   <span>-{formatCurrency(cart.discountAmount)}</span>
                 </div>

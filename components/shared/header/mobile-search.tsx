@@ -48,11 +48,11 @@ export default function MobileSearch({ onClose }: Props) {
     >
       {/* Search header — dark themed */}
       <div className="flex items-center gap-2 px-3 py-2 bg-primary text-primary-foreground">
-        <Button variant="ghost" size="icon" onClick={onClose} className="text-primary-foreground hover:bg-white/10">
+        <Button variant="ghost" size="icon" onClick={onClose} className="text-primary-foreground hover:bg-primary-foreground/10">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <form onSubmit={handleSubmit} className="flex-1 flex items-center gap-2">
-          <div className="flex-1 flex items-center bg-white/10 rounded-full border border-white/20 px-3">
+          <div className="flex-1 flex items-center bg-primary-foreground/10 rounded-full border border-primary-foreground/20 px-3">
             <SearchIcon className="h-4 w-4 text-primary-foreground/60 shrink-0" />
             <input
               ref={inputRef}
@@ -76,7 +76,7 @@ export default function MobileSearch({ onClose }: Props) {
               </button>
             )}
           </div>
-          <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-white flex items-center justify-center shrink-0">
+          <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-accent-foreground flex items-center justify-center shrink-0">
             <SearchIcon className="h-4 w-4" />
           </button>
         </form>

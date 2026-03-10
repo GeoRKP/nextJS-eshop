@@ -242,7 +242,7 @@ function SingleCategoryMegaMenu({
           <Link
             href={`/search?category=${encodeURIComponent(category.name)}`}
             onClick={onClose}
-            className="inline-flex items-center gap-1 text-xs font-bold bg-brand-accent text-white px-4 py-2 rounded-md hover:bg-brand-accent-dark transition-colors"
+            className="inline-flex items-center gap-1 text-xs font-bold bg-brand-accent text-accent-foreground px-4 py-2 rounded-md hover:bg-brand-accent-dark transition-colors"
           >
             {translations.viewAll}
             <ArrowRight className="h-3 w-3" />

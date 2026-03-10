@@ -22,16 +22,16 @@ import { formatCurrency } from "@/lib/utils";
 
 const CHART_COLORS = [
   "hsl(var(--brand-accent))", // brand accent (amber gold)
-  "hsl(var(--primary))", // primary (deep navy)
-  "hsl(150, 60%, 45%)", // green
-  "hsl(0, 70%, 55%)", // red
-  "hsl(270, 60%, 55%)", // purple
-  "hsl(190, 70%, 50%)", // cyan
+  "hsl(var(--chart-1))", // chart-1 (adapts to theme)
+  "hsl(var(--chart-3))", // chart-3 (adapts to theme)
+  "hsl(var(--chart-5))", // chart-5 (adapts to theme)
+  "hsl(var(--chart-4))", // chart-4 (adapts to theme)
+  "hsl(var(--chart-2))", // chart-2 (adapts to theme)
   "hsl(330, 60%, 55%)", // pink
   "hsl(90, 60%, 45%)", // lime
 ];
 
-const AXIS_STROKE = "hsl(var(--muted-foreground))";
+const AXIS_STROKE = "hsl(var(--foreground) / 0.5)";
 
 // -- Types --
 
@@ -159,11 +159,11 @@ function RevenueChart({
       <ComposedChart data={data}>
         <defs>
           <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={CHART_COLORS[0]} stopOpacity={0.3} />
-            <stop offset="95%" stopColor={CHART_COLORS[0]} stopOpacity={0} />
+            <stop offset="5%" stopColor={CHART_COLORS[0]} stopOpacity={0.4} />
+            <stop offset="95%" stopColor={CHART_COLORS[0]} stopOpacity={0.05} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        <CartesianGrid strokeDasharray="3 3" className="stroke-muted-foreground/20" />
         <XAxis
           dataKey="date"
           stroke={AXIS_STROKE}
@@ -326,7 +326,7 @@ function TopProductsChart({
   return (
     <ResponsiveContainer width="100%" height={Math.max(250, data.length * 45)}>
       <BarChart data={chartData} layout="vertical" margin={{ left: 10 }}>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        <CartesianGrid strokeDasharray="3 3" className="stroke-muted-foreground/20" />
         <XAxis
           type="number"
           tickFormatter={(v) =>

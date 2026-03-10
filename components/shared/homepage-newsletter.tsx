@@ -18,10 +18,10 @@ export default async function HomepageNewsletter() {
           <span className="text-label text-brand-accent mb-3">
             {t("stayUpdated")}
           </span>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight text-white mb-3">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight text-primary-foreground mb-3">
             {t("newsletterTitle")}
           </h2>
-          <p className="text-white/60 text-sm md:text-base max-w-lg mb-8">
+          <p className="text-primary-foreground/60 text-sm md:text-base max-w-lg mb-8">
             {t("newsletterSubtitle")}
           </p>
           <div className="w-full max-w-md">

@@ -54,7 +54,7 @@ const Footer = async () => {
       </div>
 
       {/* Tier 2: Trust Bar */}
-      <div className="border-b border-white/5">
+      <div className="border-b border-primary-foreground/5">
         <div className="wrapper py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {[
@@ -91,7 +91,7 @@ const Footer = async () => {
                 <a
                   key={social.label}
                   href="#"
-                  className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-accent hover:scale-110 transition-all duration-200"
+                  className="h-10 w-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-brand-accent hover:scale-110 transition-all duration-200"
                   aria-label={social.label}
                 >
                   <social.icon className="h-4 w-4" />
@@ -107,17 +107,17 @@ const Footer = async () => {
             </h3>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/search" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
+                <Link href="/search" className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors py-1 inline-block">
                   {t("allProducts")}
                 </Link>
               </li>
               <li>
-                <Link href="/search?sort=newest" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
+                <Link href="/search?sort=newest" className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors py-1 inline-block">
                   {t("newArrivals")}
                 </Link>
               </li>
               <li>
-                <Link href="/search?price=1-50" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
+                <Link href="/search?price=1-50" className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors py-1 inline-block">
                   {t("deals")}
                 </Link>
               </li>
@@ -134,7 +134,7 @@ const Footer = async () => {
                 <li key={key}>
                   <a
                     href="#"
-                    className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block"
+                    className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors py-1 inline-block"
                   >
                     {t(key as "contactUs" | "faq" | "returns" | "shippingInfo")}
                   </a>
@@ -150,22 +150,22 @@ const Footer = async () => {
             </h3>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/user/orders" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
+                <Link href="/user/orders" className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors py-1 inline-block">
                   {t("myOrders")}
                 </Link>
               </li>
               <li>
-                <Link href="/user/wishlist" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
+                <Link href="/user/wishlist" className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors py-1 inline-block">
                   {t("myWishlist")}
                 </Link>
               </li>
               <li>
-                <Link href="/user/profile" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
+                <Link href="/user/profile" className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors py-1 inline-block">
                   {t("myProfile")}
                 </Link>
               </li>
               <li>
-                <Link href="/user/addresses" className="text-sm text-primary-foreground/60 hover:text-white transition-colors py-1 inline-block">
+                <Link href="/user/addresses" className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors py-1 inline-block">
                   {t("myAddresses")}
                 </Link>
               </li>
@@ -200,7 +200,7 @@ const Footer = async () => {
       </div>
 
       {/* Tier 4: Bottom Bar */}
-      <div className="border-t border-white/10">
+      <div className="border-t border-primary-foreground/10">
         <div className="wrapper py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-primary-foreground/50">
             &copy; {currentYear} {APP_NAME}. {tc("allRightsReserved")}
@@ -217,14 +217,14 @@ const Footer = async () => {
             </div>
             <span className="text-primary-foreground/30">|</span>
             <div className="flex items-center gap-3 text-xs text-primary-foreground/50">
-              <a href="#" className="hover:text-white transition-colors">{t("privacyPolicy")}</a>
-              <a href="#" className="hover:text-white transition-colors">{t("termsOfService")}</a>
-              <a href="#" className="hover:text-white transition-colors">{t("cookies")}</a>
+              <a href="#" className="hover:text-primary-foreground transition-colors">{t("privacyPolicy")}</a>
+              <a href="#" className="hover:text-primary-foreground transition-colors">{t("termsOfService")}</a>
+              <a href="#" className="hover:text-primary-foreground transition-colors">{t("cookies")}</a>
             </div>
             <span className="text-primary-foreground/30">|</span>
             <a
               href="#"
-              className="text-xs text-primary-foreground/50 hover:text-white transition-colors flex items-center gap-1 py-2 px-2"
+              className="text-xs text-primary-foreground/50 hover:text-primary-foreground transition-colors flex items-center gap-1 py-2 px-2"
               aria-label={t("backToTop")}
             >
               <ArrowUp className="h-4 w-4" />

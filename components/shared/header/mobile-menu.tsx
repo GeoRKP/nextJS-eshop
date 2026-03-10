@@ -105,7 +105,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
             </SheetTitle>
             <div className="flex items-center gap-1">
               <LanguageToggle />
-              <Button variant="ghost" size="icon" onClick={closeMenu} className="text-primary-foreground hover:bg-white/10">
+              <Button variant="ghost" size="icon" onClick={closeMenu} className="text-primary-foreground hover:bg-primary-foreground/10">
                 <X className="h-5 w-5" />
               </Button>
             </div>
@@ -125,7 +125,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
               className="flex-1 h-10 bg-transparent pl-2 pr-2 text-sm focus:outline-none"
               autoComplete="off"
             />
-            <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-white flex items-center justify-center shrink-0 mr-1">
+            <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-accent-foreground flex items-center justify-center shrink-0 mr-1">
               <SearchIcon className="h-3.5 w-3.5" />
             </button>
           </form>
@@ -147,7 +147,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
           ) : (
             <div className="space-y-2">
               <Link href="/sign-in" onClick={closeMenu}>
-                <Button className="w-full bg-brand-accent hover:bg-brand-accent-dark text-white" size="sm">
+                <Button className="w-full bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground" size="sm">
                   {t("signIn")}
                 </Button>
               </Link>

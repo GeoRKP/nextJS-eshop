@@ -72,7 +72,7 @@ export default function ReviewList({
           onReviewSubmitted={reload}
         />
       ) : (
-        <div className="text-sm text-muted-foreground p-4 rounded-lg bg-muted/50 border border-border/50">
+        <div className="text-sm text-muted-foreground p-4 rounded-lg bg-card border border-border">
           {t.rich("signInToReview", {
             signInLink: (chunks) => (
               <Link
@@ -88,7 +88,7 @@ export default function ReviewList({
 
       {/* Rating summary */}
       {totalReviews > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-8 p-6 bg-card rounded-lg border border-border/50 shadow-card-subtle">
+        <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-8 p-6 bg-card rounded-lg border border-border shadow-card-subtle">
           {/* Average rating */}
           <div className="flex flex-col items-center justify-center gap-1">
             <span className="text-4xl sm:text-5xl font-black">{avgRating.toFixed(1)}</span>
@@ -106,7 +106,7 @@ export default function ReviewList({
                   {star}
                   <Star className="h-3 w-3 fill-brand-accent text-brand-accent" />
                 </span>
-                <div className="flex-1 h-2.5 rounded-full bg-muted overflow-hidden">
+                <div className="flex-1 h-2.5 rounded-full bg-muted-foreground/20 overflow-hidden">
                   <div
                     className="h-full rounded-full bg-brand-accent transition-all duration-500"
                     style={{
@@ -134,7 +134,7 @@ export default function ReviewList({
         {reviews.map((review) => (
           <div
             key={review.id}
-            className="border border-border/50 rounded-lg p-5 hover:border-border transition-colors"
+            className="border border-border rounded-lg p-5 hover:border-border transition-colors"
           >
             {/* Top: stars + date */}
             <div className="flex items-start justify-between gap-4">
@@ -155,7 +155,7 @@ export default function ReviewList({
 
             {/* Author */}
             <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border/30">
-              <div className="w-7 h-7 rounded-full bg-brand-accent/10 text-brand-accent flex items-center justify-center text-xs font-bold">
+              <div className="w-7 h-7 rounded-full bg-brand-accent/10 dark:bg-brand-accent/20 text-brand-accent flex items-center justify-center text-xs font-bold">
                 {review.user
                   ? review.user.name.charAt(0).toUpperCase()
                   : "?"}

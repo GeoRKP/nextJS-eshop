@@ -34,9 +34,9 @@ export default function CheckoutSteps({ current = 0 }: { current: number }) {
                     "relative flex items-center justify-center rounded-full font-semibold text-sm",
                     "w-10 h-10 md:w-12 md:h-12",
                     isCompleted &&
-                      "bg-brand-accent text-white shadow-md",
+                      "bg-brand-accent text-accent-foreground shadow-card",
                     isCurrent &&
-                      "bg-brand-accent text-white ring-4 ring-brand-accent/20 shadow-md",
+                      "bg-brand-accent text-accent-foreground ring-4 ring-brand-accent/20 shadow-card",
                     !isCompleted &&
                       !isCurrent &&
                       "bg-muted text-muted-foreground border-2 border-border"
