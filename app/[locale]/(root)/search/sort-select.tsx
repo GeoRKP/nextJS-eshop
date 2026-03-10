@@ -4,12 +4,11 @@ import { useRouter } from "@/i18n/navigation";
 import { ArrowUpDown } from "lucide-react";
 
 type Props = {
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; url: string }[];
   current: string;
-  buildUrl: (sort: string) => string;
 };
 
-export default function SortSelect({ options, current, buildUrl }: Props) {
+export default function SortSelect({ options, current }: Props) {
   const router = useRouter();
 
   return (
@@ -17,7 +16,10 @@ export default function SortSelect({ options, current, buildUrl }: Props) {
       <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
       <select
         value={current}
-        onChange={(e) => router.push(buildUrl(e.target.value))}
+        onChange={(e) => {
+          const opt = options.find((o) => o.value === e.target.value);
+          if (opt) router.push(opt.url);
+        }}
         className="appearance-none bg-muted/50 border border-border/50 rounded-lg pl-9 pr-8 py-2 text-xs font-medium w-full focus:outline-none focus:ring-2 focus:ring-brand-accent/30"
       >
         {options.map((opt) => (

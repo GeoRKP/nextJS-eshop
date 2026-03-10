@@ -309,9 +309,9 @@ export default async function SearchPage(props: {
               value: s,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               label: t(sortKeyMap[s] as any),
+              url: getFilterUrl({ s }),
             }))}
             current={sort}
-            buildUrl={(s) => getFilterUrl({ s })}
           />
 
           {/* View toggle */}
