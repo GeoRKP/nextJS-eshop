@@ -125,10 +125,8 @@ export default function OrderDetailsTable({
     discountAmount,
   } = order;
 
-  const { toast } = useToast();
   const t = useTranslations("Order");
   const tCheckout = useTranslations("Checkout");
-  const tCommon = useTranslations("Common");
 
   return (
     <>
