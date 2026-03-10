@@ -5,25 +5,9 @@ import {
 } from "@/lib/actions/dashboard.actions";
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import dynamic from "next/dynamic";
 import DashboardFilters from "./dashboard-filters";
 import KpiCards from "./kpi-cards";
-
-const Charts = dynamic(() => import("./charts"), {
-  ssr: false,
-  loading: () => (
-    <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <div className="card-premium col-span-4 h-[400px] animate-pulse bg-muted/50 rounded-lg" />
-        <div className="card-premium col-span-3 h-[400px] animate-pulse bg-muted/50 rounded-lg" />
-      </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <div className="card-premium col-span-4 h-[400px] animate-pulse bg-muted/50 rounded-lg" />
-        <div className="card-premium col-span-3 h-[400px] animate-pulse bg-muted/50 rounded-lg" />
-      </div>
-    </div>
-  ),
-});
+import Charts from "./charts-wrapper";
 
 import {
   Table,
