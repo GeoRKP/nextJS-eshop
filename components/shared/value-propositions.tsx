@@ -8,7 +8,7 @@ export default async function ValuePropositions() {
   const t = await getTranslations("ValueProps");
 
   return (
-    <section className="relative z-10 -mt-8 md:-mt-10">
+    <section className="relative z-10 mt-6 md:mt-8">
       <div className="wrapper">
         <div className="bg-card rounded-lg shadow-elevated border border-border/50">
           <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-border/50">

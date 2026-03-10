@@ -68,7 +68,7 @@ export default function MobileBottomNav() {
                   onClick={tab.action}
                   className="flex flex-col items-center justify-center"
                 >
-                  <div className="bg-brand-accent text-white rounded-full h-14 w-14 flex items-center justify-center -mt-5 ring-4 ring-background shadow-card-glow hover:bg-brand-accent-dark transition-colors">
+                  <div className="bg-brand-accent text-white rounded-full h-14 w-14 flex items-center justify-center -mt-7 ring-4 ring-background shadow-card-glow hover:bg-brand-accent-dark transition-colors">
                     <Icon className="h-[22px] w-[22px]" />
                   </div>
                 </button>
