@@ -309,7 +309,6 @@ function AllCategoriesMegaMenu({
         <div className="w-2/5 max-h-[400px] overflow-y-auto border-r border-border pr-3 space-y-0.5">
           {categories.map((cat) => {
             const Icon = getCategoryIcon(cat.name);
-            const subCount = cat.children?.length ?? 0;
             const isActive = activeRoot === cat.id;
             return (
               <Link
