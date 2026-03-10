@@ -19,12 +19,16 @@ import { Truck, Shield, RotateCcw } from "lucide-react";
 import { prisma } from "@/db/prisma";
 
 export async function generateStaticParams() {
-  const products = await prisma.product.findMany({
-    select: { slug: true },
-    where: { deletedAt: null },
-    take: 100,
-  });
-  return products.map((p) => ({ slug: p.slug }));
+  try {
+    const products = await prisma.product.findMany({
+      select: { slug: true },
+      where: { deletedAt: null },
+      take: 100,
+    });
+    return products.map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata(props: {
