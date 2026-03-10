@@ -4,17 +4,25 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
-import { removeFromWishlist } from "@/lib/actions/wishlist.actions";
+import { toggleWishlist } from "@/lib/actions/wishlist.actions";
 import { addItemToCart } from "@/lib/actions/cart.actions";
-import { Product } from "@/types";
 import { ShoppingCart, Trash2 } from "lucide-react";
+
+type WishlistProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  price: string;
+  images: string[];
+  stock: number;
+};
 
 export default function WishlistActions({
   productId,
   product,
 }: {
   productId: string;
-  product: Product;
+  product: WishlistProduct;
 }) {
   const { toast } = useToast();
   const t = useTranslations("Wishlist");
@@ -22,7 +30,7 @@ export default function WishlistActions({
 
   const handleRemove = () => {
     startTransition(async () => {
-      const res = await removeFromWishlist(productId);
+      const res = await toggleWishlist(productId);
       toast({
         description: res.message,
         variant: res.success ? "default" : "destructive",
