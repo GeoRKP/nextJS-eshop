@@ -1,22 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 700" width="1920" height="700">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 700">
   <defs>
-    <!-- Background gradient -->
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0.8">
       <stop offset="0%" stop-color="#0e1830"/>
       <stop offset="50%" stop-color="#142040"/>
       <stop offset="100%" stop-color="#16284a"/>
     </linearGradient>
-    <!-- Warm accent glow -->
     <radialGradient id="glow" cx="68%" cy="50%" r="40%">
       <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.14"/>
       <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.05"/>
       <stop offset="100%" stop-color="#142040" stop-opacity="0"/>
     </radialGradient>
-    <!-- Grid -->
     <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
       <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#ffffff" stroke-opacity="0.025" stroke-width="0.4"/>
     </pattern>
-    <!-- Dot pattern -->
     <pattern id="dots" width="30" height="30" patternUnits="userSpaceOnUse">
       <circle cx="15" cy="15" r="0.8" fill="#f59e0b" opacity="0.04"/>
     </pattern>
@@ -30,9 +26,7 @@
 
   <!-- Large pipe assembly - right side -->
   <g transform="translate(1200, 350)" opacity="0.11">
-    <!-- Main horizontal pipe -->
     <rect x="-150" y="-20" width="500" height="40" rx="4" fill="none" stroke="#f59e0b" stroke-width="2"/>
-    <!-- Pipe thread marks -->
     <g stroke="#f59e0b" stroke-width="0.8" opacity="0.6">
       <line x1="-140" y1="-18" x2="-140" y2="18"/>
       <line x1="-135" y1="-18" x2="-135" y2="18"/>
@@ -45,51 +39,36 @@
       <line x1="325" y1="-18" x2="325" y2="18"/>
       <line x1="320" y1="-18" x2="320" y2="18"/>
     </g>
-
-    <!-- T-fitting body -->
     <rect x="80" y="-35" width="80" height="70" rx="5" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-    <!-- Vertical branch of T -->
     <rect x="100" y="-180" width="40" height="145" rx="3" fill="none" stroke="#f59e0b" stroke-width="2"/>
-    <!-- Thread marks on vertical -->
     <g stroke="#f59e0b" stroke-width="0.8" opacity="0.6">
       <line x1="102" y1="-170" x2="138" y2="-170"/>
       <line x1="102" y1="-165" x2="138" y2="-165"/>
       <line x1="102" y1="-160" x2="138" y2="-160"/>
       <line x1="102" y1="-155" x2="138" y2="-155"/>
     </g>
-    <!-- Flange at top -->
     <rect x="90" y="-195" width="60" height="15" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
     <circle cx="100" cy="-187" r="3" fill="none" stroke="#f59e0b" stroke-width="1"/>
     <circle cx="140" cy="-187" r="3" fill="none" stroke="#f59e0b" stroke-width="1"/>
-
-    <!-- End fittings / nuts -->
     <rect x="-170" y="-28" width="25" height="56" rx="3" fill="none" stroke="#f59e0b" stroke-width="2"/>
     <rect x="345" y="-28" width="25" height="56" rx="3" fill="none" stroke="#f59e0b" stroke-width="2"/>
   </g>
 
   <!-- Elbow fitting - upper right -->
   <g transform="translate(1600, 160)" opacity="0.08">
-    <!-- Horizontal part -->
     <rect x="-80" y="-15" width="95" height="30" rx="3" fill="none" stroke="#f59e0b" stroke-width="2"/>
-    <!-- Curved elbow -->
     <path d="M 15,-15 Q 55,-15 55,25" fill="none" stroke="#f59e0b" stroke-width="2"/>
     <path d="M 15,15 Q 25,15 25,25" fill="none" stroke="#f59e0b" stroke-width="2"/>
-    <!-- Vertical part -->
     <rect x="10" y="25" width="30" height="80" rx="3" fill="none" stroke="#f59e0b" stroke-width="2"/>
-    <!-- Nut -->
     <rect x="5" y="105" width="40" height="20" rx="3" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
   </g>
 
-  <!-- Push-in connector schematic - mid right -->
+  <!-- Push-in connector - mid right -->
   <g transform="translate(1650, 450)" opacity="0.07">
-    <!-- Body -->
     <rect x="-25" y="-50" width="50" height="100" rx="8" fill="none" stroke="#f59e0b" stroke-width="2"/>
-    <!-- Release ring -->
     <circle cx="0" cy="-30" r="18" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
-    <!-- O-ring grooves -->
     <ellipse cx="0" cy="-5" rx="22" ry="3" fill="none" stroke="#f59e0b" stroke-width="1"/>
     <ellipse cx="0" cy="10" rx="22" ry="3" fill="none" stroke="#f59e0b" stroke-width="1"/>
-    <!-- Tube entry -->
     <rect x="-12" y="-70" width="24" height="20" rx="2" fill="none" stroke="#f59e0b" stroke-width="1"/>
     <rect x="-12" y="50" width="24" height="20" rx="2" fill="none" stroke="#f59e0b" stroke-width="1"/>
   </g>
@@ -98,7 +77,6 @@
   <g stroke="#f59e0b" stroke-width="1.2" fill="none" opacity="0.06">
     <path d="M 950,100 C 1000,100 1050,150 1050,200 C 1050,250 1100,300 1150,300"/>
     <path d="M 950,550 C 1020,550 1080,500 1100,430 C 1120,360 1180,320 1250,320"/>
-    <!-- Hose cross sections -->
     <circle cx="950" cy="100" r="6" stroke-width="1.5"/>
     <circle cx="950" cy="100" r="3"/>
     <circle cx="950" cy="550" r="6" stroke-width="1.5"/>
@@ -107,19 +85,10 @@
 
   <!-- Hydraulic symbol -->
   <g transform="translate(1080, 250)" opacity="0.05">
-    <!-- Pump symbol -->
     <circle cx="0" cy="0" r="25" fill="none" stroke="#ffffff" stroke-width="1.5"/>
     <polygon points="0,-15 12,10 -12,10" fill="none" stroke="#ffffff" stroke-width="1"/>
-    <!-- Lines -->
     <line x1="0" y1="25" x2="0" y2="50" stroke="#ffffff" stroke-width="1"/>
     <line x1="0" y1="-25" x2="0" y2="-50" stroke="#ffffff" stroke-width="1"/>
-  </g>
-
-  <!-- Technical specs -->
-  <g opacity="0.04" fill="#ffffff" font-family="monospace" font-size="10">
-    <text x="1400" y="620">BSP / NPT THREADS</text>
-    <text x="1400" y="635">PRESSURE: 250 BAR MAX</text>
-    <text x="1100" y="80">DIN 2353 / ISO 8434</text>
   </g>
 
   <!-- Size callouts -->
@@ -127,38 +96,9 @@
     <line x1="1050" y1="330" x2="1050" y2="370"/>
     <line x1="1550" y1="330" x2="1550" y2="370"/>
     <line x1="1050" y1="350" x2="1550" y2="350"/>
-    <text x="1280" y="345" fill="#f59e0b" font-family="monospace" font-size="10" text-anchor="middle">500mm</text>
   </g>
 
   <!-- Accent lines -->
   <line x1="0" y1="698" x2="1920" y2="698" stroke="#f59e0b" stroke-width="2" opacity="0.3"/>
   <line x1="0" y1="0" x2="1920" y2="0" stroke="#f59e0b" stroke-width="1" opacity="0.15"/>
-
-  <!-- Content area -->
-  <g transform="translate(120, 180)">
-    <!-- Category label -->
-    <text x="0" y="0" fill="#f59e0b" font-family="'Roboto Condensed', 'Arial Narrow', sans-serif" font-size="16" font-weight="700" letter-spacing="4">PIPE FITTINGS &amp; HOSES</text>
-
-    <!-- Accent line -->
-    <rect x="0" y="12" width="60" height="3" fill="#f59e0b" rx="1"/>
-
-    <!-- Main headline -->
-    <text x="0" y="85" fill="#ffffff" font-family="'Roboto Condensed', 'Arial Narrow', sans-serif" font-size="72" font-weight="900" letter-spacing="-1">ΡΑΚΟΡ &amp;</text>
-    <text x="0" y="155" fill="#ffffff" font-family="'Roboto Condensed', 'Arial Narrow', sans-serif" font-size="72" font-weight="900" letter-spacing="-1">ΣΩΛΗΝΩΣΕΙΣ</text>
-
-    <!-- Product types -->
-    <text x="0" y="215" fill="#ffffff" font-family="'Roboto', Arial, sans-serif" font-size="18" font-weight="400" opacity="0.6" letter-spacing="2">Teflon  &bull;  Push-in  &bull;  Hydraulic  &bull;  Pneumatic</text>
-
-    <!-- Decorative line -->
-    <rect x="0" y="240" width="380" height="1" fill="#ffffff" opacity="0.1"/>
-
-    <!-- Standard reference -->
-    <text x="0" y="275" fill="#ffffff" font-family="'Roboto', Arial, sans-serif" font-size="15" font-weight="300" opacity="0.5" letter-spacing="1">BSP | NPT | Metric | Push-in 4-16mm</text>
-  </g>
-
-  <!-- AVL Logo -->
-  <g transform="translate(1800, 640)">
-    <rect x="-45" y="-22" width="90" height="44" rx="4" fill="#142040" stroke="#f59e0b" stroke-width="1.5" opacity="0.9"/>
-    <text x="0" y="8" fill="#f59e0b" font-family="'Roboto Condensed', 'Arial Narrow', sans-serif" font-size="24" font-weight="900" text-anchor="middle" letter-spacing="3">AVL</text>
-  </g>
 </svg>
