@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useForm } from "react-hook-form";
 import { updateUserProfileSchema } from "@/lib/validators";
 import { useSession } from "next-auth/react";
@@ -21,7 +21,7 @@ export default function ProfileForm() {
   const { data: session, update } = useSession();
 
   const form = useForm<z.infer<typeof updateUserProfileSchema>>({
-    resolver: zodResolver(updateUserProfileSchema),
+    resolver: standardSchemaResolver(updateUserProfileSchema),
     defaultValues: {
       name: session?.user?.name ?? "",
       email: session?.user?.email ?? "",

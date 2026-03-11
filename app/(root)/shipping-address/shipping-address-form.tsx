@@ -6,7 +6,7 @@ import { useTransition } from "react";
 import { shippingAddressSchema } from "@/lib/validators";
 import { ShippingAddress } from "@/types";
 import { useForm, ControllerRenderProps, SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { shippingAddressDefaultValues } from "@/lib/constants";
 import {
   Form,
@@ -30,7 +30,7 @@ export default function ShippingAddressForm({
   const { toast } = useToast();
 
   const form = useForm<ShippingAddress>({
-    resolver: zodResolver(shippingAddressSchema),
+    resolver: standardSchemaResolver(shippingAddressSchema),
     defaultValues: address || shippingAddressDefaultValues,
   });
 

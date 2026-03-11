@@ -2,10 +2,10 @@
 
 import { insertProductSchema, updateProductSchema } from "@/lib/validators";
 import { useToast } from "@/hooks/use-toast";
-import { ControllerRenderProps, useForm } from "react-hook-form";
+import { ControllerRenderProps, useForm, useWatch } from "react-hook-form";
 import { Product } from "@/types";
 import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
 import { productDefaultValues } from "@/lib/constants";
 import {
@@ -41,7 +41,7 @@ export default function ProductForm({
   const form = useForm<
     z.infer<typeof insertProductSchema> | z.infer<typeof updateProductSchema>
   >({
-    resolver: zodResolver(insertProductSchema),
+    resolver: standardSchemaResolver(insertProductSchema),
     defaultValues:
       product && type === "Update" ? product : productDefaultValues,
   });
@@ -85,9 +85,9 @@ export default function ProductForm({
     }
   };
 
-  const images = form.watch("images");
-  const banner = form.watch("banner");
-  const isFeatured = form.watch("isFeatured");
+  const images = useWatch({ control: form.control, name: "images" });
+  const banner = useWatch({ control: form.control, name: "banner" });
+  const isFeatured = useWatch({ control: form.control, name: "isFeatured" });
 
   return (
     <Form {...form}>
@@ -229,7 +229,7 @@ export default function ProductForm({
               <FormItem className="w-full">
                 <FormLabel>Stock</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter stock" {...field} />
+                  <Input type="number" placeholder="Enter stock" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

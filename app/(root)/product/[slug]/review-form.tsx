@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { insertReviewSchema } from "@/lib/validators";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { StarIcon } from "lucide-react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -29,7 +29,7 @@ export default function ReviewForm({
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof insertReviewSchema>>({
-    resolver: zodResolver(insertReviewSchema),
+    resolver: standardSchemaResolver(insertReviewSchema),
     defaultValues: reviewFormDefaultValues,
   });
 
@@ -115,7 +115,7 @@ export default function ReviewForm({
                   <FormItem>
                     <FormLabel>Rating</FormLabel>
                     <FormControl>
-                      <Select value={field.value?.toString() || undefined}  onValueChange={field.onChange}>                        
+                      <Select value={field.value?.toString() || undefined}  onValueChange={(val) => field.onChange(Number(val))}>                        
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a rating" />

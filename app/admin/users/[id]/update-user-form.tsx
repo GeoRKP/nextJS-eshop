@@ -4,7 +4,7 @@ import { z } from "zod";
 import { updateUserSchema } from "@/lib/validators";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { ControllerRenderProps, useForm } from "react-hook-form";
 import {
   Form,
@@ -36,7 +36,7 @@ export default function UpdateUserForm({
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof updateUserSchema>>({
-    resolver: zodResolver(updateUserSchema),
+    resolver: standardSchemaResolver(updateUserSchema),
     defaultValues: user,
   });
 

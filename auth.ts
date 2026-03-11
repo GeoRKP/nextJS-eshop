@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compareSync } from "bcrypt-ts-edge";
+import { compareSync } from "bcrypt-ts";
 import type { NextAuthConfig } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -49,6 +49,7 @@ export const config: NextAuthConfig = {
     }),
   ],
   callbacks: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async session({ session, user, trigger, token }: any) {
       session.user.id = token.sub as string;
       session.user.role = token.role as string;
@@ -58,6 +59,7 @@ export const config: NextAuthConfig = {
       }
       return session;
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async jwt({ token, user, session, trigger }: any) {
       if (user) {
         
@@ -81,6 +83,7 @@ export const config: NextAuthConfig = {
 
       return token;
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     authorized({ request, auth }: any) {
       // Array of regex patterns of paths we want to protect
       const protectedPaths = [
