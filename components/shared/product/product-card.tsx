@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import ProductPrice from "./product-price";
@@ -22,12 +21,6 @@ export default async function ProductCard({
   variant?: "grid" | "list";
 }) {
   const t = await getTranslations("Product");
-  const tBadge = await getTranslations("ProductCard");
-
-  const isNew =
-    new Date().getTime() - new Date(product.createdAt).getTime() <
-    14 * 24 * 60 * 60 * 1000;
-  const isLowStock = product.stock > 0 && product.stock <= 5;
 
   if (variant === "list") {
     return (
@@ -74,19 +67,6 @@ export default async function ProductCard({
               {product.description}
             </p>
 
-            {/* Badges */}
-            <div className="flex gap-1.5 mt-2">
-              {isNew && (
-                <Badge className="bg-brand-accent hover:bg-brand-accent-dark text-white text-xs px-2 py-0 rounded-md font-bold">
-                  {tBadge("new")}
-                </Badge>
-              )}
-              {isLowStock && (
-                <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-2 py-0 rounded-md font-bold">
-                  {tBadge("lowStock")}
-                </Badge>
-              )}
-            </div>
 
             {/* Price + Actions */}
             <div className="mt-auto pt-3 border-t border-border/30 flex items-center justify-between">
@@ -147,24 +127,6 @@ export default async function ProductCard({
           </Link>
           {/* Wishlist button - client-side state, always visible on mobile / when in wishlist */}
           <ProductCardWishlist productId={product.id} />
-          {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-            {isNew && (
-              <Badge className="bg-brand-accent hover:bg-brand-accent-dark text-white text-xs px-2.5 py-0.5 rounded-md font-bold">
-                {tBadge("new")}
-              </Badge>
-            )}
-            {product.isFeatured && (
-              <Badge className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-2.5 py-0.5 rounded-md font-bold">
-                {tBadge("featured")}
-              </Badge>
-            )}
-            {isLowStock && (
-              <Badge className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-2.5 py-0.5 rounded-md font-bold">
-                {tBadge("lowStock")}
-              </Badge>
-            )}
-          </div>
         </CardHeader>
         <CardContent className="p-4 grid gap-2">
           <div className="text-brand-accent text-xs font-bold uppercase tracking-[0.15em]">
