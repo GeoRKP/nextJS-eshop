@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Roboto, Roboto_Condensed } from "next/font/google";
 import "../../assets/styles/globals.css";
 import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from "@/lib/constants";
-import { ThemeProvider } from "next-themes";
+
 import { Toaster } from "@/components/ui/toaster";
 import { WishlistProvider } from "@/components/shared/product/wishlist-provider";
 import { NextIntlClientProvider } from "next-intl";
@@ -103,20 +103,13 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale}>
       <body className={`${roboto.variable} ${robotoCondensed.variable} font-sans antialiased`}>
         <NextIntlClientProvider messages={messages}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <WishlistProvider>
-              {children}
-            </WishlistProvider>
-            <Toaster />
-          </ThemeProvider>
+          <WishlistProvider>
+            {children}
+          </WishlistProvider>
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>

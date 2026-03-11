@@ -47,7 +47,7 @@ export default function AddToCartButton({ item }: { item: CartItem }) {
       variant="ghost"
       className={`h-9 w-9 rounded-full transition-all ${
         added
-          ? "bg-green-500/15 text-green-600 dark:text-green-400"
+          ? "bg-green-500/15 text-green-600"
           : "hover:bg-brand-accent/15 text-muted-foreground hover:text-brand-accent"
       }`}
       onClick={(e) => {

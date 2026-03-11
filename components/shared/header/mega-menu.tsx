@@ -129,7 +129,7 @@ function MegaMenuShell({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/20 dark:bg-black/40 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
       <div
         ref={panelRef}
         role="menu"

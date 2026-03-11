@@ -106,7 +106,7 @@ export default async function ProductCard({
                         price: product.price,
                       }}
                     />
-                    <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-full p-1.5">
                       <WishlistButton productId={product.id} />
                     </div>
                   </div>
@@ -114,7 +114,7 @@ export default async function ProductCard({
               ) : (
                 <>
                   <p className="text-destructive text-sm font-medium">{t("outOfStock")}</p>
-                  <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-1.5">
                     <WishlistButton productId={product.id} />
                   </div>
                 </>

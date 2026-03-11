@@ -31,7 +31,7 @@ import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
 import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
 import { formatCurrency } from "@/lib/utils";
-import ModeToggle from "./mode-toggle";
+
 import LanguageSwitcher from "./language-switcher";
 import { LanguageToggle } from "./language-switcher";
 
@@ -421,7 +421,6 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
         <div>
           <div className="divider-gradient" />
           <div className="px-4 py-3 flex items-center gap-2 bg-card">
-            <ModeToggle />
             <LanguageSwitcher />
           </div>
         </div>

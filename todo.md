@@ -1,126 +1,207 @@
-# Mobile Homepage UI Bugs — Fix Guide
+# Remove Dark Mode — Light Only TODO
 
-> 3 bugs to fix. Each section contains: the problem, exact file/line, current code, and the fix.
-
----
-
-## Bug 1: Pagination Badge "01 / 04" Overlaps the "ΛΕΠΤΟΜΕΡΕΙΕΣ" Button Border
-
-### Problem
-The slide counter ("01 / 04") in the bottom-right of the hero carousel sits at `bottom-6` (24px from section bottom). The CTA buttons ("ΑΓΟΡΑΣΤΕ ΤΩΡΑ" + "ΛΕΠΤΟΜΕΡΕΙΕΣ") are inside a container with `pb-24` (96px padding-bottom). On mobile (h-[400px]), the buttons stack vertically (`flex-col`) making them taller, and the counter badge overlaps the bottom border of the "ΛΕΠΤΟΜΕΡΕΙΕΣ" button.
-
-### File
-`components/shared/hero-carousel.tsx`
-
-### Current Code — Slide counter (lines 176-185)
-```tsx
-{/* Slide counter — bottom right */}
-{total > 1 && (
-  <div className="absolute bottom-6 right-5 md:right-10 text-white/60 text-sm font-heading tracking-wider">
-    <span className="text-white font-bold">
-      {String(current + 1).padStart(2, "0")}
-    </span>
-    {" / "}
-    {String(total).padStart(2, "0")}
-  </div>
-)}
-```
-
-### Current Code — Slide indicators (lines 158-173)
-```tsx
-<div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 min-h-[44px]">
-```
-
-### Current Code — Content container (line 98)
-```tsx
-<div className="relative h-full wrapper flex flex-col justify-end pb-24 md:pb-24">
-```
-
-### Fix
-Move the slide counter and slide indicators DOWN to avoid overlapping the CTA buttons on mobile:
-- Line 160: change `bottom-6` → `bottom-2 md:bottom-6`
-- Line 178: change `bottom-6` → `bottom-2 md:bottom-6`
-
-This pushes them to 8px from bottom on mobile (clear of the buttons) while keeping 24px on desktop.
+> Complete removal of dark/light mode toggle system. Keep ONLY light mode.
+> 30+ agents scanned the entire codebase. Every dark mode reference is listed below.
 
 ---
 
-## Bug 2: Bottom Nav Search Button Not Vertically Centered
+## PHASE 1: Core Infrastructure (Theme System Removal)
 
-### Problem
-The floating orange search button (56px circle) in the mobile bottom navigation uses `-mt-5` (20px negative margin) to rise above the nav bar. It doesn't sit symmetrically elevated — it's too close to the nav bar baseline compared to where it should float.
+### Task 1: Remove ThemeProvider from layout
+**File:** `app/[locale]/layout.tsx`
+- [x] Remove `import { ThemeProvider } from "next-themes";`
+- [x] Remove `<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>` wrapper
+- [x] Keep `<WishlistProvider>`, `{children}`, `<Toaster />` in place (unwrap from ThemeProvider)
+- [x] Remove `suppressHydrationWarning` from `<html>` tag (no longer needed without theme switching)
 
-### File
-`components/shared/header/mobile-bottom-nav.tsx`
+### Task 2: Remove darkMode from Tailwind config
+**File:** `tailwind.config.ts`
+- [x] Remove `darkMode: ["class"],` (line 4)
 
-### Current Code (lines 64-75)
-```tsx
-if (tab.action && "isCenter" in tab && tab.isCenter) {
-  return (
-    <button
-      key={tab.key}
-      onClick={tab.action}
-      className="flex flex-col items-center justify-center"
-    >
-      <div className="bg-brand-accent text-white rounded-full h-14 w-14 flex items-center justify-center -mt-5 ring-4 ring-background shadow-card-glow hover:bg-brand-accent-dark transition-colors">
-        <Icon className="h-[22px] w-[22px]" />
-      </div>
-    </button>
-  );
-}
-```
+### Task 3: Remove dark theme CSS variables from globals.css
+**File:** `assets/styles/globals.css`
+- [x] Remove entire `.dark { ... }` block (lines ~247-288) containing all dark mode CSS variable overrides
+- [x] Remove `html.dark .upload-field .text-white { color: #ffffff !important; }` rule (line ~305)
+- [x] Keep the light theme `:root { ... }` block intact — this is the only theme now
 
-### Context
-- Nav bar height: `h-[68px]` (line 59)
-- Button size: `h-14 w-14` (56px)
-- Current offset: `-mt-5` (20px up = 1.25rem)
+### Task 4: Uninstall next-themes package
+**Command:** `npm uninstall next-themes`
+- [x] Run the uninstall command
+- [x] Verify `next-themes` is removed from `package.json` dependencies
+- [x] Verify no remaining imports of `next-themes` exist in codebase
 
-### Fix
-- Line 71: change `-mt-5` → `-mt-7` (28px up = 1.75rem)
-
-This raises the button higher so its center sits roughly at the top edge of the nav bar, making it symmetrically elevated.
+### Task 5: Delete mode-toggle component
+**File:** `components/shared/header/mode-toggle.tsx`
+- [x] Delete the entire file (Sun/Moon/SunMoon icon toggle dropdown)
 
 ---
 
-## Bug 3: Features Grid ("ΔΩΡΕΑΝ ΑΠΟΣΤΟΛΗ" κλπ.) Overlaps the Hero Carousel
+## PHASE 2: Remove Theme Usage from Non-Header Components
 
-### Problem
-The ValuePropositions section uses `-mt-8 md:-mt-10` (negative top margin) which pulls it UP by 32-40px to deliberately overlap the hero carousel. On mobile (where carousel is only 400px tall) this creates an ugly overlap where the features card covers part of the carousel's bottom content area and indicators.
-
-### File
-`components/shared/value-propositions.tsx`
-
-### Current Code (line 11)
-```tsx
-<section className="relative z-10 -mt-8 md:-mt-10">
-```
-
-### Context
-- Hero carousel heights: `h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px]`
-- The hero section is `<section className="relative w-full">` (hero-carousel.tsx line 65)
-- Carousel has absolute indicators at `bottom-6` (or `bottom-2` after Bug 1 fix)
-- The `.wrapper` class adds `py-5` (20px vertical padding)
-
-### Fix
-- Line 11: change `className="relative z-10 -mt-8 md:-mt-10"` → `className="relative z-10 mt-6 md:mt-8"`
-
-This removes the negative margin entirely and adds positive spacing (24px mobile, 32px desktop) so the features section sits clearly BELOW the carousel in normal document flow.
+### Task 6: Clean stripe-payment.tsx (useTheme dependency)
+**File:** `app/[locale]/(root)/order/[id]/stripe-payment.tsx`
+- [x] Remove `import { useTheme } from "next-themes";` (line 9)
+- [x] Remove `const { theme, systemTheme } = useTheme();` (line 31)
+- [x] Simplify Stripe appearance to always use light theme: replace the theme ternary (lines 105-112) with just `theme: "stripe"` (Stripe's light theme)
 
 ---
 
-## Files Summary
+## PHASE 3: Remove ModeToggle Usage from Header
 
-| Bug | File | Lines to Change |
-|-----|------|-----------------|
-| 1 — Pagination badge overlap | `components/shared/hero-carousel.tsx` | 160, 178 |
-| 2 — Search button centering | `components/shared/header/mobile-bottom-nav.tsx` | 71 |
-| 3 — Features overlapping carousel | `components/shared/value-propositions.tsx` | 11 |
+### Task 7: Clean utility-bar.tsx
+**File:** `components/shared/header/utility-bar.tsx`
+- [x] Remove `import ModeToggle from "./mode-toggle";` (line 4)
+- [x] Remove `<ModeToggle />` usage (line 36)
 
-## Testing Checklist
-After fixing, verify on mobile viewport (375px width):
-- [x] Slide counter "01 / 04" does NOT overlap the "ΛΕΠΤΟΜΕΡΕΙΕΣ" button
-- [x] Slide indicator pills are visible and not overlapping buttons
-- [x] Orange search button in bottom nav is symmetrically elevated above the nav bar
-- [x] Features card sits clearly below the hero carousel with visible gap
-- [x] No layout shift or overflow on any viewport from 320px to 768px
-- [x] Desktop (1024px+) layout is not negatively affected by any changes
+### Task 8: Clean mobile-menu.tsx
+**File:** `components/shared/header/mobile-menu.tsx`
+- [x] Remove `import ModeToggle from "./mode-toggle";` (line 34)
+- [x] Remove `<ModeToggle />` usage (line 424)
+
+---
+
+## PHASE 4: Remove dark: Tailwind Classes from Components
+
+### Task 9: Clean order-status-badge.tsx (8 dark: classes)
+**File:** `components/shared/order-status-badge.tsx`
+- [x] Remove `dark:text-yellow-400` (pending status)
+- [x] Remove `dark:text-blue-400` (confirmed status)
+- [x] Remove `dark:text-indigo-400` (processing status)
+- [x] Remove `dark:text-purple-400` (shipped status)
+- [x] Remove `dark:text-green-400` (delivered status)
+- [x] Remove `dark:text-red-400` (cancelled status)
+- [x] Remove `dark:text-orange-400` (refund_requested status)
+- [x] Remove `dark:text-gray-400` (refunded status)
+
+### Task 10: Clean order-status-timeline.tsx (8 dark: classes)
+**File:** `components/shared/order-status-timeline.tsx`
+- [x] Remove `dark:text-yellow-400` (pending)
+- [x] Remove `dark:text-blue-400` (confirmed)
+- [x] Remove `dark:text-indigo-400` (processing)
+- [x] Remove `dark:text-purple-400` (shipped)
+- [x] Remove `dark:text-green-400` (delivered)
+- [x] Remove `dark:text-red-400` (cancelled)
+- [x] Remove `dark:text-orange-400` (refund_requested)
+- [x] Remove `dark:text-gray-400` (refunded)
+
+### Task 11: Clean product-images.tsx (4 dark: classes)
+**File:** `components/shared/product/product-images.tsx`
+- [x] Line ~34: Remove `dark:bg-card/80` from left arrow button
+- [x] Line ~34: Remove `dark:hover:bg-card` from left arrow button
+- [x] Line ~41: Remove `dark:bg-card/80` from right arrow button
+- [x] Line ~41: Remove `dark:hover:bg-card` from right arrow button
+
+### Task 12: Clean product-card.tsx (2 dark: classes)
+**File:** `components/shared/product/product-card.tsx`
+- [x] Line ~109: Remove `dark:bg-card/90` from wishlist button (list variant)
+- [x] Line ~117: Remove `dark:bg-card/90` from wishlist button (grid variant)
+
+### Task 13: Clean product-card-wishlist.tsx (1 dark: class)
+**File:** `components/shared/product/product-card-wishlist.tsx`
+- [x] Line ~24: Remove `dark:bg-card/90` from wishlist button background
+
+### Task 14: Clean add-to-cart-button.tsx (1 dark: class)
+**File:** `components/shared/product/add-to-cart-button.tsx`
+- [x] Line ~50: Remove `dark:text-green-400` from success state
+
+### Task 15: Clean mega-menu.tsx (1 dark: class)
+**File:** `components/shared/header/mega-menu.tsx`
+- [x] Line ~132: Remove `dark:bg-black/40` from overlay backdrop
+
+### Task 16: Clean brand-showcase-client.tsx (1 dark: class)
+**File:** `components/shared/brand-showcase-client.tsx`
+- [x] Line ~48: Remove `dark:invert` from brand logo images
+
+### Task 17: Clean product detail page (2 dark: classes)
+**File:** `app/[locale]/(root)/product/[slug]/page.tsx`
+- [x] Line ~123: Remove `dark:text-green-400` from "in stock" text
+- [x] Line ~128: Remove `dark:text-orange-400` from "low stock" text
+
+### Task 18: Clean highlight-text.tsx (1 dark: class)
+**File:** `lib/highlight-text.tsx`
+- [x] Line ~28: Remove `dark:bg-yellow-800` from highlighted search text
+
+---
+
+## PHASE 5: Verification & Testing
+
+### Task 19: Build verification
+- [x] Run `npm run build` — ensure zero errors
+- [x] Run `npm run lint` — ensure no broken imports or unused variables
+
+### Task 20: Visual verification
+- [x] Check homepage renders correctly in light mode
+- [x] Check product cards display correctly
+- [x] Check product detail page (stock indicators visible)
+- [x] Check order status badges have correct colors
+- [x] Check order status timeline colors
+- [x] Check mega-menu overlay works
+- [x] Check brand showcase logos are visible
+- [x] Check search highlight text is visible
+- [x] Check admin dashboard charts render
+- [x] Check mobile menu works (no ModeToggle crash)
+- [x] Check utility bar works (no ModeToggle crash)
+- [x] Check Stripe payment form renders with light "stripe" theme
+- [x] Check UploadThing file upload works in admin
+
+### Task 21: Final grep verification
+- [x] Run `grep -r "dark:" --include="*.tsx" --include="*.ts" --include="*.css"` and confirm ZERO results (excluding node_modules)
+- [x] Run `grep -r "next-themes" --include="*.tsx" --include="*.ts"` and confirm ZERO results (excluding node_modules)
+- [x] Run `grep -r "useTheme" --include="*.tsx" --include="*.ts"` and confirm ZERO results (excluding node_modules)
+- [x] Run `grep -r "setTheme" --include="*.tsx" --include="*.ts"` and confirm ZERO results (excluding node_modules)
+
+---
+
+## Summary Table
+
+| Phase | Tasks | Files Affected | dark: Removals |
+|-------|-------|---------------|----------------|
+| 1 — Infrastructure | 5 | 4 files + 1 package | Core theme system |
+| 2 — Non-header cleanup | 1 | 1 file | Stripe useTheme |
+| 3 — Header cleanup | 2 | 2 files | ModeToggle imports |
+| 4 — Component cleanup | 10 | 10 files | ~30 dark: classes |
+| 5 — Verification | 3 | — | Final checks |
+| **Total** | **21** | **17 files** | **~30 classes** |
+
+## Files Quick Reference
+
+```
+DELETE:
+  components/shared/header/mode-toggle.tsx
+
+MODIFY (infrastructure):
+  app/[locale]/layout.tsx
+  tailwind.config.ts
+  assets/styles/globals.css
+  package.json
+
+MODIFY (remove useTheme):
+  app/[locale]/(root)/order/[id]/stripe-payment.tsx
+
+MODIFY (remove imports):
+  components/shared/header/utility-bar.tsx
+  components/shared/header/mobile-menu.tsx
+
+MODIFY (remove dark: classes):
+  components/shared/order-status-badge.tsx
+  components/shared/order-status-timeline.tsx
+  components/shared/product/product-images.tsx
+  components/shared/product/product-card.tsx
+  components/shared/product/product-card-wishlist.tsx
+  components/shared/product/add-to-cart-button.tsx
+  components/shared/header/mega-menu.tsx
+  components/shared/brand-showcase-client.tsx
+  app/[locale]/(root)/product/[slug]/page.tsx
+  lib/highlight-text.tsx
+```
+
+## Notes
+
+- shadcn/ui components (`components/ui/`) use CSS variables (not `dark:` classes) — they automatically work with light-only since `:root` defines all values
+- Charts in admin use `hsl(var(...))` CSS variables — they work automatically with light theme
+- Footer uses semantic colors (`bg-primary`, `text-primary-foreground`) — works automatically
+- Cart/checkout pages have ZERO `dark:` classes — no changes needed
+- Auth pages have ZERO `dark:` classes — no changes needed
+- User profile/orders/addresses pages have ZERO `dark:` classes — no changes needed
+- Form components (input, select, textarea, checkbox) have ZERO `dark:` classes — no changes needed
+- The `brand-accent-dark` color in tailwind.config.ts is a shade name (darker gold), NOT a dark-mode class — keep it

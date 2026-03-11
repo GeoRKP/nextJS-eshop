@@ -244,48 +244,6 @@
     --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
   }
-  .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 96%;
-    --card: 222 40% 10%;
-    --card-foreground: 210 40% 96%;
-    --popover: 222 40% 10%;
-    --popover-foreground: 210 40% 96%;
-    --primary: 210 40% 96%;
-    --primary-foreground: 222 47% 6%;
-    --secondary: 222 30% 16%;
-    --secondary-foreground: 210 40% 96%;
-    --muted: 222 30% 16%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 38 92% 50%;
-    --accent-foreground: 222 47% 6%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 96%;
-    --border: 222 25% 20%;
-    --input: 222 25% 20%;
-    --ring: 38 92% 50%;
-    --chart-1: 217 72% 55%;
-    --chart-2: 38 92% 55%;
-    --chart-3: 160 60% 45%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 0 72% 55%;
-    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.25);
-    --shadow-card-hover: 0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 6px 10px -6px rgba(0, 0, 0, 0.25);
-    --shadow-elevated: 0 20px 50px -12px rgba(0, 0, 0, 0.5), 0 8px 20px -8px rgba(0, 0, 0, 0.3);
-    --shadow-card-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    --shadow-card-glow: 0 4px 20px -4px rgba(245, 158, 11, 0.3), 0 2px 8px -2px rgba(245, 158, 11, 0.2);
-    --shadow-inner-soft: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
-    --brand-accent: 38 92% 50%;
-    --brand-accent-light: 38 90% 58%;
-    --brand-accent-dark: 38 92% 42%;
-    --surface-elevated: 222 35% 13%;
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
-    --info: 199 89% 48%;
-    --info-foreground: 0 0% 100%;
-  }
 }
 
 @layer base {
@@ -302,10 +260,6 @@
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* Uploadthing button text override */
-html.dark .upload-field .text-white {
-  color: #ffffff !important;
-}
-
 .upload-field .text-white {
   color: #000000 !important;
 }

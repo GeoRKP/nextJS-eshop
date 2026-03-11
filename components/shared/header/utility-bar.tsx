@@ -1,7 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 import { Phone, HelpCircle, Package, BadgeCheck } from "lucide-react";
-import ModeToggle from "./mode-toggle";
+
 import LanguageSwitcher from "./language-switcher";
 
 export default async function UtilityBar() {
@@ -33,8 +33,6 @@ export default async function UtilityBar() {
           </Link>
         </div>
         <div className="flex items-center gap-3">
-          <ModeToggle />
-          <span className="w-1 h-1 rounded-full bg-primary-foreground/30" />
           <LanguageSwitcher />
           <span className="w-1 h-1 rounded-full bg-primary-foreground/30" />
           <Link

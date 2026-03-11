@@ -45,7 +45,7 @@ export default function BrandShowcaseClient({
                     alt={`${b.brand} logo`}
                     width={200}
                     height={80}
-                    className="h-full w-auto object-contain dark:invert"
+                    className="h-full w-auto object-contain"
                   />
                 ) : (
                   <span className="text-2xl md:text-3xl font-black text-brand-accent">

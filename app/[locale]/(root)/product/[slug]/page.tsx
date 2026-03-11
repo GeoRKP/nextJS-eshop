@@ -120,12 +120,12 @@ export default async function ProductDetailsPage(props: {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
                       </span>
-                      <span className="text-sm font-medium text-green-600 dark:text-green-400">{t("inStock")}</span>
+                      <span className="text-sm font-medium text-green-600">{t("inStock")}</span>
                     </>
                   ) : product.stock > 0 ? (
                     <>
                       <span className="inline-flex rounded-full h-2.5 w-2.5 bg-orange-500" />
-                      <span className="text-sm font-medium text-orange-600 dark:text-orange-400">{t("lowStock", { count: product.stock })}</span>
+                      <span className="text-sm font-medium text-orange-600">{t("lowStock", { count: product.stock })}</span>
                     </>
                   ) : (
                     <>

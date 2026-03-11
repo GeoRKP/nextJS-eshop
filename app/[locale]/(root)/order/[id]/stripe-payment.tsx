@@ -6,7 +6,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { useTheme } from "next-themes";
+
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
@@ -28,7 +28,6 @@ export default function StripePayment({
   orderId: string;
   clientSecret: string | null;
 }) {
-  const { theme, systemTheme } = useTheme();
 
   const StripeForm = () => {
     const stripe = useStripe();
@@ -102,14 +101,7 @@ export default function StripePayment({
       options={{
         clientSecret: clientSecret ?? undefined,
         appearance: {
-          theme:
-            theme === "dark"
-              ? "night"
-              : theme === "light"
-              ? "stripe"
-              : systemTheme === "light"
-              ? "stripe"
-              : "night",
+          theme: "stripe",
         },
       }}
       stripe={stripePromise}

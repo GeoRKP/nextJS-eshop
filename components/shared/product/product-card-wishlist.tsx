@@ -21,7 +21,7 @@ export default function ProductCardWishlist({
           : "md:opacity-0 md:group-hover:opacity-100"
       )}
     >
-      <div className="bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full p-1.5 shadow-sm">
+      <div className="bg-white/90 backdrop-blur-sm rounded-full p-1.5 shadow-sm">
         <WishlistButton productId={productId} />
       </div>
     </div>
