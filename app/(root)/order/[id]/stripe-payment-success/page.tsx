@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Button } from "@/components/ui/button";
 import { getOrderById } from "@/lib/actions/order.actions";
 import Link from "next/link";

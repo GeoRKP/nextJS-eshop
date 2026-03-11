@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Metadata } from "next";
 import { getMyCart } from "@/lib/actions/cart.actions";
 import { auth } from "@/auth";

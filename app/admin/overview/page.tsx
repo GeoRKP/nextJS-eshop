@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getOrderSummary } from "@/lib/actions/order.actions";
 import { auth } from "@/auth";
 import { Metadata } from "next";

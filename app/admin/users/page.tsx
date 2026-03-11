@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { PAGE_SIZE } from "@/lib/constants";
 import { getAllUsers, deleteUser } from "@/lib/actions/user.actions";
 import { Metadata } from "next";

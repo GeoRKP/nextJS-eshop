@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Table, TableCell, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { deleteOrder, getAllOrders } from "@/lib/actions/order.actions";
 import { formatDateTime } from "@/lib/utils";

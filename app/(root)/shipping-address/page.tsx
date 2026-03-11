@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { auth } from "@/auth";
 import { getMyCart } from "@/lib/actions/cart.actions";
 import { redirect } from "next/navigation";

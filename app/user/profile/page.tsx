@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Metadata } from "next";
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
