@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createSignInFormSchema } from "@/lib/validators";
-import { z } from "zod";
+import { z } from "zod/v3";
 import {
   Form,
   FormControl,
@@ -40,19 +40,23 @@ export default function CredentialsSignInForm() {
     defaultValues: signInDefaultValues,
   });
 
-  const onSubmit = (values: SignInFormValues) => {
+  const onSubmit = async (values: SignInFormValues) => {
     setServerError("");
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.append("email", values.email);
-      formData.append("password", values.password);
-      formData.append("callbackUrl", callbackUrl);
+    let res: { success: boolean; message: string } | undefined;
+    await new Promise<void>((resolve) => {
+      startTransition(async () => {
+        const formData = new FormData();
+        formData.append("email", values.email);
+        formData.append("password", values.password);
+        formData.append("callbackUrl", callbackUrl);
 
-      const res = await signInWithCredentials(null, formData);
-      if (res && !res.success) {
-        setServerError(res.message);
-      }
+        res = await signInWithCredentials(null, formData);
+        resolve();
+      });
     });
+    if (res && !res.success) {
+      setServerError(res.message);
+    }
   };
 
   return (

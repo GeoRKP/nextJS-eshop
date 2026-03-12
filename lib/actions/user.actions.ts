@@ -10,11 +10,11 @@ import {
 } from "../validators";
 import { auth, signIn, signOut } from "@/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { hashSync } from "bcrypt-ts-edge";
+import { hashSync } from "bcrypt-ts";
 import { prisma } from "@/db/prisma";
 import { formatError } from "../utils";
 import { ShippingAddress } from "@/types";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";

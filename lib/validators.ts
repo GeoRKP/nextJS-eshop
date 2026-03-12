@@ -1,9 +1,9 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { formatNumberWithDecimal } from "./utils";
 import { PAYMENT_METHODS } from "./constants";
 
 // Translation function type — compatible with both useTranslations and getTranslations
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type T = (key: string, values?: any) => string;
 
 const currency = z

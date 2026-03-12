@@ -10,7 +10,7 @@ import {
   insertAddressSchema,
   insertCouponSchema,
 } from "@/lib/validators";
-import { z } from "zod";
+import { z } from "zod/v3";
 
 export type Product = z.infer<typeof insertProductSchema> & {
   rating: string;

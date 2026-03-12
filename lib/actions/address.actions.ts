@@ -5,7 +5,7 @@ import { getAuthSession } from "@/lib/auth-session";
 import { formatError, toPlainObject } from "../utils";
 import { revalidatePath } from "next/cache";
 import { createInsertAddressSchema, createUpdateAddressSchema } from "../validators";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { insertAddressSchema, updateAddressSchema } from "../validators";
 import { getTranslations } from "next-intl/server";
 

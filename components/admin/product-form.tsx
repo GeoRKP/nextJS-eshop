@@ -2,11 +2,11 @@
 
 import { insertProductSchema, updateProductSchema, createInsertProductSchema } from "@/lib/validators";
 import { useToast } from "@/hooks/use-toast";
-import { ControllerRenderProps, useForm } from "react-hook-form";
+import { ControllerRenderProps, useForm, useWatch } from "react-hook-form";
 import { Product } from "@/types";
 import { useRouter } from "@/i18n/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { productDefaultValues } from "@/lib/constants";
 import {
   Form,
@@ -99,9 +99,9 @@ export default function ProductForm({
     }
   };
 
-  const images = form.watch("images");
-  const banner = form.watch("banner");
-  const isFeatured = form.watch("isFeatured");
+  const images = useWatch({ control: form.control, name: "images" });
+  const banner = useWatch({ control: form.control, name: "banner" });
+  const isFeatured = useWatch({ control: form.control, name: "isFeatured" });
 
   return (
     <Form {...form}>

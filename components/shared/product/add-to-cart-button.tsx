@@ -17,28 +17,32 @@ export default function AddToCartButton({ item }: { item: CartItem }) {
   const router = useRouter();
   const t = useTranslations("Product");
 
-  const handleAdd = () => {
-    startTransition(async () => {
-      const res = await addItemToCart(item);
-      if (!res.success) {
-        toast({ variant: "destructive", description: res.message });
-        return;
-      }
-      setAdded(true);
-      toast({
-        description: res.message,
-        action: (
-          <ToastAction
-            altText={t("goToCart")}
-            className="bg-primary text-white hover:bg-gray-800"
-            onClick={() => router.push("/cart")}
-          >
-            {t("goToCart")}
-          </ToastAction>
-        ),
+  const handleAdd = async () => {
+    let res: { success: boolean; message: string };
+    await new Promise<void>((resolve) => {
+      startTransition(async () => {
+        res = await addItemToCart(item);
+        resolve();
       });
-      setTimeout(() => setAdded(false), 2000);
     });
+    if (!res!.success) {
+      toast({ variant: "destructive", description: res!.message });
+      return;
+    }
+    setAdded(true);
+    toast({
+      description: res!.message,
+      action: (
+        <ToastAction
+          altText={t("goToCart")}
+          className="bg-primary text-white hover:bg-gray-800"
+          onClick={() => router.push("/cart")}
+        >
+          {t("goToCart")}
+        </ToastAction>
+      ),
+    });
+    setTimeout(() => setAdded(false), 2000);
   };
 
   return (

@@ -5,10 +5,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev          # Dev server with Turbopack
-npm run build        # Production build
+npm run dev          # Dev server (Turbopack default in Next.js 16)
+npm run build        # Production build (Turbopack)
 npm start            # Start production server
-npm run lint         # ESLint
+npm run lint         # ESLint 9 (flat config, eslint.config.mjs)
 npx jest             # Run all tests
 npx jest --watch     # Run tests in watch mode
 npx jest path/to/test.ts  # Run a single test file
@@ -18,13 +18,14 @@ npx prisma db push   # Push schema changes to database
 
 ## Tech Stack
 
-- **Next.js 15** (App Router) with **React 19** and **TypeScript** (strict mode)
+- **Next.js 16** (App Router, Turbopack) with **React 19.2** and **TypeScript** (strict mode)
 - **Prisma 6** ORM with **Neon serverless PostgreSQL** (WebSocket adapter)
-- **NextAuth.js v5** (beta) — JWT sessions, Credentials provider, bcrypt-ts-edge
+- **NextAuth.js v5** (beta.30) — JWT sessions, Credentials provider, bcrypt-ts
 - **next-intl v4** — i18n with Greek (el, default) and English (en)
 - **Tailwind CSS** with **shadcn/ui** (Radix UI primitives)
-- **Zod** for validation, **react-hook-form** for forms
+- **Zod v4** for validation (v3 compat mode), **react-hook-form** for forms
 - **Stripe** + **PayPal** for payments, **UploadThing** for file uploads
+- **ESLint 9** with flat config (`eslint.config.mjs`)
 - **recharts** for admin analytics charts
 
 ## Architecture
@@ -53,7 +54,7 @@ All server actions live in `lib/actions/` and follow this pattern:
 - Validate input with Zod schemas
 - Use `getTranslations()` for localized error/success messages
 - Return `{ success: boolean, message: string, data?: T }`
-- Call `revalidatePath()` for cache invalidation
+- Call `revalidatePath()` and `revalidateTag(tag, "max")` for cache invalidation
 - Errors wrapped with `formatError()` from `lib/utils`
 
 Files: `cart.actions.ts`, `product.actions.ts`, `order.actions.ts`, `user.actions.ts`, `review-actions.ts`
@@ -81,9 +82,9 @@ Zod schemas are defined as factory functions that accept a translation function 
 - Prisma client singleton in `db/prisma.ts` with custom result transformers
 - Key models: User, Product, Cart, Order, OrderItem, Review
 
-### Middleware (middleware.ts)
+### Proxy (proxy.ts)
 
-Composes next-intl middleware with NextAuth. Sets `sessionCartId` cookie (UUID) for guest cart tracking. Protects routes via regex patterns.
+Renamed from `middleware.ts` in Next.js 16 migration. Composes next-intl middleware with NextAuth. Sets `sessionCartId` cookie (UUID) for guest cart tracking. Runs on Node.js runtime (not edge).
 
 ### Components
 

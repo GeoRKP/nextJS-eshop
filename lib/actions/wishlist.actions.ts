@@ -126,7 +126,7 @@ export async function toggleWishlist(productId: string) {
       });
       revalidatePath("/user/wishlist");
       revalidatePath("/en/user/wishlist");
-      revalidateTag("wishlist");
+      revalidateTag("wishlist", "max");
       return { success: true, message: t("removedFromWishlist") };
     } else {
       // Add to wishlist
@@ -144,7 +144,7 @@ export async function toggleWishlist(productId: string) {
       });
       revalidatePath("/user/wishlist");
       revalidatePath("/en/user/wishlist");
-      revalidateTag("wishlist");
+      revalidateTag("wishlist", "max");
       return { success: true, message: t("addedToWishlist", { name: product.name }) };
     }
   } catch (error) {

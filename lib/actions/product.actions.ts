@@ -5,7 +5,7 @@ import { LATEST_PRODUCTS_LIMIT, PAGE_SIZE } from "../constants";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { unstable_cache } from "next/cache";
 import { insertProductSchema, updateProductSchema, createInsertProductSchema, createUpdateProductSchema } from "../validators";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
@@ -305,8 +305,8 @@ export async function deleteProduct(id: string) {
     revalidatePath("/admin/products");
     revalidatePath("/products");
     revalidatePath("/en/products");
-    revalidateTag("products");
-    revalidateTag("categories");
+    revalidateTag("products", "max");
+    revalidateTag("categories", "max");
 
     return { success: true, message: t("productDeletedSuccessfully") };
   } catch (error) {
@@ -328,8 +328,8 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
     revalidatePath("/admin/products");
     revalidatePath("/products");
     revalidatePath("/en/products");
-    revalidateTag("products");
-    revalidateTag("categories");
+    revalidateTag("products", "max");
+    revalidateTag("categories", "max");
 
     return { success: true, message: t("productCreatedSuccessfully") };
   } catch (error) {
@@ -363,8 +363,8 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
     revalidatePath("/admin/products");
     revalidatePath("/products");
     revalidatePath("/en/products");
-    revalidateTag("products");
-    revalidateTag("categories");
+    revalidateTag("products", "max");
+    revalidateTag("categories", "max");
 
     return { success: true, message: t("productUpdatedSuccessfully") };
   } catch (error) {

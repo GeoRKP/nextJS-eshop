@@ -1,6 +1,6 @@
 "use client";
 
-import { z } from "zod";
+import { z } from "zod/v3";
 import { updateUserSchema, createUpdateUserSchema } from "@/lib/validators";
 import { useRouter } from "@/i18n/navigation";
 import { useToast } from "@/hooks/use-toast";

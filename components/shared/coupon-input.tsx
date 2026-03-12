@@ -18,18 +18,22 @@ export default function CouponInput({
   const [isPending, startTransition] = useTransition();
   const [code, setCode] = useState("");
 
-  const handleApply = () => {
+  const handleApply = async () => {
     if (!code.trim()) return;
-    startTransition(async () => {
-      const res = await applyCouponToCart(code);
-      toast({
-        description: res.message,
-        variant: res.success ? "default" : "destructive",
+    let res: { success: boolean; message: string };
+    await new Promise<void>((resolve) => {
+      startTransition(async () => {
+        res = await applyCouponToCart(code);
+        resolve();
       });
-      if (res.success) {
-        setCode("");
-      }
     });
+    toast({
+      description: res!.message,
+      variant: res!.success ? "default" : "destructive",
+    });
+    if (res!.success) {
+      setCode("");
+    }
   };
 
   const handleRemove = () => {

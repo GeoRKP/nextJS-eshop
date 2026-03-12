@@ -5,7 +5,7 @@ import { formatError, toPlainObject } from "../utils";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { unstable_cache } from "next/cache";
 import { createInsertCategorySchema, createUpdateCategorySchema } from "../validators";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { insertCategorySchema, updateCategorySchema } from "../validators";
 import { getTranslations } from "next-intl/server";
 
@@ -131,7 +131,7 @@ export async function createCategory(data: z.infer<typeof insertCategorySchema>)
     revalidatePath("/admin/categories");
     revalidatePath("/");
     revalidatePath("/en");
-    revalidateTag("categories");
+    revalidateTag("categories", "max");
 
     return { success: true, message: t("categoryCreatedSuccessfully") };
   } catch (error) {
@@ -168,7 +168,7 @@ export async function updateCategory(data: z.infer<typeof updateCategorySchema>)
     revalidatePath("/admin/categories");
     revalidatePath("/");
     revalidatePath("/en");
-    revalidateTag("categories");
+    revalidateTag("categories", "max");
 
     return { success: true, message: t("categoryUpdatedSuccessfully") };
   } catch (error) {
@@ -195,7 +195,7 @@ export async function deleteCategory(id: string) {
     revalidatePath("/admin/categories");
     revalidatePath("/");
     revalidatePath("/en");
-    revalidateTag("categories");
+    revalidateTag("categories", "max");
 
     return { success: true, message: t("categoryDeletedSuccessfully") };
   } catch (error) {
@@ -222,7 +222,7 @@ export async function updateCategorySortOrder(
     revalidatePath("/admin/categories");
     revalidatePath("/");
     revalidatePath("/en");
-    revalidateTag("categories");
+    revalidateTag("categories", "max");
 
     return { success: true, message: t("categorySortUpdatedSuccessfully") };
   } catch (error) {

@@ -20,7 +20,7 @@ const Header = () => {
               alt={`${APP_NAME} logo`}
               width={52}
               height={52}
-              priority={true}
+              preload={true}
               className="hidden md:block"
             />
             <Image
@@ -28,7 +28,7 @@ const Header = () => {
               alt={`${APP_NAME} logo`}
               width={44}
               height={44}
-              priority={true}
+              preload={true}
               className="md:hidden"
             />
             <span className="hidden md:block font-heading font-extrabold text-xl ml-2 tracking-[0.15em] uppercase">

@@ -1,207 +1,350 @@
-# Remove Dark Mode — Light Only TODO
+# Security Migration: Next.js 15.2.4 → 16.1.5+ & React 19.1.0 → 19.2.4
 
-> Complete removal of dark/light mode toggle system. Keep ONLY light mode.
-> 30+ agents scanned the entire codebase. Every dark mode reference is listed below.
-
----
-
-## PHASE 1: Core Infrastructure (Theme System Removal)
-
-### Task 1: Remove ThemeProvider from layout
-**File:** `app/[locale]/layout.tsx`
-- [x] Remove `import { ThemeProvider } from "next-themes";`
-- [x] Remove `<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>` wrapper
-- [x] Keep `<WishlistProvider>`, `{children}`, `<Toaster />` in place (unwrap from ThemeProvider)
-- [x] Remove `suppressHydrationWarning` from `<html>` tag (no longer needed without theme switching)
-
-### Task 2: Remove darkMode from Tailwind config
-**File:** `tailwind.config.ts`
-- [x] Remove `darkMode: ["class"],` (line 4)
-
-### Task 3: Remove dark theme CSS variables from globals.css
-**File:** `assets/styles/globals.css`
-- [x] Remove entire `.dark { ... }` block (lines ~247-288) containing all dark mode CSS variable overrides
-- [x] Remove `html.dark .upload-field .text-white { color: #ffffff !important; }` rule (line ~305)
-- [x] Keep the light theme `:root { ... }` block intact — this is the only theme now
-
-### Task 4: Uninstall next-themes package
-**Command:** `npm uninstall next-themes`
-- [x] Run the uninstall command
-- [x] Verify `next-themes` is removed from `package.json` dependencies
-- [x] Verify no remaining imports of `next-themes` exist in codebase
-
-### Task 5: Delete mode-toggle component
-**File:** `components/shared/header/mode-toggle.tsx`
-- [x] Delete the entire file (Sun/Moon/SunMoon icon toggle dropdown)
+> **Priority: CRITICAL** — Current versions are vulnerable to:
+> - **CVE-2025-55182** (RCE, CVSS 10.0) — Remote Code Execution via React Server Components Flight protocol. Actively exploited in the wild.
+> - **CVE-2025-66478** (RCE, CVSS 10.0) — Remote Code Execution via RSC. Fixed in Next.js 16.0.7.
+> - **CVE-2025-55183** (Source Code Exposure, CVSS 5.3) — Leaks compiled source of Server Functions. Fixed in Next.js 16.0.10.
+> - **CVE-2025-55184 / CVE-2025-67779** (DoS, CVSS 7.5) — Infinite loop hangs server. Fixed in Next.js 16.0.10.
+> - **CVE-2026-23864** (DoS, CVSS 7.5) — Server Action DoS. Fixed in React 19.2.4 & Next.js 16.1.5.
+>
+> **Target versions:** Next.js 16.1.5+ (covers all CVEs), React 19.2.4, React DOM 19.2.4
+>
+> **Strategy:** 7-phase migration, ordered by dependency chain. Each phase is independently testable.
+> **Research:** 42 agents scanned every file, dependency, breaking change, and compatibility concern.
 
 ---
 
-## PHASE 2: Remove Theme Usage from Non-Header Components
+## PHASE 0: Pre-Migration — Environment & Backup
 
-### Task 6: Clean stripe-payment.tsx (useTheme dependency)
-**File:** `app/[locale]/(root)/order/[id]/stripe-payment.tsx`
-- [x] Remove `import { useTheme } from "next-themes";` (line 9)
-- [x] Remove `const { theme, systemTheme } = useTheme();` (line 31)
-- [x] Simplify Stripe appearance to always use light theme: replace the theme ternary (lines 105-112) with just `theme: "stripe"` (Stripe's light theme)
+### Task 0.1: Verify Node.js version
+- [x] Next.js 16 requires **Node.js 20.9+** (Node 18 dropped) — **v24.13.0** ✅
+- [x] Run `node -v` and upgrade if below 20.9
+- [x] Update any CI/CD pipelines, Dockerfiles, or Vercel config to Node 20+
+- [x] Browser requirements: Chrome 111+, Edge 111+, Firefox 111+, Safari 16.4+
 
----
+### Task 0.2: Create migration branch
+- [x] `git checkout -b dev-main-plus-16`
+- [x] Ensure all current work is committed
+- [x] Take note of current `package-lock.json` (can revert if needed)
 
-## PHASE 3: Remove ModeToggle Usage from Header
-
-### Task 7: Clean utility-bar.tsx
-**File:** `components/shared/header/utility-bar.tsx`
-- [x] Remove `import ModeToggle from "./mode-toggle";` (line 4)
-- [x] Remove `<ModeToggle />` usage (line 36)
-
-### Task 8: Clean mobile-menu.tsx
-**File:** `components/shared/header/mobile-menu.tsx`
-- [x] Remove `import ModeToggle from "./mode-toggle";` (line 34)
-- [x] Remove `<ModeToggle />` usage (line 424)
+### Task 0.3: Run current build baseline
+- [x] Run `npm run build` — record current status (pass/fail, warnings) — **PASS** ✅
+- [x] Run `npm run lint` — record current lint status — **PASS** (2 warnings) ✅
+- [x] Run `npx jest` — record current test status — **9/9 PASS** ✅
 
 ---
 
-## PHASE 4: Remove dark: Tailwind Classes from Components
+## PHASE 1: Core Framework Upgrade (Next.js + React + Types)
 
-### Task 9: Clean order-status-badge.tsx (8 dark: classes)
-**File:** `components/shared/order-status-badge.tsx`
-- [x] Remove `dark:text-yellow-400` (pending status)
-- [x] Remove `dark:text-blue-400` (confirmed status)
-- [x] Remove `dark:text-indigo-400` (processing status)
-- [x] Remove `dark:text-purple-400` (shipped status)
-- [x] Remove `dark:text-green-400` (delivered status)
-- [x] Remove `dark:text-red-400` (cancelled status)
-- [x] Remove `dark:text-orange-400` (refund_requested status)
-- [x] Remove `dark:text-gray-400` (refunded status)
+### Task 1.1: Upgrade React and React DOM
+- [x] `npm install react@^19.2.4 react-dom@^19.2.4` — **19.2.4** ✅
+- [x] Verify: `node -e "console.log(require('react/package.json').version)"` → 19.2.4+
+- [x] **Security:** Fixes CVE-2025-55182, CVE-2025-55184, CVE-2025-67779, CVE-2025-55183, CVE-2026-23864
 
-### Task 10: Clean order-status-timeline.tsx (8 dark: classes)
-**File:** `components/shared/order-status-timeline.tsx`
-- [x] Remove `dark:text-yellow-400` (pending)
-- [x] Remove `dark:text-blue-400` (confirmed)
-- [x] Remove `dark:text-indigo-400` (processing)
-- [x] Remove `dark:text-purple-400` (shipped)
-- [x] Remove `dark:text-green-400` (delivered)
-- [x] Remove `dark:text-red-400` (cancelled)
-- [x] Remove `dark:text-orange-400` (refund_requested)
-- [x] Remove `dark:text-gray-400` (refunded)
+### Task 1.2: Upgrade TypeScript types for React 19
+- [x] `npm install -D @types/react@^19 @types/react-dom@^19` — **19.2.14 / 19.2.3** ✅
+- [x] Run codemod: `npx types-react-codemod@latest preset-19 ./`
+- [x] Key changes:
+  - `useRef` requires explicit argument (`useRef<T>(null)` instead of `useRef<T>()`)
+  - `ReactElement` type parameter changed (3 → 2 params)
+  - `forwardRef` still works but deprecated (components now accept `ref` as prop)
+- [x] ~40 shadcn/ui files use `forwardRef` — **non-breaking**, just deprecated warnings
+- [x] Verify no `ReactChild`, `ReactText`, `ReactFragment` types used (removed in @types/react@19)
 
-### Task 11: Clean product-images.tsx (4 dark: classes)
-**File:** `components/shared/product/product-images.tsx`
-- [x] Line ~34: Remove `dark:bg-card/80` from left arrow button
-- [x] Line ~34: Remove `dark:hover:bg-card` from left arrow button
-- [x] Line ~41: Remove `dark:bg-card/80` from right arrow button
-- [x] Line ~41: Remove `dark:hover:bg-card` from right arrow button
+### Task 1.3: Upgrade Next.js to 16.1.5+
+- [x] `npm install next@^16.1` — **16.1.6** ✅
+- [x] **Security:** Fixes CVE-2025-66478, CVE-2025-55183, CVE-2026-23864
+- [x] May need `--legacy-peer-deps` if next-auth peer dep fails
+- [x] Run all codemods at once: `npx @next/codemod@canary upgrade latest`
+  - This handles: middleware→proxy, async APIs, unstable_ prefix removal, ESLint migration
 
-### Task 12: Clean product-card.tsx (2 dark: classes)
-**File:** `components/shared/product/product-card.tsx`
-- [x] Line ~109: Remove `dark:bg-card/90` from wishlist button (list variant)
-- [x] Line ~117: Remove `dark:bg-card/90` from wishlist button (grid variant)
+### Task 1.4: Upgrade @next/bundle-analyzer
+- [x] `npm install -D @next/bundle-analyzer@^16.1` ✅
+- [x] Current: `^16.1.6` in devDeps — likely already compatible
 
-### Task 13: Clean product-card-wishlist.tsx (1 dark: class)
-**File:** `components/shared/product/product-card-wishlist.tsx`
-- [x] Line ~24: Remove `dark:bg-card/90` from wishlist button background
-
-### Task 14: Clean add-to-cart-button.tsx (1 dark: class)
-**File:** `components/shared/product/add-to-cart-button.tsx`
-- [x] Line ~50: Remove `dark:text-green-400` from success state
-
-### Task 15: Clean mega-menu.tsx (1 dark: class)
-**File:** `components/shared/header/mega-menu.tsx`
-- [x] Line ~132: Remove `dark:bg-black/40` from overlay backdrop
-
-### Task 16: Clean brand-showcase-client.tsx (1 dark: class)
-**File:** `components/shared/brand-showcase-client.tsx`
-- [x] Line ~48: Remove `dark:invert` from brand logo images
-
-### Task 17: Clean product detail page (2 dark: classes)
-**File:** `app/[locale]/(root)/product/[slug]/page.tsx`
-- [x] Line ~123: Remove `dark:text-green-400` from "in stock" text
-- [x] Line ~128: Remove `dark:text-orange-400` from "low stock" text
-
-### Task 18: Clean highlight-text.tsx (1 dark: class)
-**File:** `lib/highlight-text.tsx`
-- [x] Line ~28: Remove `dark:bg-yellow-800` from highlighted search text
+### Task 1.5: Quick build smoke test
+- [x] `npm run build` — revalidateTag errors (expected, fix in Phase 3) ✅
+- [x] Categorize errors by type for systematic fixing
 
 ---
 
-## PHASE 5: Verification & Testing
+## PHASE 2: Breaking Changes — Middleware → Proxy + ESLint
 
-### Task 19: Build verification
-- [x] Run `npm run build` — ensure zero errors
-- [x] Run `npm run lint` — ensure no broken imports or unused variables
+### Task 2.1: Rename middleware.ts to proxy.ts
+- [x] Run codemod: `npx @next/codemod@canary middleware-to-proxy .`
+- [x] Or manually:
+  - Rename file: `middleware.ts` → `proxy.ts`
+  - Rename function: `export default async function middleware(req)` → `export default async function proxy(req)`
+  - `createIntlMiddleware` import and usage stays unchanged
+  - `config` export with `matcher` stays unchanged
+- [x] **Runtime change:** proxy runs on **Node.js** (not edge) — this is fine for this project
+- [x] **Known bug:** proxy.ts may not execute behind some reverse proxies (GitHub #86122). If deploying behind Cloudflare/Traefik, test thoroughly
+- [x] **next-intl:** v4.8.3+ supports proxy.ts pattern — no upgrade needed
 
-### Task 20: Visual verification
-- [x] Check homepage renders correctly in light mode
-- [x] Check product cards display correctly
-- [x] Check product detail page (stock indicators visible)
-- [x] Check order status badges have correct colors
-- [x] Check order status timeline colors
-- [x] Check mega-menu overlay works
-- [x] Check brand showcase logos are visible
-- [x] Check search highlight text is visible
-- [x] Check admin dashboard charts render
-- [x] Check mobile menu works (no ModeToggle crash)
-- [x] Check utility bar works (no ModeToggle crash)
-- [x] Check Stripe payment form renders with light "stripe" theme
-- [x] Check UploadThing file upload works in admin
+### Task 2.2: Update next.config.ts proxy-related flags
+- [x] If using `skipMiddlewareUrlNormalize` → rename to `skipProxyUrlNormalize`
+- [x] If using `experimental.middlewareClientMaxBodySize` → rename to `experimental.proxyClientMaxBodySize`
+- [x] **Current config uses NONE of these** — no change needed
 
-### Task 21: Final grep verification
-- [x] Run `grep -r "dark:" --include="*.tsx" --include="*.ts" --include="*.css"` and confirm ZERO results (excluding node_modules)
-- [x] Run `grep -r "next-themes" --include="*.tsx" --include="*.ts"` and confirm ZERO results (excluding node_modules)
-- [x] Run `grep -r "useTheme" --include="*.tsx" --include="*.ts"` and confirm ZERO results (excluding node_modules)
-- [x] Run `grep -r "setTheme" --include="*.tsx" --include="*.ts"` and confirm ZERO results (excluding node_modules)
+### Task 2.3: Verify NextAuth works with proxy.ts
+- [x] The `authorized()` callback in `auth.config.ts` runs server-side — compatible with Node.js runtime
+- [x] Auth is NOT composed as middleware export — it uses NextAuth's `authorized` callback pattern
+- [x] No changes to `auth.ts` or `auth.config.ts` needed for the proxy rename
+- [x] Verify sessionCartId cookie still sets in `proxy.ts`
+
+### Task 2.4: Replace bcrypt-ts-edge with bcrypt-ts
+- [x] `npm uninstall bcrypt-ts-edge`
+- [x] `npm install bcrypt-ts`
+- [x] Update imports in **3 files**:
+  - `auth.ts`: `import { compareSync } from "bcrypt-ts-edge"` → `"bcrypt-ts"` ✅
+  - `lib/actions/user.actions.ts`: `import { hashSync } from "bcrypt-ts-edge"` → `"bcrypt-ts"` ✅
+  - `db/sample-data.ts`: `import { hashSync } from "bcrypt-ts-edge"` → `"bcrypt-ts"` ✅
+- [x] Reason: Edge runtime not used in proxy.ts; bcrypt-ts-edge unmaintained (last update May 2023)
+
+### Task 2.5: Migrate ESLint to v9 flat config
+- [x] `npm install -D eslint@^9 eslint-config-next@^16.1` — **9.39.4 / 16.1.6** ✅
+- [x] Delete `.eslintrc.json`
+- [x] Create `eslint.config.mjs` (flat config with core-web-vitals + typescript)
+- [x] Update `package.json` lint script: `"lint": "eslint ."` (replaces `"next lint"`)
+- [x] Disabled React Compiler lint rules (static-components, preserve-manual-memoization, refs)
+- [x] Note: `next build` NO LONGER runs linting — add lint step to CI if needed
+- [x] Also upgraded zod to v4.3.6 (required by eslint-plugin-react-hooks@7, backward-compat via zod/v3)
+
+### Task 2.6: Test Phase 2
+- [x] `npm run lint` — **0 errors, 19 warnings** ✅
+- [ ] `npm run build` — will test after Phase 3 (revalidateTag fix needed)
+- [ ] Test sign-in / sign-out flow (manual)
+- [ ] Test protected routes redirect (manual)
+- [ ] Test admin access (manual)
+- [ ] Test guest cart cookie (manual)
+
+---
+
+## PHASE 3: Async APIs & Caching Updates
+
+### Task 3.1: Verify async request APIs (ALREADY COMPLIANT)
+**Agent scan result:** All 10 page files with params, all 10 with searchParams, all 6 layouts, all 7 API routes, and all 30 generateMetadata functions already use the correct `Promise<>` type + `await` pattern. **No changes needed.**
+- [x] Confirm: already compliant ✅
+- [x] Run `npx next typegen` to generate `PageProps`, `LayoutProps`, `RouteContext` type helpers ✅
+
+### Task 3.2: Update revalidateTag() calls (BREAKING — ~25 calls)
+- [x] Updated ALL 25 `revalidateTag()` calls to include `"max"` as second argument ✅
+- [x] Also upgraded zod to v4.3.6 and changed all `from "zod"` imports to `from "zod/v3"` for backward compat
+- [x] Upgraded `@hookform/resolvers` to v5.2.2 (supports zod v4 types)
+- [x] **Build passes** ✅
+
+### Task 3.3: Verify no parallel route slots exist
+- [x] No `@`-prefixed route folders found — **no action needed** ✅
+
+### Task 3.4: Optional — Migrate unstable_cache to `"use cache"` directive
+- [x] **Kept `unstable_cache` for now** — migrate to `"use cache"` later when next-intl compatibility improves
+
+### Task 3.5: Test server actions and caching
+- [ ] Test add-to-cart → verify cart badge updates (manual)
+- [ ] Test admin product CRUD → verify product listing updates (manual)
+- [ ] Test order placement → verify order appears in dashboard (manual)
+- [ ] Test review submission → verify review appears on product page (manual)
+
+---
+
+## PHASE 4: next.config.ts & Build Configuration
+
+### Task 4.1: Update dev script (Turbopack is now default)
+- [x] Change `package.json`: `"dev": "next dev --turbopack"` → `"dev": "next dev"` ✅
+- [x] The `--turbopack` flag is redundant in Next.js 16 (Turbopack is default for both dev and build)
+
+### Task 4.2: Review experimental options in next.config.ts
+- [x] `experimental.optimizePackageImports` — kept for Webpack fallback builds ✅
+- [x] React Compiler: NOT enabling ✅
+
+### Task 4.3: Update image configuration (ACTION REQUIRED)
+- [x] **Added `qualities: [75]`** to `next.config.ts` images config ✅
+- [x] **Migrated `priority` → `preload`** in 5 files ✅
+- [x] Default cache/size changes — acceptable for e-shop ✅
+
+### Task 4.4: Handle potential UploadThing + Turbopack issue
+- [x] Turbopack build passes with UploadThing — **no workaround needed** ✅
+
+### Task 4.5: Verify standalone output mode
+- [x] `output: "standalone"` still supported — no change needed ✅
+
+### Task 4.6: Full build and dev verification
+- [x] `npm run build` — **zero errors** ✅
+- [ ] `npm run dev` — verify dev server starts (manual)
+- [ ] `npm start` — verify production server works (manual)
+
+---
+
+## PHASE 5: Dependency Updates
+
+### Task 5.1: Update next-auth to latest beta
+- [x] `npm install next-auth@beta --legacy-peer-deps` — **5.0.0-beta.30** ✅
+- [x] Supports Next.js 16 peer dep ✅
+
+### Task 5.2: Update react-hook-form — watch() → useWatch()
+- [x] `npm install react-hook-form@latest @hookform/resolvers@latest` ✅
+- [x] Migrated 3 `form.watch()` calls to `useWatch()` in `components/admin/product-form.tsx` ✅
+
+### Task 5.3: Update Prisma to latest 6.x
+- [x] **REVERTED to Prisma 6.5** — Prisma 6.19 causes build timeouts with Neon adapter
+- [x] Kept `@auth/prisma-adapter@^2.8.0` (compatible)
+- [x] Prisma 6.19+ upgrade deferred to separate task (investigate Neon adapter compatibility)
+
+### Task 5.4: Update PayPal SDK (if payment is active)
+- [x] **Kept v8** — minimal approach, no breaking changes needed ✅
+
+### Task 5.5: Update other dependencies (safe upgrades)
+- [x] `framer-motion@latest` upgraded ✅
+- [x] Stripe packages upgraded (stripe@^20.4, @stripe/stripe-js@^8.9, @stripe/react-stripe-js@^5.6) ✅
+- [x] Zod upgraded to v4.3.6 (required by eslint-plugin-react-hooks@7) ✅
+- [x] Embla Carousel, Recharts, lucide-react: no upgrade needed ✅
+
+### Task 5.6: Client component state-in-transition audit (React 19.2 behavioral change)
+- [x] `components/shared/coupon-input.tsx` — moved `setCode("")` outside transition ✅
+- [x] `app/[locale]/(auth)/sign-in/credentials-signin-form.tsx` — moved `setServerError` outside transition ✅
+- [x] `app/[locale]/(auth)/sign-up/sign-up-form.tsx` — moved `setServerError` outside transition ✅
+- [x] `components/shared/delete-dialog.tsx` — moved `setIsOpen` outside transition ✅
+- [x] `components/shared/product/add-to-cart-button.tsx` — moved `setAdded` outside transition ✅
+
+---
+
+## PHASE 6: Verification & Testing
+
+### Task 6.1: Full build verification
+- [x] `npm run build` — **zero errors** ✅
+- [x] `npm run lint` — **0 errors, 18 warnings** ✅
+- [x] `npx jest` — **9/9 tests pass** ✅
+
+### Task 6.2: Core functionality smoke test (MANUAL)
+- [ ] Homepage loads (el + en locales)
+- [ ] Product listing and search work
+- [ ] Product detail page renders (images, price, reviews)
+- [ ] Add to cart works (guest cart with sessionCartId cookie)
+- [ ] Add to cart works (authenticated user)
+- [ ] Checkout flow: shipping → payment → place order
+- [ ] Stripe payment completes
+- [ ] PayPal payment completes (if enabled)
+- [ ] Admin dashboard loads (recharts renders)
+- [ ] Admin product CRUD with image upload (UploadThing)
+- [ ] Admin order management
+- [ ] Admin user management
+- [ ] User profile page
+- [ ] User orders page
+- [ ] User wishlist page
+- [ ] User addresses CRUD
+- [ ] Language switching (el ↔ en) throughout all pages
+- [ ] Coupon code application
+
+### Task 6.3: Security verification
+- [x] React **19.2.4** ✅ (fixes CVE-2025-55182, CVE-2025-55184, CVE-2025-67779, CVE-2026-23864)
+- [x] Next.js **16.1.6** ✅ (fixes CVE-2025-66478, CVE-2025-55183, CVE-2026-23864)
+- [ ] Protected routes redirect unauthenticated users to /sign-in (manual)
+- [ ] Admin routes return 403/redirect for non-admin users (manual)
+- [ ] Stripe webhook processes correctly with signature verification (manual)
+
+### Task 6.4: Performance verification
+- [x] Production build completes with Turbopack ✅
+- [ ] Dev server starts with Turbopack (manual)
+- [ ] HMR responds within 1-2s (manual)
+- [ ] No console errors in browser (manual)
+
+### Task 6.5: Edge cases (MANUAL)
+- [ ] Direct URL navigation to protected routes
+- [ ] Browser back/forward navigation
+- [ ] Page refresh on dynamic routes
+- [ ] 404 page works for invalid routes
+- [ ] Unauthorized page works
+
+---
+
+## PHASE 7: Cleanup & Documentation
+
+### Task 7.1: Code cleanup
+- [x] Remove any unused packages from `package.json` — clean ✅
+- [x] Remove `--turbopack` from dev script — done in Phase 4 ✅
+- [x] Verify `package.json` versions match installed versions ✅
+- [x] Delete any `@next-codemod-error` comments — none found ✅
+- [x] Remove any `UnsafeUnwrapped*` type casts — none found ✅
+- [x] Auto-fixed 10 unused eslint-disable directives ✅
+
+### Task 7.2: Update CLAUDE.md
+- [x] Update tech stack versions (Next.js 16, React 19.2) ✅
+- [x] Update commands (lint uses `eslint .` via flat config) ✅
+- [x] Note middleware → proxy rename ✅
+- [x] Note ESLint flat config, Zod v4, bcrypt-ts, revalidateTag changes ✅
+
+### Task 7.3: Final verification
+- [x] `npm run build` — **zero errors** ✅
+- [x] `npm run lint` — **0 errors, 8 warnings** ✅
+- [x] `npx jest` — **9/9 pass** ✅
+- [ ] `npm run dev` — verify manually
+- [ ] Ready for merge / deploy
 
 ---
 
 ## Summary Table
 
-| Phase | Tasks | Files Affected | dark: Removals |
-|-------|-------|---------------|----------------|
-| 1 — Infrastructure | 5 | 4 files + 1 package | Core theme system |
-| 2 — Non-header cleanup | 1 | 1 file | Stripe useTheme |
-| 3 — Header cleanup | 2 | 2 files | ModeToggle imports |
-| 4 — Component cleanup | 10 | 10 files | ~30 dark: classes |
-| 5 — Verification | 3 | — | Final checks |
-| **Total** | **21** | **17 files** | **~30 classes** |
+| Category | Current | Target | Breaking? | Effort |
+|----------|---------|--------|-----------|--------|
+| **Next.js** | 15.2.4 | 16.1.5+ | YES | High |
+| **React** | 19.1.0 | 19.2.4 | No (security) | Low |
+| **React DOM** | 19.1.0 | 19.2.4 | No | Low |
+| **@types/react** | ^18 | ^19 | Minor | Low |
+| **@types/react-dom** | ^18 | ^19 | Minor | Low |
+| **next-auth** | beta.25 | beta.30 | Peer dep | Low |
+| **eslint** | ^8 | ^9 | YES (flat config) | Medium |
+| **eslint-config-next** | 15.0.3 | 16.x | YES | Medium |
+| **@next/bundle-analyzer** | ^16.1.6 | ^16.1.x | No | Low |
+| **middleware.ts** | exists | → proxy.ts | YES (rename) | Medium |
+| **bcrypt-ts-edge** | ^3.0.1 | → bcrypt-ts | YES (replace) | Low |
+| **react-hook-form** | ^7.55.0 | ^7.71.x | watch→useWatch | Low |
+| **prisma** | 6.5 | 6.19.x | No | Low |
+| **@prisma/client** | 6.5 | 6.19.x | No | Low |
+| **@prisma/adapter-neon** | ^6.5.0 | ^6.19.x | No | Low |
+| **@auth/prisma-adapter** | ^2.8.0 | ^2.11.x | No | Low |
+| **revalidateTag()** | 1 arg | 2 args required | YES (~23 calls) | Medium |
+| **Image priority** | priority | → preload | YES (5 files) | Low |
+| **Image qualities** | implicit | explicit required | YES (config) | Low |
+| **Tailwind CSS** | v3.4 | v3.4 (keep) | No | None |
+| **Stripe SDK** | current | safe to upgrade | No | Optional |
+| **Embla Carousel** | v8.6 | v8.6 (keep) | No | None |
+| **Recharts** | v2.15 | v2.15 (keep) | No | None |
+| **framer-motion** | v12.x | v12.x (keep) | No | None |
+| **UploadThing** | v7.x | v7.x (keep) | Turbopack? | Check |
 
-## Files Quick Reference
+## Key Risks & Mitigations
 
-```
-DELETE:
-  components/shared/header/mode-toggle.tsx
+| # | Risk | Severity | Mitigation |
+|---|------|----------|------------|
+| 1 | **UploadThing + Turbopack build** | Medium | Use `--webpack` for production builds if needed |
+| 2 | **revalidateTag() 2nd argument** | High | ~23 calls — bulk find-and-replace, test each action |
+| 3 | **next-auth still beta** | Medium | beta.30 works; evaluate Better Auth migration long-term |
+| 4 | **proxy.ts behind reverse proxy** | Low | GitHub #86122 — test in deployment environment |
+| 5 | **Recharts blank charts** | Low | Add `overrides: { "react-is": "^19.1.0" }` if needed |
+| 6 | **State updates inside transitions** | Medium | 5 files need audit — test for re-render issues |
+| 7 | **Image priority deprecation** | Low | 5 files — simple prop rename |
 
-MODIFY (infrastructure):
-  app/[locale]/layout.tsx
-  tailwind.config.ts
-  assets/styles/globals.css
-  package.json
+## Codebase Readiness (Agent Scan Results)
 
-MODIFY (remove useTheme):
-  app/[locale]/(root)/order/[id]/stripe-payment.tsx
+| Area | Files Scanned | Status | Notes |
+|------|--------------|--------|-------|
+| Async params/searchParams | 17 pages | COMPLIANT | All use `Promise<>` + `await` |
+| Async cookies()/headers() | 3 server action calls | COMPLIANT | All use `await cookies()` |
+| generateMetadata | 30 functions | COMPLIANT | All properly await params |
+| Layouts | 6 files | COMPLIANT | Only locale layout uses params, already awaits |
+| API routes | 7 files | COMPLIANT | uploads/[...path] already uses Promise params |
+| Server actions | 11 files | COMPLIANT | cookies() awaited, revalidateTag needs 2nd arg |
+| Client components | 80 files | 5 files need audit | State updates inside transitions |
+| Middleware | 1 file | NEEDS RENAME | middleware.ts → proxy.ts |
+| Image priority prop | 5 files | NEEDS UPDATE | priority → preload |
 
-MODIFY (remove imports):
-  components/shared/header/utility-bar.tsx
-  components/shared/header/mobile-menu.tsx
+## What NOT to do in this migration
 
-MODIFY (remove dark: classes):
-  components/shared/order-status-badge.tsx
-  components/shared/order-status-timeline.tsx
-  components/shared/product/product-images.tsx
-  components/shared/product/product-card.tsx
-  components/shared/product/product-card-wishlist.tsx
-  components/shared/product/add-to-cart-button.tsx
-  components/shared/header/mega-menu.tsx
-  components/shared/brand-showcase-client.tsx
-  app/[locale]/(root)/product/[slug]/page.tsx
-  lib/highlight-text.tsx
-```
-
-## Notes
-
-- shadcn/ui components (`components/ui/`) use CSS variables (not `dark:` classes) — they automatically work with light-only since `:root` defines all values
-- Charts in admin use `hsl(var(...))` CSS variables — they work automatically with light theme
-- Footer uses semantic colors (`bg-primary`, `text-primary-foreground`) — works automatically
-- Cart/checkout pages have ZERO `dark:` classes — no changes needed
-- Auth pages have ZERO `dark:` classes — no changes needed
-- User profile/orders/addresses pages have ZERO `dark:` classes — no changes needed
-- Form components (input, select, textarea, checkbox) have ZERO `dark:` classes — no changes needed
-- The `brand-accent-dark` color in tailwind.config.ts is a shade name (darker gold), NOT a dark-mode class — keep it
+- Do NOT upgrade to **Tailwind CSS v4** (17 gradient renames, HSL→OKLCH, config overhaul — separate project)
+- Do NOT upgrade to **Prisma 7** (ESM-only, new config file, new import paths — separate project)
+- Do NOT enable **React Compiler** (opt-in, requires babel plugin, test separately)
+- Do NOT migrate **framer-motion → motion** package (optional, 11 import changes — separate task)
+- Do NOT migrate to **unified `radix-ui` package** (optional, `npx shadcn@latest migrate radix` later)
+- Do NOT migrate to **Better Auth** (evaluate after stabilizing on Next.js 16)
+- Do NOT adopt **`"use cache"` directive** (next-intl incompatibility with getTranslations, wait for next/root-params API)
+- Do NOT upgrade **Embla Carousel to v9** (still in RC, significant breaking changes)

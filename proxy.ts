@@ -4,7 +4,7 @@ import { routing } from "@/i18n/routing";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   // Run intl middleware (auth is handled by NextAuth's authorized callback in auth.config.ts)
   const response = intlMiddleware(req);
 

@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createSignUpFormSchema } from "@/lib/validators";
-import { z } from "zod";
+import { z } from "zod/v3";
 import {
   Form,
   FormControl,
@@ -40,21 +40,25 @@ export default function SignUpForm() {
     defaultValues: signUpDefaultValues,
   });
 
-  const onSubmit = (values: SignUpFormValues) => {
+  const onSubmit = async (values: SignUpFormValues) => {
     setServerError("");
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.append("name", values.name);
-      formData.append("email", values.email);
-      formData.append("password", values.password);
-      formData.append("confirmPassword", values.confirmPassword);
-      formData.append("callbackUrl", callbackUrl);
+    let res: { success: boolean; message: string } | undefined;
+    await new Promise<void>((resolve) => {
+      startTransition(async () => {
+        const formData = new FormData();
+        formData.append("name", values.name);
+        formData.append("email", values.email);
+        formData.append("password", values.password);
+        formData.append("confirmPassword", values.confirmPassword);
+        formData.append("callbackUrl", callbackUrl);
 
-      const res = await signUpUser(null, formData);
-      if (res && !res.success) {
-        setServerError(res.message);
-      }
+        res = await signUpUser(null, formData);
+        resolve();
+      });
     });
+    if (res && !res.success) {
+      setServerError(res.message);
+    }
   };
 
   return (

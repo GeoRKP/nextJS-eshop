@@ -233,7 +233,7 @@ export async function approvePaypalOrder(
 
     revalidatePath(`/order/${orderId}`);
     revalidatePath(`/en/order/${orderId}`);
-    revalidateTag("orders");
+    revalidateTag("orders", "max");
 
     return {
       success: true,
@@ -296,7 +296,7 @@ export async function updateOrderToPaid({
 
   revalidatePath(`/order/${orderId}`);
   revalidatePath(`/en/order/${orderId}`);
-  revalidateTag("orders");
+  revalidateTag("orders", "max");
 }
 
 // Get the users orders
@@ -451,7 +451,7 @@ export async function deleteOrder(id: string) {
     await prisma.order.delete({ where: { id } });
 
     revalidatePath("/admin/orders");
-    revalidateTag("orders");
+    revalidateTag("orders", "max");
 
     return { success: true, message: t("orderDeletedSuccessfully") };
   } catch (error) {
@@ -468,7 +468,7 @@ export async function updateOrderToPaidCOD(orderId: string) {
 
     revalidatePath(`/order/${orderId}`);
     revalidatePath(`/en/order/${orderId}`);
-    revalidateTag("orders");
+    revalidateTag("orders", "max");
 
     return { success: true, message: t("orderMarkedAsPaid") };
 
@@ -513,7 +513,7 @@ export async function deliverOrder(orderId: string) {
 
     revalidatePath(`/order/${orderId}`);
     revalidatePath(`/en/order/${orderId}`);
-    revalidateTag("orders");
+    revalidateTag("orders", "max");
 
     return { success: true, message: t("orderMarkedAsDelivered") };
   } catch (error) {
@@ -573,7 +573,7 @@ export async function updateOrderStatus({
     revalidatePath(`/order/${orderId}`);
     revalidatePath(`/en/order/${orderId}`);
     revalidatePath("/admin/orders");
-    revalidateTag("orders");
+    revalidateTag("orders", "max");
 
     return { success: true, message: t("orderStatusUpdatedSuccessfully") };
   } catch (error) {

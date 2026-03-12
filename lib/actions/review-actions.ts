@@ -3,7 +3,7 @@
 import { getAuthSession } from "@/lib/auth-session";
 import { formatError } from "../utils";
 import { insertReviewSchema, createInsertReviewSchema } from "../validators";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { prisma } from "@/db/prisma";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getTranslations } from "next-intl/server";
@@ -98,8 +98,8 @@ export async function createUpdateReview(
 
     revalidatePath(`/product/${product.slug}`);
     revalidatePath(`/en/product/${product.slug}`);
-    revalidateTag("reviews");
-    revalidateTag("products");
+    revalidateTag("reviews", "max");
+    revalidateTag("products", "max");
 
     return {
       success: true,

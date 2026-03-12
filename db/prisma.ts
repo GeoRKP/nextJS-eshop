@@ -6,11 +6,11 @@ function createPrismaClient() {
 
   if (isNeon) {
     // Dynamic imports are not needed — these are only loaded when Neon is used
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+     
     const { Pool, neonConfig } = require("@neondatabase/serverless");
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+     
     const { PrismaNeon } = require("@prisma/adapter-neon");
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+     
     const ws = require("ws");
 
     neonConfig.webSocketConstructor = ws;

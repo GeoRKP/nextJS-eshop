@@ -28,22 +28,25 @@ export default function DeleteDialog({
   const t = useTranslations("DeleteDialog");
   const tc = useTranslations("Common");
 
-  const handleDeleteClick = () => {
-    startTransition(async () => {
-      const res = await action(id);
-      if (!res.success) {
-        toast({
-          variant: "destructive",
-          description: res.message,
-        });
-      } else {
-        setIsOpen(false);
-
-        toast({
-          description: res.message,
-        });
-      }
+  const handleDeleteClick = async () => {
+    let res: { success: boolean; message: string };
+    await new Promise<void>((resolve) => {
+      startTransition(async () => {
+        res = await action(id);
+        resolve();
+      });
     });
+    if (!res!.success) {
+      toast({
+        variant: "destructive",
+        description: res!.message,
+      });
+    } else {
+      setIsOpen(false);
+      toast({
+        description: res!.message,
+      });
+    }
   };
 
   return (

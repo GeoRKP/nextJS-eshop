@@ -79,7 +79,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                         src={product.banner}
                         alt={product.name}
                         fill
-                        priority={index === 0}
+                        preload={index === 0}
                         className="object-cover"
                         sizes="100vw"
                       />

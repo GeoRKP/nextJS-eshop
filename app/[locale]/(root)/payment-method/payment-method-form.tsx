@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTransition } from "react";
 import { paymentMethodSchema, createPaymentMethodSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Loader2, ArrowRight, CreditCard, Wallet, Banknote, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";

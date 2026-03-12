@@ -112,7 +112,7 @@ export async function addItemToCart(data: CartItem) {
       revalidatePath(`/en/product/${product.slug}`);
       revalidatePath("/cart");
       revalidatePath("/en/cart");
-      revalidateTag("cart");
+      revalidateTag("cart", "max");
 
       return {
         success: true,
@@ -158,7 +158,7 @@ export async function addItemToCart(data: CartItem) {
       revalidatePath(`/en/product/${product.slug}`);
       revalidatePath("/cart");
       revalidatePath("/en/cart");
-      revalidateTag("cart");
+      revalidateTag("cart", "max");
 
       return {
         success: true,
@@ -305,7 +305,7 @@ export async function removeItemFromCart(productId: string) {
     revalidatePath(`/en/product/${product.slug}`);
     revalidatePath("/cart");
     revalidatePath("/en/cart");
-    revalidateTag("cart");
+    revalidateTag("cart", "max");
 
     return {
       success: true,
@@ -377,7 +377,7 @@ export async function applyCouponToCart(code: string) {
     revalidatePath("/en/cart");
     revalidatePath("/place-order");
     revalidatePath("/en/place-order");
-    revalidateTag("cart");
+    revalidateTag("cart", "max");
 
     return {
       success: true,
@@ -410,7 +410,7 @@ export async function removeCouponFromCart() {
     revalidatePath("/en/cart");
     revalidatePath("/place-order");
     revalidatePath("/en/place-order");
-    revalidateTag("cart");
+    revalidateTag("cart", "max");
 
     return { success: true, message: t("couponRemoved") };
   } catch (error) {

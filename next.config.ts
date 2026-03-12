@@ -10,6 +10,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig: NextConfig = {
   output: "standalone",
   images: {
+    qualities: [75],
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     formats: ["image/avif", "image/webp"],
