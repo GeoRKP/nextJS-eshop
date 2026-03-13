@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createProduct, updateProduct } from "@/lib/actions/product.actions";
 import { ImageUploadButton } from "@/components/shared/image-upload";
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { useTranslations } from "next-intl";
 import {
@@ -286,16 +286,29 @@ export default function ProductForm({
               <FormItem className="w-full">
                 <FormLabel>{t("images")}</FormLabel>
                 <div className="card-premium p-4 space-y-2 min-h-48">
-                  <div className="flex-start space-x-2">
-                    {images.map((image: string) => (
-                      <Image
-                        key={image}
-                        src={image}
-                        alt="Product image"
-                        className="w-20 h-20 object-cover object-center rounded-sm"
-                        width={100}
-                        height={100}
-                      />
+                  <div className="flex-start space-x-2 flex-wrap gap-2">
+                    {images.map((image: string, idx: number) => (
+                      <div key={image} className="relative group">
+                        <Image
+                          src={image}
+                          alt={tCommon("productImage")}
+                          className="w-20 h-20 object-cover object-center rounded-sm"
+                          width={100}
+                          height={100}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            form.setValue(
+                              "images",
+                              images.filter((_: string, i: number) => i !== idx)
+                            );
+                          }}
+                          className="absolute -top-2 -right-2 bg-destructive text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
                     ))}
                     <FormControl>
                       <ImageUploadButton
@@ -336,13 +349,22 @@ export default function ProductForm({
                 )}
               />
               {isFeatured && banner && (
-                <Image
-                  src={banner}
-                  alt="Banner"
-                  width={1920}
-                  height={1080}
-                  className="w-full object-cover object-center rounded-sm"
-                />
+                <div className="relative group">
+                  <Image
+                    src={banner}
+                    alt={tCommon("bannerAlt")}
+                    width={1920}
+                    height={1080}
+                    className="w-full object-cover object-center rounded-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => form.setValue("banner", "")}
+                    className="absolute top-2 right-2 bg-destructive text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               )}
               {isFeatured && !banner && (
                 <ImageUploadButton
