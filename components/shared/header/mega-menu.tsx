@@ -129,12 +129,12 @@ function MegaMenuShell({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
       <div
         ref={panelRef}
         role="menu"
-        className="absolute left-0 right-0 z-50 bg-popover/60 backdrop-blur-2xl border-t-2 border-t-brand-accent border-b shadow-elevated"
-        style={{ boxShadow: "inset 0 1px 30px -10px hsl(var(--brand-accent) / 0.12), var(--shadow-elevated)" }}
+        className="absolute left-0 right-0 z-50 bg-black/70 backdrop-blur-2xl border-t-2 border-t-brand-accent border-b shadow-elevated"
+        style={{ boxShadow: "inset 0 1px 30px -10px hsl(var(--brand-accent) / 0.15), var(--shadow-elevated)" }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
