@@ -15,6 +15,7 @@
     "create": "Δημιουργία",
     "generate": "Δημιουργία",
     "details": "Λεπτομέρειες",
+    "pagination": "Σελιδοποίηση",
     "previous": "Προηγούμενο",
     "next": "Επόμενο",
     "clear": "Καθαρισμός",
@@ -35,7 +36,31 @@
     "deletedUser": "Διαγραμμένος Χρήστης",
     "user": "Χρήστης",
     "admin": "Διαχειριστής",
-    "noItems": "Δεν βρέθηκαν στοιχεία"
+    "noItems": "Δεν βρέθηκαν στοιχεία",
+    "cartLabel": "Καλάθι",
+    "wishlistLabel": "Λίστα Επιθυμιών",
+    "userMenu": "Μενού χρήστη",
+    "dismiss": "Απόρριψη",
+    "previousImage": "Προηγούμενη εικόνα",
+    "nextImage": "Επόμενη εικόνα",
+    "productImage": "Εικόνα προϊόντος",
+    "thumbnailAlt": "Μικρογραφία {index}",
+    "bannerAlt": "Μπάνερ",
+    "unknownError": "Παρουσιάστηκε άγνωστο σφάλμα",
+    "viewProfile": "Προβολή Προφίλ",
+    "trustedByCount": "Εμπιστοσύνη 10.000+ επαγγελματιών",
+    "toggleSubcategories": "Εναλλαγή υποκατηγοριών",
+    "switchTo": "Αλλαγή σε {locale}",
+    "id": "ID",
+    "upload": "Μεταφόρτωση",
+    "uploading": "Μεταφόρτωση...",
+    "uploadFailed": "Η μεταφόρτωση απέτυχε",
+    "unauthorized": "Μη εξουσιοδοτημένο",
+    "noFileProvided": "Δεν δόθηκε αρχείο",
+    "invalidFileType": "Μη έγκυρος τύπος αρχείου",
+    "fileTooLarge": "Το αρχείο είναι πολύ μεγάλο (μέγ. 4MB)",
+    "forbidden": "Απαγορεύεται",
+    "notFoundError": "Δεν βρέθηκε"
   },
   "Nav": {
     "cart": "Καλάθι",
@@ -167,7 +192,10 @@
     "payWithPaypal": "Πληρωμή μέσω PayPal",
     "payOnDelivery": "Πληρωμή κατά την παραλαβή",
     "confirmOrder": "Επιβεβαίωση & Υποβολή Παραγγελίας",
-    "orderProcessing": "Επεξεργασία παραγγελίας..."
+    "orderProcessing": "Επεξεργασία παραγγελίας...",
+    "paymentStripe": "Stripe",
+    "paymentPaypal": "PayPal",
+    "paymentCashOnDelivery": "Αντικαταβολή"
   },
   "Order": {
     "orderDetails": "Παραγγελία {id}",
@@ -260,7 +288,11 @@
     "listView": "Προβολή λίστας",
     "activeFilters": "Ενεργά Φίλτρα",
     "noResultsTitle": "Δεν βρέθηκαν αποτελέσματα",
-    "noResultsSubtitle": "Δοκιμάστε να προσαρμόσετε την αναζήτηση ή τα φίλτρα σας."
+    "noResultsSubtitle": "Δοκιμάστε να προσαρμόσετε την αναζήτηση ή τα φίλτρα σας.",
+    "clearAll": "Καθαρισμός όλων",
+    "productsSection": "Προϊόντα",
+    "categoriesSection": "Κατηγορίες",
+    "searchAriaLabel": "Αναζήτηση"
   },
   "AdminDashboard": {
     "dashboard": "Πίνακας Ελέγχου",
@@ -318,7 +350,13 @@
     "allCategories": "Όλες οι Κατηγορίες",
     "noData": "Δεν υπάρχουν δεδομένα για αυτή την περίοδο",
     "ofTotal": "του συνόλου",
-    "category": "Κατηγορία"
+    "category": "Κατηγορία",
+    "paymentStripe": "Stripe",
+    "paymentPaypal": "PayPal",
+    "paymentCashOnDelivery": "Αντικαταβολή",
+    "statusPending": "Εκκρεμεί",
+    "statusPaid": "Πληρωμένη",
+    "statusDelivered": "Παραδόθηκε"
   },
   "AdminProducts": {
     "products": "Προϊόντα",
@@ -519,7 +557,8 @@
     "myOrders": "Οι Παραγγελίες μου",
     "unauthorizedAccess": "Μη Εξουσιοδοτημένη Πρόσβαση",
     "unauthorizedDescription": "Δεν είστε εξουσιοδοτημένοι να αποκτήσετε πρόσβαση σε αυτή τη σελίδα",
-    "searchProducts": "Αναζήτηση προϊόντων"
+    "searchProducts": "Αναζήτηση προϊόντων",
+    "seoKeywords": "ηλεκτρονικό κατάστημα,ανταλλακτικά φορτηγών,κατάστημα,προϊόντα"
   },
   "LanguageSwitcher": {
     "label": "Γλώσσα",
@@ -630,7 +669,8 @@
   },
   "Categories": {
     "shopByCategory": "Αγορές ανά Κατηγορία",
-    "productCount": "{count} προϊόντα"
+    "productCount": "{count} προϊόντα",
+    "subcategoriesCount": "{count} υποκατηγορίες"
   },
   "ProductCard": {
     "new": "Νέο",
@@ -688,6 +728,7 @@
     "moveToWishlist": "Μεταφορά στη Λίστα Επιθυμιών"
   },
   "AdminCategories": {
+    "id": "ID",
     "categories": "Κατηγορίες",
     "createCategory": "Δημιουργία Κατηγορίας",
     "updateCategory": "Ενημέρωση Κατηγορίας",
@@ -710,6 +751,7 @@
     "updateButton": "Ενημέρωση Κατηγορίας"
   },
   "AdminCoupons": {
+    "id": "ID",
     "coupons": "Κουπόνια",
     "createCoupon": "Δημιουργία Κουπονιού",
     "updateCoupon": "Ενημέρωση Κουπονιού",

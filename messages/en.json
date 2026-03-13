@@ -15,6 +15,7 @@
     "create": "Create",
     "generate": "Generate",
     "details": "Details",
+    "pagination": "Pagination",
     "previous": "Previous",
     "next": "Next",
     "clear": "Clear",
@@ -35,7 +36,31 @@
     "deletedUser": "Deleted User",
     "user": "User",
     "admin": "Admin",
-    "noItems": "No items found"
+    "noItems": "No items found",
+    "cartLabel": "Cart",
+    "wishlistLabel": "Wishlist",
+    "userMenu": "User menu",
+    "dismiss": "Dismiss",
+    "previousImage": "Previous image",
+    "nextImage": "Next image",
+    "productImage": "Product image",
+    "thumbnailAlt": "Thumbnail {index}",
+    "bannerAlt": "Banner",
+    "unknownError": "An unknown error occurred",
+    "viewProfile": "View Profile",
+    "trustedByCount": "Trusted by 10,000+ professionals",
+    "toggleSubcategories": "Toggle subcategories",
+    "switchTo": "Switch to {locale}",
+    "id": "ID",
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "uploadFailed": "Upload failed",
+    "unauthorized": "Unauthorized",
+    "noFileProvided": "No file provided",
+    "invalidFileType": "Invalid file type",
+    "fileTooLarge": "File too large (max 4MB)",
+    "forbidden": "Forbidden",
+    "notFoundError": "Not found"
   },
   "Nav": {
     "cart": "Cart",
@@ -167,7 +192,10 @@
     "payWithPaypal": "Pay with your PayPal account",
     "payOnDelivery": "Pay when your order arrives",
     "confirmOrder": "Confirm & Place Order",
-    "orderProcessing": "Processing your order..."
+    "orderProcessing": "Processing your order...",
+    "paymentStripe": "Stripe",
+    "paymentPaypal": "PayPal",
+    "paymentCashOnDelivery": "Cash on Delivery"
   },
   "Order": {
     "orderDetails": "Order {id}",
@@ -260,7 +288,11 @@
     "listView": "List view",
     "activeFilters": "Active Filters",
     "noResultsTitle": "No results found",
-    "noResultsSubtitle": "Try adjusting your search or filters to find what you're looking for."
+    "noResultsSubtitle": "Try adjusting your search or filters to find what you're looking for.",
+    "clearAll": "Clear all",
+    "productsSection": "Products",
+    "categoriesSection": "Categories",
+    "searchAriaLabel": "Search"
   },
   "AdminDashboard": {
     "dashboard": "Dashboard",
@@ -318,7 +350,13 @@
     "allCategories": "All Categories",
     "noData": "No data for this period",
     "ofTotal": "of total",
-    "category": "Category"
+    "category": "Category",
+    "paymentStripe": "Stripe",
+    "paymentPaypal": "PayPal",
+    "paymentCashOnDelivery": "Cash on Delivery",
+    "statusPending": "Pending",
+    "statusPaid": "Paid",
+    "statusDelivered": "Delivered"
   },
   "AdminProducts": {
     "products": "Products",
@@ -519,7 +557,8 @@
     "myOrders": "My Orders",
     "unauthorizedAccess": "Unauthorized Access",
     "unauthorizedDescription": "You are not authorized to access this page",
-    "searchProducts": "Search products"
+    "searchProducts": "Search products",
+    "seoKeywords": "e-commerce,truck parts,shop,products"
   },
   "LanguageSwitcher": {
     "label": "Language",
@@ -630,7 +669,8 @@
   },
   "Categories": {
     "shopByCategory": "Shop by Category",
-    "productCount": "{count} products"
+    "productCount": "{count} products",
+    "subcategoriesCount": "{count} subcategories"
   },
   "ProductCard": {
     "new": "New",
@@ -688,6 +728,7 @@
     "moveToWishlist": "Move to Wishlist"
   },
   "AdminCategories": {
+    "id": "ID",
     "categories": "Categories",
     "createCategory": "Create Category",
     "updateCategory": "Update Category",
@@ -710,6 +751,7 @@
     "updateButton": "Update Category"
   },
   "AdminCoupons": {
+    "id": "ID",
     "coupons": "Coupons",
     "createCoupon": "Create Coupon",
     "updateCoupon": "Update Coupon",

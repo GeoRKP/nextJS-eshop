@@ -35,14 +35,25 @@ const AXIS_STROKE = "hsl(var(--muted-foreground))";
 
 // -- Types --
 
+type ChartLabels = {
+  revenue: string;
+  sales: string;
+  unitsSold: string;
+  revenueOverTime: string;
+  ordersByStatus: string;
+  topProducts: string;
+  revenueByPayment: string;
+  salesByCategory: string;
+  noData: string;
+};
+
 type ChartsProps = {
   salesTimeSeries: { date: string; revenue: number; orders: number }[];
   ordersByStatus: { status: string; count: number }[];
   revenueByPaymentMethod: { method: string; revenue: number }[];
   topProducts: { name: string; unitsSold: number; revenue: number }[];
   salesByCategory: { category: string; revenue: number }[];
-  noDataLabel: string;
-  t: (key: string) => string;
+  labels: ChartLabels;
 };
 
 // -- Main component --
@@ -53,8 +64,7 @@ export default function Charts({
   revenueByPaymentMethod,
   topProducts,
   salesByCategory,
-  noDataLabel,
-  t,
+  labels,
 }: ChartsProps) {
   return (
     <>
@@ -63,21 +73,21 @@ export default function Charts({
         <div className="card-premium col-span-4">
           <div className="px-5 py-3 border-b border-border/40">
             <h3 className="font-heading font-bold text-sm uppercase">
-              {t("revenueOverTime")}
+              {labels.revenueOverTime}
             </h3>
           </div>
           <div className="p-5">
-            <RevenueChart data={salesTimeSeries} noDataLabel={noDataLabel} t={t} />
+            <RevenueChart data={salesTimeSeries} labels={labels} />
           </div>
         </div>
         <div className="card-premium col-span-3">
           <div className="px-5 py-3 border-b border-border/40">
             <h3 className="font-heading font-bold text-sm uppercase">
-              {t("ordersByStatus")}
+              {labels.ordersByStatus}
             </h3>
           </div>
           <div className="p-5">
-            <StatusDonut data={ordersByStatus} noDataLabel={noDataLabel} />
+            <StatusDonut data={ordersByStatus} noDataLabel={labels.noData} />
           </div>
         </div>
       </div>
@@ -87,21 +97,21 @@ export default function Charts({
         <div className="card-premium col-span-4">
           <div className="px-5 py-3 border-b border-border/40">
             <h3 className="font-heading font-bold text-sm uppercase">
-              {t("topProducts")}
+              {labels.topProducts}
             </h3>
           </div>
           <div className="p-5">
-            <TopProductsChart data={topProducts} noDataLabel={noDataLabel} t={t} />
+            <TopProductsChart data={topProducts} labels={labels} />
           </div>
         </div>
         <div className="card-premium col-span-3">
           <div className="px-5 py-3 border-b border-border/40">
             <h3 className="font-heading font-bold text-sm uppercase">
-              {t("revenueByPayment")}
+              {labels.revenueByPayment}
             </h3>
           </div>
           <div className="p-5">
-            <PaymentDonut data={revenueByPaymentMethod} noDataLabel={noDataLabel} t={t} />
+            <PaymentDonut data={revenueByPaymentMethod} labels={labels} />
           </div>
         </div>
       </div>
@@ -111,11 +121,11 @@ export default function Charts({
         <div className="card-premium col-span-4">
           <div className="px-5 py-3 border-b border-border/40">
             <h3 className="font-heading font-bold text-sm uppercase">
-              {t("salesByCategory")}
+              {labels.salesByCategory}
             </h3>
           </div>
           <div className="p-5">
-            <CategoryPie data={salesByCategory} noDataLabel={noDataLabel} t={t} />
+            <CategoryPie data={salesByCategory} labels={labels} />
           </div>
         </div>
       </div>
@@ -145,14 +155,12 @@ const tooltipStyle = {
 
 function RevenueChart({
   data,
-  noDataLabel,
-  t,
+  labels,
 }: {
   data: ChartsProps["salesTimeSeries"];
-  noDataLabel: string;
-  t: (key: string) => string;
+  labels: ChartLabels;
 }) {
-  if (data.length === 0) return <NoData label={noDataLabel} />;
+  if (data.length === 0) return <NoData label={labels.noData} />;
 
   return (
     <ResponsiveContainer width="100%" height={280} className="sm:!h-[350px]">
@@ -178,7 +186,7 @@ function RevenueChart({
           tickLine={false}
           axisLine={false}
           tickFormatter={(v) =>
-            `\u20AC${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`
+            `${v >= 1000 ? formatCurrency((v / 1000).toFixed(1)) + "k" : formatCurrency(v)}`
           }
         />
         <YAxis
@@ -192,7 +200,7 @@ function RevenueChart({
         <Tooltip
           formatter={(value: number, name: string) => [
             name === "revenue" ? formatCurrency(value) : value,
-            name === "revenue" ? t("revenue") : t("sales"),
+            name === "revenue" ? labels.revenue : labels.sales,
           ]}
           labelFormatter={(label) => label}
           contentStyle={tooltipStyle}
@@ -202,7 +210,7 @@ function RevenueChart({
           yAxisId="revenue"
           type="monotone"
           dataKey="revenue"
-          name={t("revenue")}
+          name={labels.revenue}
           stroke={CHART_COLORS[0]}
           fill="url(#revenueGradient)"
           strokeWidth={2}
@@ -211,7 +219,7 @@ function RevenueChart({
           yAxisId="orders"
           type="monotone"
           dataKey="orders"
-          name={t("sales")}
+          name={labels.sales}
           stroke={CHART_COLORS[1]}
           strokeWidth={2}
           strokeDasharray="5 5"
@@ -269,14 +277,12 @@ function StatusDonut({
 
 function PaymentDonut({
   data,
-  noDataLabel,
-  t,
+  labels,
 }: {
   data: ChartsProps["revenueByPaymentMethod"];
-  noDataLabel: string;
-  t: (key: string) => string;
+  labels: ChartLabels;
 }) {
-  if (data.length === 0) return <NoData label={noDataLabel} />;
+  if (data.length === 0) return <NoData label={labels.noData} />;
 
   return (
     <ResponsiveContainer width="100%" height={240} className="sm:!h-[300px]">
@@ -296,7 +302,7 @@ function PaymentDonut({
           ))}
         </Pie>
         <Tooltip
-          formatter={(value: number) => [formatCurrency(value), t("revenue")]}
+          formatter={(value: number) => [formatCurrency(value), labels.revenue]}
           contentStyle={tooltipStyle}
         />
         <Legend />
@@ -309,14 +315,12 @@ function PaymentDonut({
 
 function TopProductsChart({
   data,
-  noDataLabel,
-  t,
+  labels,
 }: {
   data: ChartsProps["topProducts"];
-  noDataLabel: string;
-  t: (key: string) => string;
+  labels: ChartLabels;
 }) {
-  if (data.length === 0) return <NoData label={noDataLabel} />;
+  if (data.length === 0) return <NoData label={labels.noData} />;
 
   const chartData = data.map((d) => ({
     ...d,
@@ -330,7 +334,7 @@ function TopProductsChart({
         <XAxis
           type="number"
           tickFormatter={(v) =>
-            `\u20AC${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`
+            `${v >= 1000 ? formatCurrency((v / 1000).toFixed(1)) + "k" : formatCurrency(v)}`
           }
           stroke={AXIS_STROKE}
           fontSize={12}
@@ -346,13 +350,13 @@ function TopProductsChart({
         <Tooltip
           formatter={(value: number, name: string) => [
             name === "revenue" ? formatCurrency(value) : value,
-            name === "revenue" ? t("revenue") : t("unitsSold"),
+            name === "revenue" ? labels.revenue : labels.unitsSold,
           ]}
           contentStyle={tooltipStyle}
         />
         <Bar
           dataKey="revenue"
-          name={t("revenue")}
+          name={labels.revenue}
           fill={CHART_COLORS[0]}
           radius={[0, 4, 4, 0]}
         />
@@ -365,14 +369,12 @@ function TopProductsChart({
 
 function CategoryPie({
   data,
-  noDataLabel,
-  t,
+  labels,
 }: {
   data: ChartsProps["salesByCategory"];
-  noDataLabel: string;
-  t: (key: string) => string;
+  labels: ChartLabels;
 }) {
-  if (data.length === 0) return <NoData label={noDataLabel} />;
+  if (data.length === 0) return <NoData label={labels.noData} />;
 
   const total = data.reduce((sum, d) => sum + d.revenue, 0);
 
@@ -395,7 +397,7 @@ function CategoryPie({
           ))}
         </Pie>
         <Tooltip
-          formatter={(value: number) => [formatCurrency(value), t("revenue")]}
+          formatter={(value: number) => [formatCurrency(value), labels.revenue]}
           contentStyle={tooltipStyle}
         />
         <Legend />

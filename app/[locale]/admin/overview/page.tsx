@@ -65,8 +65,17 @@ export default async function AdminOverviewPage(props: {
         revenueByPaymentMethod={data.revenueByPaymentMethod}
         topProducts={data.topProducts}
         salesByCategory={data.salesByCategory}
-        noDataLabel={t("noData")}
-        t={(key) => t(key as Parameters<typeof t>[0])}
+        labels={{
+          revenue: t("revenue"),
+          sales: t("sales"),
+          unitsSold: t("unitsSold"),
+          revenueOverTime: t("revenueOverTime"),
+          ordersByStatus: t("ordersByStatus"),
+          topProducts: t("topProducts"),
+          revenueByPayment: t("revenueByPayment"),
+          salesByCategory: t("salesByCategory"),
+          noData: t("noData"),
+        }}
       />
 
       {/* Recent Orders */}
@@ -98,7 +107,7 @@ export default async function AdminOverviewPage(props: {
                     {formatCurrency(order.totalPrice)}
                   </TableCell>
                   <TableCell>
-                    <StatusBadge status={order.status} />
+                    <StatusBadge status={order.status} label={t(`status${order.status}` as Parameters<typeof t>[0])} />
                   </TableCell>
                   <TableCell>
                     <Link href={`/order/${order.id}`}>
@@ -160,7 +169,7 @@ export default async function AdminOverviewPage(props: {
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, label }: { status: string; label: string }) {
   const variants: Record<
     string,
     "default" | "secondary" | "destructive" | "outline" | "accent" | "success" | "warning"
@@ -172,7 +181,7 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <Badge variant={variants[status] || "outline"} className="text-xs">
-      {status}
+      {label}
     </Badge>
   );
 }
