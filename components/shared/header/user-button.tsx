@@ -10,12 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { LogOutIcon, UserIcon, Package, Heart, MapPin } from "lucide-react";
+import { LogOutIcon, UserIcon, Package, Heart, MapPin, Shield } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 export default async function UserButton() {
   const session = await getAuthSession();
   const t = await getTranslations("UserNav");
+  const tCommon = await getTranslations("Common");
 
   if (!session) {
     return (
@@ -33,7 +34,7 @@ export default async function UserButton() {
     <div className="flex items-center">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button aria-label="User menu" className="h-9 w-9 rounded-full bg-primary text-primary-foreground font-heading font-bold text-sm flex items-center justify-center ml-1 hover:ring-2 hover:ring-brand-accent/30 transition-all">
+          <button aria-label={tCommon("userMenu")} className="h-9 w-9 rounded-full bg-primary text-primary-foreground font-heading font-bold text-sm flex items-center justify-center ml-1 hover:ring-2 hover:ring-brand-accent/30 transition-all">
             {firstInitial}
           </button>
         </DropdownMenuTrigger>
@@ -49,26 +50,26 @@ export default async function UserButton() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href="/user/profile" className="w-full flex items-center gap-2">
+          <DropdownMenuItem className="p-0">
+            <Link href="/user/profile" className="w-full flex items-center gap-2 px-2 py-2.5">
               <UserIcon className="w-4 h-4" />
               {t("userProfile")}
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/user/orders" className="w-full flex items-center gap-2">
+          <DropdownMenuItem className="p-0">
+            <Link href="/user/orders" className="w-full flex items-center gap-2 px-2 py-2.5">
               <Package className="w-4 h-4" />
               {t("orderHistory")}
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/user/wishlist" className="w-full flex items-center gap-2">
+          <DropdownMenuItem className="p-0">
+            <Link href="/user/wishlist" className="w-full flex items-center gap-2 px-2 py-2.5">
               <Heart className="w-4 h-4" />
               {t("wishlist")}
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/user/addresses" className="w-full flex items-center gap-2">
+          <DropdownMenuItem className="p-0">
+            <Link href="/user/addresses" className="w-full flex items-center gap-2 px-2 py-2.5">
               <MapPin className="w-4 h-4" />
               {t("addresses")}
             </Link>
@@ -77,8 +78,9 @@ export default async function UserButton() {
           {session?.user?.role === "admin" && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/admin/overview" className="w-full">
+              <DropdownMenuItem className="p-0">
+                <Link href="/admin/overview" className="w-full flex items-center gap-2 px-2 py-2.5 text-brand-accent font-medium">
+                  <Shield className="w-4 h-4" />
                   {t("admin")}
                 </Link>
               </DropdownMenuItem>

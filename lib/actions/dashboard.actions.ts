@@ -304,7 +304,7 @@ async function getOrdersByStatus(
        COUNT(*)::int as "count"
      FROM "Order"
      ${whereClause}
-     GROUP BY "status"
+     GROUP BY 1
      ORDER BY "count" DESC`,
     ...params
   );
