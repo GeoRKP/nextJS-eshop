@@ -24,11 +24,11 @@ export default async function ProductList({
   const t = await getTranslations("Product");
 
   return (
-    <div className="my-10">
-      <div className="flex items-end justify-between mb-4">
+    <div className="my-12 md:my-16 lg:my-20">
+      <div className="flex items-end justify-between mb-8 pb-4 border-b border-foreground/15">
         <div>
           {subtitle && (
-            <span className="text-label text-brand-accent block mb-1">
+            <span className="text-stamp text-accent block mb-2 hazard-mark">
               {subtitle}
             </span>
           )}
@@ -37,7 +37,7 @@ export default async function ProductList({
         {viewAllLabel && viewAllHref && (
           <Link
             href={viewAllHref}
-            className="text-brand-accent text-sm font-semibold hover:underline flex items-center gap-1"
+            className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground hover:text-accent transition-colors flex items-center gap-2 border-b border-foreground hover:border-accent pb-1"
           >
             {viewAllLabel}
             <ArrowRight className="h-3.5 w-3.5" />
@@ -45,7 +45,7 @@ export default async function ProductList({
         )}
       </div>
       {data.length > 0 ? (
-        <AnimatedGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 md:gap-4">
+        <AnimatedGrid className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4 2xl:gap-5">
           {limitedData.map((product: Product) => (
             <AnimatedGridItem key={product.slug}>
               <ProductCard product={product} />
@@ -53,8 +53,8 @@ export default async function ProductList({
           ))}
         </AnimatedGrid>
       ) : (
-        <div>
-          <p>{t("noProductsFound")}</p>
+        <div className="border border-dashed border-border p-8 text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">▲ {t("noProductsFound")}</p>
         </div>
       )}
     </div>

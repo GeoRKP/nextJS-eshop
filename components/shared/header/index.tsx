@@ -14,13 +14,13 @@ const Header = () => {
         {/* Left: Hamburger (mobile) + Logo */}
         <div className="flex items-center gap-2 shrink-0">
           <MobileMenuWrapper />
-          <Link href="/" className="flex-start">
+          <Link href="/" className="flex-start group">
             <Image
               src="/images/logo.png"
               alt={`${APP_NAME} logo`}
               width={52}
               height={52}
-              preload={true}
+              priority
               className="hidden md:block"
             />
             <Image
@@ -28,11 +28,12 @@ const Header = () => {
               alt={`${APP_NAME} logo`}
               width={44}
               height={44}
-              preload={true}
+              priority
               className="md:hidden"
             />
-            <span className="hidden md:block font-heading font-extrabold text-xl ml-2 tracking-[0.15em] uppercase">
-              {APP_NAME}
+            <span className="hidden md:flex items-baseline ml-2.5 font-heading font-extrabold text-xl tracking-[0.18em] uppercase">
+              <span className="text-accent text-base mr-1.5 leading-none translate-y-[-1px]">▲</span>
+              <span className="group-hover:text-accent transition-colors">{APP_NAME}</span>
             </span>
           </Link>
         </div>

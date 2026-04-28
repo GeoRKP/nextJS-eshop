@@ -9,7 +9,7 @@ const statusColors: Record<string, string> = {
   delivered: "bg-green-500/10 text-green-600",
   cancelled: "bg-red-500/10 text-red-600",
   refund_requested: "bg-orange-500/10 text-orange-600",
-  refunded: "bg-gray-500/10 text-gray-600",
+  refunded: "bg-muted text-muted-foreground",
 };
 
 export default function OrderStatusBadge({
@@ -24,7 +24,7 @@ export default function OrderStatusBadge({
       variant="outline"
       className={cn(
         "font-medium border-0",
-        statusColors[status] || "bg-gray-500/10 text-gray-600"
+        statusColors[status] || "bg-muted text-muted-foreground"
       )}
     >
       {label}

@@ -48,7 +48,7 @@ export default async function AdminCategoriesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
+                  <TableHead>{t("id")}</TableHead>
                   <TableHead>{t("name")}</TableHead>
                   <TableHead>{t("slug")}</TableHead>
                   <TableHead>{t("parent")}</TableHead>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import type { ProductSuggestion, CategorySuggestion } from "@/types/search";
 import { Clock, SearchIcon, Tag, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Props = {
   query: string;
@@ -31,6 +32,7 @@ function SearchDropdown({
   onRemoveRecent,
   onClearRecents,
 }: Props) {
+  const t = useTranslations("Search");
   const showRecents = !query && recentSearches.length > 0;
   const showProducts = query && products.length > 0;
   const showCategories = query && categories.length > 0;
@@ -71,7 +73,7 @@ function SearchDropdown({
   return (
     <div
       id="search-dropdown"
-      className="absolute top-full left-0 right-0 z-[55] mt-2 max-h-[50vh] md:max-h-[400px] overflow-y-auto rounded-xl border border-t-2 border-t-brand-accent bg-popover shadow-elevated"
+      className="absolute top-full left-0 right-0 z-[55] mt-2 max-h-[50vh] md:max-h-[400px] overflow-y-auto rounded-none border border-t-[3px] border-t-brand-accent bg-popover shadow-elevated animate-in fade-in slide-in-from-top-1 duration-150"
       role="listbox"
     >
       {/* Recent searches */}
@@ -79,7 +81,7 @@ function SearchDropdown({
         <div className="p-3">
           <div className="flex items-center justify-between px-1 pb-2">
             <span className="text-label text-muted-foreground">
-              Recent Searches
+              {t("recentSearches")}
             </span>
             <button
               type="button"
@@ -89,7 +91,7 @@ function SearchDropdown({
               }}
               className="text-xs text-muted-foreground hover:text-foreground px-2 py-1"
             >
-              Clear all
+              {t("clearAll")}
             </button>
           </div>
           {recentSearches.map((term, i) => {
@@ -132,7 +134,7 @@ function SearchDropdown({
       {showProducts && (
         <div className="p-3">
           <span className="text-label text-muted-foreground px-1">
-            Products
+            {t("productsSection")}
           </span>
           {products.map((product, i) => {
             const idx = indices.products[i];
@@ -152,10 +154,10 @@ function SearchDropdown({
                 <Image
                   src={product.image}
                   alt={product.name}
-                  width={44}
-                  height={44}
-                  className="rounded-lg object-cover border"
-                  sizes="44px"
+                  width={56}
+                  height={56}
+                  className="w-11 h-11 md:w-14 md:h-14 rounded-none object-cover border border-border bg-muted/30 bg-blueprint-grid-sm shrink-0"
+                  sizes="(max-width: 768px) 44px, 56px"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="truncate text-sm font-medium">
@@ -178,7 +180,7 @@ function SearchDropdown({
       {showCategories && (
         <div className="p-3 border-t">
           <span className="text-label text-muted-foreground px-1">
-            Categories
+            {t("categoriesSection")}
           </span>
           {categories.map((cat, i) => {
             const idx = indices.categories[i];
@@ -222,7 +224,7 @@ function SearchDropdown({
           >
             <SearchIcon className="h-3.5 w-3.5 text-muted-foreground" />
             <span>
-              Search for &quot;{query}&quot;
+              {t("searchFor", { query })}
             </span>
           </div>
         </div>
@@ -244,7 +246,7 @@ function SearchDropdown({
           >
             <SearchIcon className="h-3.5 w-3.5 text-muted-foreground" />
             <span>
-              Search for &quot;{query}&quot;
+              {t("searchFor", { query })}
             </span>
           </div>
         </div>

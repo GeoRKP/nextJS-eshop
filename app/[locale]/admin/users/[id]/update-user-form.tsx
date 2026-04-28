@@ -140,7 +140,7 @@ export default function UpdateUserForm({
                   <SelectContent>
                     {USER_ROLES.map((role) => (
                       <SelectItem key={role} value={role}>
-                        {role.charAt(0).toUpperCase() + role.slice(1)}
+                        {tCommon(role)}
                       </SelectItem>
                     ))}
                   </SelectContent>

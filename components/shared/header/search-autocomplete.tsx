@@ -4,12 +4,14 @@ import { useEffect, useRef } from "react";
 import { SearchIcon, ArrowRight } from "lucide-react";
 import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
 import SearchDropdown, { getItemCount } from "./search-dropdown";
+import { useTranslations } from "next-intl";
 
 type Props = {
   placeholder?: string;
 };
 
 export default function SearchAutocomplete({ placeholder }: Props) {
+  const t = useTranslations("Search");
   const {
     query,
     products,
@@ -59,18 +61,23 @@ export default function SearchAutocomplete({ placeholder }: Props) {
     <div ref={containerRef} className="relative">
       <form onSubmit={handleSubmit}>
         <div
-          className="search-premium flex w-full items-center bg-muted/30"
+          className="search-premium flex w-full items-stretch bg-card"
           role="combobox"
           aria-expanded={isOpen}
           aria-controls="search-dropdown"
           aria-haspopup="listbox"
         >
-          <SearchIcon className="h-4 w-4 text-muted-foreground/60 ml-4 shrink-0" />
+          <span className="flex items-center pl-3 pr-2 border-r border-border bg-muted/40">
+            <SearchIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span className="hidden lg:inline ml-2 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              SEARCH
+            </span>
+          </span>
           <input
             ref={inputRef}
             type="text"
-            placeholder={placeholder || "Search..."}
-            className="w-full h-10 bg-transparent pl-3 pr-2 text-sm placeholder:italic placeholder:text-muted-foreground/60 focus:outline-none"
+            placeholder={placeholder || t("searchPlaceholder")}
+            className="w-full h-11 bg-transparent pl-3 pr-2 text-sm placeholder:text-muted-foreground/70 focus:outline-none"
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => setIsOpen(true)}
@@ -81,9 +88,10 @@ export default function SearchAutocomplete({ placeholder }: Props) {
           />
           <button
             type="submit"
-            aria-label="Search"
-            className="h-8 w-8 rounded-full bg-brand-accent hover:bg-brand-accent-dark text-white flex items-center justify-center shrink-0 mr-1 transition-colors"
+            aria-label={t("searchAriaLabel")}
+            className="h-11 px-4 bg-foreground hover:bg-accent text-background hover:text-accent-foreground flex items-center justify-center gap-1.5 shrink-0 transition-colors font-heading text-[11px] font-bold uppercase tracking-[0.16em]"
           >
+            <span className="hidden md:inline">{t("searchAriaLabel")}</span>
             <ArrowRight className="h-4 w-4" />
           </button>
         </div>

@@ -35,7 +35,7 @@ export default function AddToCartButton({ item }: { item: CartItem }) {
       action: (
         <ToastAction
           altText={t("goToCart")}
-          className="bg-primary text-white hover:bg-gray-800"
+          className="bg-primary text-background hover:bg-primary/90"
           onClick={() => router.push("/cart")}
         >
           {t("goToCart")}
@@ -49,10 +49,11 @@ export default function AddToCartButton({ item }: { item: CartItem }) {
     <Button
       size="icon"
       variant="ghost"
-      className={`h-9 w-9 rounded-full transition-all ${
+      aria-label={t("addToCart")}
+      className={`h-10 w-10 rounded-none border transition-all btn-stamp ${
         added
-          ? "bg-green-500/15 text-green-600"
-          : "hover:bg-brand-accent/15 text-muted-foreground hover:text-brand-accent"
+          ? "border-success bg-success/10 text-success"
+          : "border-foreground bg-background text-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent"
       }`}
       onClick={(e) => {
         e.preventDefault();

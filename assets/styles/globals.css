@@ -2,271 +2,402 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =====================================================================
+   LEMENTZOGLOY — Declassified Workshop Manual design system
+   Heavy-duty industrial-editorial. Graphite + Signal Yellow.
+   Hairline borders, stamped hover states, sharp geometry.
+   ===================================================================== */
+
 @layer utilities {
+  /* ─── Container wrappers ─────────────────────────────────────────── */
   .wrapper {
-    @apply max-w-7xl 2xl:max-w-[1440px] lg:mx-auto px-4 py-5 md:px-8 lg:px-10 w-full;
+    @apply max-w-7xl 2xl:max-w-[1440px] 3xl:max-w-[1700px] lg:mx-auto px-3 sm:px-4 py-5 md:px-8 lg:px-10 2xl:px-12 w-full;
   }
 
   .wrapper-narrow {
     @apply max-w-5xl lg:mx-auto p-5 md:px-10 w-full;
   }
 
-  .flex-start {
-    @apply flex justify-start items-center;
-  }
-  .flex-center {
-    @apply flex justify-center items-center;
+  .wrapper-wide {
+    @apply max-w-[1440px] 3xl:max-w-[1700px] lg:mx-auto p-5 md:px-10 2xl:px-12 w-full;
   }
 
-  .flex-between {
-    @apply flex justify-between items-center;
-  }
+  /* ─── Flex utilities ─────────────────────────────────────────────── */
+  .flex-start  { @apply flex justify-start  items-center; }
+  .flex-center { @apply flex justify-center items-center; }
+  .flex-between{ @apply flex justify-between items-center; }
 
+  /* ─── Type system ────────────────────────────────────────────────── */
+  /* Display & headings — Archivo Narrow, condensed industrial */
   .h1-bold {
-    @apply font-heading font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight uppercase;
+    @apply font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl uppercase;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
   }
-
   .h2-bold {
-    @apply font-heading font-bold text-2xl md:text-2xl lg:text-3xl tracking-tight uppercase;
+    @apply font-heading font-bold text-2xl md:text-3xl lg:text-4xl 2xl:text-5xl uppercase;
+    letter-spacing: -0.015em;
+    line-height: 1.05;
   }
-
   .h3-bold {
-    @apply font-heading font-bold text-xl lg:text-2xl uppercase;
+    @apply font-heading font-bold text-xl lg:text-2xl 2xl:text-3xl uppercase;
+    letter-spacing: -0.01em;
   }
-
+  .h4-bold {
+    @apply font-heading font-bold text-base lg:text-lg leading-snug;
+    letter-spacing: -0.005em;
+  }
+  .h5-bold {
+    @apply font-heading font-bold text-sm md:text-[15px] leading-snug;
+  }
+  .h6-bold {
+    @apply font-heading font-semibold text-xs leading-snug;
+    letter-spacing: 0.02em;
+  }
   .text-display {
-    @apply font-heading text-3xl md:text-4xl lg:text-6xl font-extrabold tracking-tight uppercase;
+    @apply font-heading font-black text-4xl md:text-6xl lg:text-7xl 2xl:text-8xl uppercase;
+    letter-spacing: -0.025em;
+    line-height: 0.98;
   }
 
+  /* Stamp labels — small uppercase, mechanical */
   .text-label {
-    @apply font-heading text-xs font-semibold uppercase tracking-widest sm:tracking-[0.2em];
+    @apply font-heading text-[11px] font-bold uppercase tracking-[0.22em];
   }
 
-  .transition-default {
-    @apply transition-all duration-150 ease-out;
+  /* NEW: Mono stamp — for badge-style mechanical labels */
+  .text-stamp {
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.12em];
   }
 
-  .transition-slow {
-    @apply transition-all duration-250 ease-out;
+  /* NEW: Mono code — for SKU / OEM / part numbers */
+  .text-code {
+    @apply font-mono text-[13px] font-medium tracking-[0.02em];
   }
 
-  .bg-gradient-subtle {
-    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted) / 0.5) 100%);
+  /* NEW: Mono spec — for spec tables, dot-leader rows */
+  .text-spec {
+    @apply font-mono text-xs font-normal;
+    line-height: 1.55;
   }
 
-  .bg-gradient-section {
-    background: linear-gradient(180deg, hsl(var(--muted) / 0.3) 0%, hsl(var(--background)) 100%);
+  /* Greek-friendly tracking override (diacritics need air) */
+  [lang="el"] .text-label,
+  [lang="el"] .text-stamp {
+    letter-spacing: 0.16em;
   }
 
-  .bg-gradient-industrial {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(222 47% 20%) 50%, hsl(var(--brand-accent) / 0.15) 100%);
-  }
+  /* ─── Transitions ────────────────────────────────────────────────── */
+  .transition-default { @apply transition-all duration-150 ease-out; }
+  .transition-slow    { @apply transition-all duration-300 ease-out; }
 
-  .header-row {
-    @apply h-[4.25rem];
-  }
+  /* ─── Header heights ─────────────────────────────────────────────── */
+  .header-row       { @apply h-[4.25rem]; }
+  .announcement-bar { @apply h-8; }
 
-  .announcement-bar {
-    @apply h-8;
-  }
-
-  /* Frosted glass for sticky scrolled state */
+  /* ─── Header scrolled state — solid + thicker bottom border ─────── */
   .header-frosted {
-    @apply bg-background/80 backdrop-blur-xl;
-    -webkit-backdrop-filter: blur(24px);
+    @apply bg-background/95 backdrop-blur-md;
+    border-bottom: 1px solid oklch(var(--foreground) / 0.95);
+    box-shadow: 0 1px 0 0 oklch(var(--foreground) / 0.1);
   }
 
-  /* Premium search input container with amber glow on focus */
+  /* ─── Search input — rectangular, yellow focus ring ─────────────── */
   .search-premium {
-    @apply border-2 border-muted rounded-full transition-all duration-200;
+    @apply border-2 border-border bg-background transition-all duration-200;
+    border-radius: 2px;
   }
   .search-premium:focus-within {
-    border-color: hsl(var(--brand-accent));
-    box-shadow: 0 0 0 3px hsl(var(--brand-accent) / 0.15);
+    border-color: oklch(var(--accent));
+    box-shadow: 0 0 0 4px oklch(var(--accent) / 0.18);
   }
 
-  /* Gradient horizontal rule for footer divider */
-  .footer-divider {
-    @apply h-px w-full border-0;
-    background: linear-gradient(90deg, transparent 0%, hsl(0 0% 100% / 0.15) 50%, transparent 100%);
-  }
-
-  /* 1440px max-width container variant */
-  .wrapper-wide {
-    @apply max-w-[1440px] lg:mx-auto p-5 md:px-10 w-full;
-  }
-
-  /* Premium card with subtle border and hover glow */
+  /* ─── Card — hairline, hover stamps darker ──────────────────────── */
   .card-premium {
-    @apply bg-card rounded-lg border border-border/60 shadow-card transition-all duration-200;
+    @apply bg-card border border-border transition-all duration-200;
+    border-radius: 2px;
   }
   .card-premium:hover {
-    @apply shadow-card-hover;
-    border-color: hsl(var(--brand-accent) / 0.3);
+    border-color: oklch(var(--foreground));
+    box-shadow: 0 0 0 1px oklch(var(--foreground)), 0 8px 24px -12px oklch(var(--foreground) / 0.2);
+    transform: translateY(-2px);
   }
 
-  /* Section header with accent underline */
+  /* ─── Section header — yellow accent bar ────────────────────────── */
   .section-header {
-    @apply font-heading text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground relative pb-3 mb-6;
+    @apply font-heading text-[11px] font-bold uppercase tracking-[0.22em] text-muted-foreground relative pb-3 mb-6;
   }
   .section-header::after {
     content: '';
-    @apply absolute bottom-0 left-0 h-0.5 w-10 rounded-sm;
-    background: hsl(var(--brand-accent));
+    @apply absolute bottom-0 left-0 h-[3px] w-12;
+    background: oklch(var(--accent));
   }
 
-  /* Modern input with focus ring animation */
+  /* ─── Modern input — rectangular, yellow focus ring ─────────────── */
   .input-modern {
-    @apply w-full rounded-md border border-border bg-background px-4 py-3 text-sm transition-all duration-150;
+    @apply w-full border-2 border-input bg-background px-4 py-3 text-sm transition-all duration-150;
+    border-radius: 2px;
   }
   .input-modern:focus {
-    @apply outline-none ring-2 border-transparent;
-    --tw-ring-color: hsl(var(--brand-accent) / 0.3);
-    border-color: hsl(var(--brand-accent));
+    @apply outline-none;
+    border-color: oklch(var(--accent));
+    box-shadow: 0 0 0 4px oklch(var(--accent) / 0.18);
   }
 
-  /* Pulsing badge for status */
-  .badge-glow {
-    @apply relative;
+  /* ─── Glass card — repurposed: now plain bordered surface ───────── */
+  .glass-card {
+    @apply bg-card border border-border;
+    border-radius: 2px;
   }
+
+  /* ─── Pulsing badge ─────────────────────────────────────────────── */
+  .badge-glow { @apply relative; }
   .badge-glow::before {
     content: '';
-    @apply absolute inset-0 rounded-full;
+    @apply absolute inset-0;
     animation: glow-pulse 2.5s ease-in-out infinite;
     background: inherit;
     opacity: 0.5;
   }
 
-  /* Gradient divider */
+  /* ─── Divider ───────────────────────────────────────────────────── */
   .divider-gradient {
     @apply h-px w-full border-0;
-    background: linear-gradient(90deg, transparent 0%, hsl(var(--border)) 30%, hsl(var(--border)) 70%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, oklch(var(--border)) 30%, oklch(var(--border)) 70%, transparent 100%);
   }
 
-  /* Glass card */
-  .glass-card {
-    @apply rounded-lg border border-white/10;
-    background: hsl(var(--card) / 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+  /* ─── Footer divider — scan-line look ───────────────────────────── */
+  .footer-divider {
+    @apply h-px w-full border-0;
+    background: linear-gradient(90deg, transparent 0%, oklch(var(--accent) / 0.4) 50%, transparent 100%);
   }
 
-  /* Image zoom container — overflow-hidden, img scales on hover */
-  .image-zoom-container {
-    @apply overflow-hidden;
+  /* ─── Subtle gradient backgrounds (recolored to graphite system) ─ */
+  .bg-gradient-subtle {
+    background: linear-gradient(135deg, oklch(var(--background)) 0%, oklch(var(--muted) / 0.5) 100%);
   }
-  .image-zoom-container img {
-    @apply transition-transform duration-500 ease-out;
+  .bg-gradient-section {
+    background: linear-gradient(180deg, oklch(var(--muted) / 0.4) 0%, oklch(var(--background)) 100%);
   }
+  .bg-gradient-industrial {
+    background:
+      linear-gradient(135deg, oklch(var(--primary)) 0%, oklch(0.22 0.015 265) 60%, oklch(0.25 0.016 265) 100%);
+  }
+
+  /* ─── Image zoom ────────────────────────────────────────────────── */
+  .image-zoom-container { @apply overflow-hidden; }
+  .image-zoom-container img { @apply transition-transform duration-500 ease-out; }
   @media (hover: hover) {
-    .image-zoom-container:hover img {
-      transform: scale(1.08);
-    }
+    .image-zoom-container:hover img { transform: scale(1.06); }
   }
 
-  /* Tab indicator underline for active tab */
-  .tab-indicator {
-    @apply relative;
-  }
+  /* ─── Tab indicator — yellow underline ──────────────────────────── */
+  .tab-indicator { @apply relative; }
   .tab-indicator::after {
     content: '';
-    @apply absolute bottom-0 left-0 right-0 h-0.5 rounded-full;
-    background: hsl(var(--brand-accent));
+    @apply absolute -bottom-px left-0 right-0 h-[3px];
+    background: oklch(var(--accent));
     transform: scaleX(0);
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: left;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .tab-indicator[data-state="active"]::after {
-    transform: scaleX(1);
-  }
+  .tab-indicator[data-state="active"]::after { transform: scaleX(1); }
 
-  /* Card actions overlay — slides up on group hover */
+  /* ─── Card actions overlay slide-up ─────────────────────────────── */
   .card-actions-overlay {
-    @apply translate-y-full transition-transform duration-250;
+    @apply translate-y-full transition-transform duration-300;
     transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .group:hover .card-actions-overlay {
-    @apply translate-y-0;
-  }
+  .group:hover .card-actions-overlay { @apply translate-y-0; }
 
-  /* Industrial diagonal stripe pattern */
+  /* ─── Industrial diagonal stripe (now signal yellow) ────────────── */
   .industrial-stripe {
     background-image: repeating-linear-gradient(
       -45deg,
       transparent,
-      transparent 4px,
-      hsl(var(--brand-accent) / 0.06) 4px,
-      hsl(var(--brand-accent) / 0.06) 8px
+      transparent 6px,
+      oklch(var(--accent) / 0.06) 6px,
+      oklch(var(--accent) / 0.06) 12px
     );
   }
+
+  /* ─── NEW: Hazard stripes — yellow + graphite, for warnings/CTAs ── */
+  .hazard-stripe {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      oklch(var(--accent)) 0,
+      oklch(var(--accent)) 14px,
+      oklch(var(--foreground)) 14px,
+      oklch(var(--foreground)) 28px
+    );
+  }
+
+  /* ─── NEW: Blueprint grid backdrop ──────────────────────────────── */
+  .bg-blueprint-grid {
+    background-image:
+      linear-gradient(to right, oklch(var(--grid-line)) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(var(--grid-line)) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .bg-blueprint-grid-sm {
+    background-image:
+      linear-gradient(to right, oklch(var(--grid-line)) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(var(--grid-line)) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
+  /* ─── NEW: Dot-leader spec row (NAME ........ VALUE) ───────────── */
+  .dot-leader {
+    @apply flex items-baseline gap-2 py-1.5 font-mono text-xs;
+  }
+  .dot-leader > .label {
+    @apply uppercase tracking-[0.08em] text-muted-foreground whitespace-nowrap;
+  }
+  .dot-leader > .value {
+    @apply text-foreground font-medium text-right ml-auto;
+  }
+  .dot-leader > .leader {
+    @apply flex-1 self-end mb-[3px] border-b border-dotted border-border min-w-[20px];
+  }
+
+  /* ─── NEW: Stamped button press ─────────────────────────────────── */
+  .btn-stamp {
+    @apply active:translate-y-px transition-transform duration-75;
+  }
+
+  /* ─── NEW: Yellow hazard triangle prefix ────────────────────────── */
+  .hazard-mark::before {
+    content: '▲';
+    @apply inline-block mr-2 text-[0.7em] align-middle;
+    color: oklch(var(--accent));
+  }
+
+  /* ─── NEW: Mono carousel counter (01/04) ────────────────────────── */
+  .counter-mono {
+    @apply font-mono text-xs tracking-[0.08em] text-muted-foreground;
+  }
+
+  /* ─── NEW: Yellow corner notch tag (top-right product badge) ────── */
+  .corner-tag {
+    @apply absolute top-0 right-0 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.1em];
+    background: oklch(var(--accent));
+    color: oklch(var(--accent-foreground));
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
 }
+
+/* =====================================================================
+   DESIGN TOKENS
+   ===================================================================== */
 
 @layer base {
   :root {
-    --background: 220 20% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 222 47% 15%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 215 16% 93%;
-    --secondary-foreground: 222 47% 15%;
-    --muted: 215 16% 93%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 38 92% 50%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 214 20% 88%;
-    --input: 214 20% 88%;
-    --ring: 38 92% 50%;
-    --chart-1: 222 47% 35%;
-    --chart-2: 38 92% 50%;
-    --chart-3: 173 58% 39%;
-    --chart-4: 215 16% 47%;
-    --chart-5: 0 72% 51%;
-    --radius: 0.375rem;
-    --shadow-card: 0 1px 3px 0 rgba(15, 23, 41, 0.08), 0 1px 2px -1px rgba(15, 23, 41, 0.08);
-    --shadow-card-hover: 0 10px 30px -5px rgba(15, 23, 41, 0.12), 0 6px 10px -6px rgba(15, 23, 41, 0.08);
-    --shadow-elevated: 0 20px 50px -12px rgba(15, 23, 41, 0.2), 0 8px 20px -8px rgba(15, 23, 41, 0.12);
-    --shadow-card-subtle: 0 1px 2px 0 rgba(15, 23, 41, 0.04);
-    --shadow-card-glow: 0 4px 20px -4px rgba(245, 158, 11, 0.2), 0 2px 8px -2px rgba(245, 158, 11, 0.12);
-    --shadow-inner-soft: inset 0 2px 4px 0 rgba(15, 23, 41, 0.06);
-    --brand-accent: 38 92% 50%;
-    --brand-accent-light: 38 90% 58%;
-    --brand-accent-dark: 38 92% 42%;
-    --surface-elevated: 215 25% 96%;
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
-    --info: 199 89% 48%;
-    --info-foreground: 0 0% 100%;
+    color-scheme: light;
+
+    /* Canvas & surfaces — OKLCH: perceptually uniform, chroma-tuned near extremes */
+    --background: 0.966 0.005 70;        /* warm off-white, paper/fog */
+    --foreground: 0.200 0.014 265;       /* near-obsidian, warm black */
+    --card: 1.000 0 0;                   /* pure white plates */
+    --card-foreground: 0.200 0.014 265;
+    --popover: 1.000 0 0;
+    --popover-foreground: 0.200 0.014 265;
+    --surface-elevated: 0.989 0.004 70;
+
+    /* Graphite primary (the dark surface) */
+    --primary: 0.248 0.016 265;
+    --primary-foreground: 0.861 0.174 95; /* yellow text on graphite = stencil */
+
+    /* Neutrals */
+    --secondary: 0.926 0.005 264;
+    --secondary-foreground: 0.200 0.014 265;
+    --muted: 0.943 0.005 264;
+    --muted-foreground: 0.459 0.009 267;
+
+    /* Accent: SIGNAL YELLOW */
+    --accent: 0.861 0.174 95;
+    --accent-foreground: 0.200 0.014 265;
+
+    /* Semantic */
+    --destructive: 0.548 0.214 28;
+    --destructive-foreground: 1.000 0 0;
+    --success: 0.556 0.143 148;
+    --success-foreground: 1.000 0 0;
+    --warning: 0.719 0.172 55;
+    --warning-foreground: 0.200 0.014 265;
+    --info: 0.528 0.177 256;
+    --info-foreground: 1.000 0 0;
+
+    /* Borders */
+    --border: 0.857 0.007 264;
+    --border-strong: 0.320 0.017 264;
+    --input: 0.838 0.008 264;
+    --ring: 0.861 0.174 95;
+
+    /* Brand aliases — kept so existing components work with new yellow */
+    --brand-accent: 0.861 0.174 95;
+    --brand-accent-light: 0.904 0.148 96;
+    --brand-accent-dark: 0.693 0.161 76;
+
+    /* Charts — graphite/yellow/blue/red/steel */
+    --chart-1: 0.248 0.016 265;
+    --chart-2: 0.861 0.174 95;
+    --chart-3: 0.528 0.177 256;
+    --chart-4: 0.548 0.214 28;
+    --chart-5: 0.594 0.013 265;
+
+    /* Geometry */
+    --radius: 2px;
+
+    /* Grid lines (blueprint) */
+    --grid-line: 0.894 0.007 265;
+
+    /* SHADOW TOKENS — hairline rings, no blur */
+    --shadow-card:        0 0 0 1px oklch(0.857 0.007 264);
+    --shadow-card-hover:  0 0 0 1px oklch(0.200 0.014 265), 0 1px 0 0 oklch(0.200 0.014 265 / 0.2);
+    --shadow-elevated:    0 0 0 1px oklch(0.857 0.007 264), 0 2px 0 0 oklch(0.200 0.014 265 / 0.08), 0 8px 24px -12px oklch(0.200 0.014 265 / 0.18);
+    --shadow-card-subtle: 0 0 0 1px oklch(0.857 0.007 264);
+    --shadow-card-glow:   0 0 0 2px oklch(0.861 0.174 95), 0 0 0 5px oklch(0.861 0.174 95 / 0.25);
+    --shadow-inner-soft:  inset 0 1px 0 0 oklch(0.857 0.007 264);
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "cv11", "tnum";
+    line-height: 1.55;
+  }
+
+  /* Tabular numerals everywhere a price or qty might appear */
+  .tabular-nums, [class*="price"], [class*="qty"] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Selection */
+  ::selection {
+    background: oklch(var(--accent));
+    color: oklch(var(--accent-foreground));
   }
 }
 
-/* Scrollbar-hide utility for horizontal scroll areas */
+/* =====================================================================
+   SCROLLBARS
+   ===================================================================== */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* Uploadthing button text override */
-.upload-field .text-white {
-  color: #000000 !important;
-}
+.upload-field .text-white { color: #000000 !important; }
 
-/* Shimmer animation for announcement bar */
+/* =====================================================================
+   ANIMATIONS
+   ===================================================================== */
+
+/* Shimmer for announcement bar */
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
+  0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 .animate-shimmer {
@@ -274,36 +405,73 @@
   animation: shimmer 8s ease-in-out infinite;
 }
 
-/* Pulsing dot for deals indicator */
+/* Pulsing dot for deals */
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.8); }
 }
-.animate-pulse-dot {
-  animation: pulse-dot 2s ease-in-out infinite;
+.animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+/* Marquee */
+.animate-marquee { animation: marquee 28s linear infinite; }
+
+/* Skeleton shimmer slide */
+@keyframes shimmer-slide {
+  100% { transform: translateX(100%); }
 }
 
-/* Marquee utility class (keyframes in tailwind.config.ts) */
-.animate-marquee {
-  animation: marquee 40s linear infinite;
+/* Wishlist heart pop on toggle */
+@keyframes heart-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
 }
 
-/* Slow spin utility class (keyframes in tailwind.config.ts) */
-.animate-spin-slow {
-  animation: spin-slow 20s linear infinite;
+/* Slow spin */
+.animate-spin-slow { animation: spin-slow 20s linear infinite; }
+
+/* Scan-line for footer band — teletype suggestion */
+@keyframes scan-line {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+.animate-scan-line {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    oklch(var(--accent) / 0.06) 3px,
+    oklch(var(--accent) / 0.06) 4px
+  );
+  animation: scan-line 8s linear infinite;
 }
 
-/* Grid item stagger animation (keyframes in tailwind.config.ts) */
-.stagger-grid > .animate-grid-item-in {
-  opacity: 0;
-  animation: grid-item-in 0.4s ease-out both;
+/* =====================================================================
+   REDUCED MOTION
+   Respect OS-level preference — WCAG 2.3.3, 2.2.2
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Kill autoplay-style decorations entirely */
+  .animate-marquee,
+  .animate-spin-slow,
+  .animate-scan-line,
+  .animate-shimmer,
+  .animate-pulse-dot,
+  .badge-glow::before {
+    animation: none !important;
+  }
+
+  /* Hover-based image zoom should not move */
+  .image-zoom-container:hover img { transform: none !important; }
 }
-.stagger-grid > .animate-grid-item-in:nth-child(1) { animation-delay: 0ms; }
-.stagger-grid > .animate-grid-item-in:nth-child(2) { animation-delay: 100ms; }
-.stagger-grid > .animate-grid-item-in:nth-child(3) { animation-delay: 200ms; }
-.stagger-grid > .animate-grid-item-in:nth-child(4) { animation-delay: 300ms; }
-.stagger-grid > .animate-grid-item-in:nth-child(5) { animation-delay: 400ms; }
-.stagger-grid > .animate-grid-item-in:nth-child(6) { animation-delay: 500ms; }
-.stagger-grid > .animate-grid-item-in:nth-child(7) { animation-delay: 600ms; }
-.stagger-grid > .animate-grid-item-in:nth-child(8) { animation-delay: 700ms; }
-.stagger-grid > .animate-grid-item-in:nth-child(n+9) { animation-delay: 800ms; }

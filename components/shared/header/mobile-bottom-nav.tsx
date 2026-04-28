@@ -54,7 +54,7 @@ export default function MobileBottomNav() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card/95 backdrop-blur-xl safe-area-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card border-t border-border safe-area-bottom">
         <div className="divider-gradient" />
         <div className="grid grid-cols-5 h-[68px]">
           {tabs.map((tab) => {
@@ -68,7 +68,7 @@ export default function MobileBottomNav() {
                   onClick={tab.action}
                   className="flex flex-col items-center justify-center"
                 >
-                  <div className="bg-brand-accent text-white rounded-full h-14 w-14 flex items-center justify-center -mt-7 ring-4 ring-background shadow-card-glow hover:bg-brand-accent-dark transition-colors">
+                  <div className="bg-brand-accent text-accent-foreground rounded-full h-14 w-14 flex items-center justify-center -mt-7 ring-4 ring-background shadow-card-glow hover:bg-brand-accent-dark transition-colors">
                     <Icon className="h-[22px] w-[22px]" />
                   </div>
                 </button>

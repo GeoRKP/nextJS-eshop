@@ -30,7 +30,7 @@ function QuantityControls({
         variant="ghost"
         size="icon"
         type="button"
-        className="w-10 h-10 rounded-none hover:bg-brand-accent/10"
+        className="w-11 h-11 rounded-none hover:bg-brand-accent/10"
         onClick={onRemove}
       >
         {isPending ? (
@@ -45,7 +45,7 @@ function QuantityControls({
         variant="ghost"
         size="icon"
         type="button"
-        className="w-10 h-10 rounded-none hover:bg-brand-accent/10"
+        className="w-11 h-11 rounded-none hover:bg-brand-accent/10"
         onClick={onAdd}
       >
         {isPending ? (
@@ -92,7 +92,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
         <ShoppingCart className="w-7 h-7" />
         <h1 className="h2-bold">{t("shoppingCart")}</h1>
         {cart && cart.items.length > 0 && (
-          <span className="bg-brand-accent text-white text-sm font-bold px-2.5 py-0.5 rounded-full">
+          <span className="bg-brand-accent text-accent-foreground text-sm font-bold px-2.5 py-0.5 rounded-full">
             {itemCount}
           </span>
         )}
@@ -108,13 +108,14 @@ export default function CartTable({ cart }: { cart?: Cart }) {
             <p className="text-muted-foreground text-sm mb-6">
               {t("cartEmptyDesc")}
             </p>
-            <Button asChild className="bg-brand-accent hover:bg-brand-accent-dark text-white rounded-lg px-8 uppercase tracking-wide active:scale-[0.98] transition-all">
+            <Button asChild className="bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground rounded-lg px-8 uppercase tracking-wide active:scale-[0.98] transition-all">
               <Link href="/">{tc("goShopping")}</Link>
             </Button>
           </div>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-3 gap-4 md:gap-8">
+        <>
+        <div className="grid lg:grid-cols-3 gap-4 md:gap-8 pb-[88px] md:pb-0">
           {/* Cart items */}
           <div className="lg:col-span-2 space-y-4">
             {cart.items.map((item) => (
@@ -148,7 +149,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                     </div>
                     <button
                       onClick={() => handleRemove(item.productId)}
-                      className="text-muted-foreground/50 hover:text-destructive transition-colors p-2"
+                      className="text-muted-foreground/50 hover:text-destructive hover:bg-destructive/5 transition-colors w-11 h-11 -m-2 flex items-center justify-center flex-shrink-0 rounded-md"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -203,7 +204,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
               </div>
 
               <Button
-                className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
+                className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
                 disabled={isPending}
                 onClick={() => {
                   startTransition(async () => {
@@ -232,6 +233,42 @@ export default function CartTable({ cart }: { cart?: Cart }) {
             </div>
           </div>
         </div>
+
+        {/* Mobile sticky checkout bar — sits above mobile-bottom-nav */}
+        <div
+          className="md:hidden fixed inset-x-0 z-40 bg-card border-t border-border shadow-elevated"
+          style={{ bottom: "calc(68px + env(safe-area-inset-bottom, 0px))" }}
+        >
+          <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <div className="flex flex-col leading-tight min-w-0">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                {t("estimatedTotal")}
+              </span>
+              <span className="font-heading text-xl font-extrabold tabular-nums truncate">
+                {formatCurrency(cart.itemsPrice)}
+              </span>
+            </div>
+            <Button
+              className="h-11 px-5 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-semibold uppercase tracking-wide text-sm whitespace-nowrap active:scale-[0.98] transition-all flex-shrink-0"
+              disabled={isPending}
+              onClick={() => {
+                startTransition(async () => {
+                  router.push("/shipping-address");
+                });
+              }}
+            >
+              {isPending ? (
+                <Loader className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  {t("proceedToCheckout")}
+                  <ArrowRight className="w-4 h-4 ml-1.5" />
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+        </>
       )}
     </>
   );

@@ -16,6 +16,7 @@ const ROTATION_INTERVAL = 4000;
 
 export default function AnnouncementBar() {
   const t = useTranslations("Announcement");
+  const tCommon = useTranslations("Common");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dismissed, setDismissed] = useState(false);
   const progressKey = useRef(0);
@@ -35,35 +36,40 @@ export default function AnnouncementBar() {
   const Icon = ANNOUNCEMENT_ICONS[currentIndex];
 
   return (
-    <div className="announcement-bar bg-primary/80 backdrop-blur-sm hidden md:flex items-center justify-center relative text-sm font-semibold tracking-wide overflow-hidden">
+    <div className="announcement-bar bg-foreground flex items-center justify-center relative overflow-hidden border-b border-foreground">
+      {/* Left stencil tag — hidden on mobile to save space */}
+      <span className="hidden md:inline-block absolute left-4 top-1/2 -translate-y-1/2 font-mono text-[10px] font-bold tracking-[0.18em] text-accent uppercase">
+        ▲ NOTICE
+      </span>
+
       <AnimatePresence mode="wait">
         <motion.p
           key={currentIndex}
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
+          exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center flex items-center gap-2 text-brand-accent"
+          className="text-center flex items-center gap-2 text-background font-mono text-[10px] md:text-[11px] font-medium uppercase tracking-[0.10em] md:tracking-[0.12em] px-10 max-w-full"
         >
-          <Icon className="h-3.5 w-3.5" />
-          {t(ANNOUNCEMENT_KEYS[currentIndex])}
+          <Icon className="h-3 w-3 text-accent shrink-0" />
+          <span className="truncate">{t(ANNOUNCEMENT_KEYS[currentIndex])}</span>
         </motion.p>
       </AnimatePresence>
 
       {/* Dismiss button */}
       <button
         onClick={() => setDismissed(true)}
-        className="absolute right-4 p-1 text-primary-foreground opacity-40 hover:opacity-100 transition-opacity"
-        aria-label="Dismiss"
+        className="absolute right-2 md:right-4 p-1 text-background/60 hover:text-accent transition-colors"
+        aria-label={tCommon("dismiss")}
       >
-        <X className="h-3.5 w-3.5" />
+        <X className="h-3 w-3" />
       </button>
 
-      {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-transparent">
+      {/* Progress bar — yellow stencil tick */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-background/10">
         <div
           key={progressKey.current}
-          className="h-full bg-brand-accent animate-progress-fill"
+          className="h-full bg-accent animate-progress-fill"
         />
       </div>
     </div>

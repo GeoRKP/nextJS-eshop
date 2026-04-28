@@ -3,7 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
-import { LayoutGrid, ChevronDown } from "lucide-react";
+import { LayoutGrid, ChevronDown, ChevronRight } from "lucide-react";
 
 type Props = {
   categories: Category[];
@@ -24,7 +24,7 @@ export default function MobileCategoryChipsClient({
           {/* All chip — larger with chevron */}
           <Link
             href="/search"
-            className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold bg-brand-accent text-white rounded-lg whitespace-nowrap shrink-0 shadow-sm scroll-snap-start"
+            className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold bg-brand-accent text-accent-foreground rounded-lg whitespace-nowrap shrink-0 shadow-sm scroll-snap-start"
           >
             <LayoutGrid className="h-3 w-3" />
             {allLabel}
@@ -47,8 +47,10 @@ export default function MobileCategoryChipsClient({
           })}
         </div>
 
-        {/* Right fade indicator */}
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10" />
+        {/* Right fade indicator with chevron hint — signals scrollable list */}
+        <div className="absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-background via-background/90 to-transparent pointer-events-none z-10 flex items-center justify-end pr-1">
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/70" />
+        </div>
       </div>
     </div>
   );

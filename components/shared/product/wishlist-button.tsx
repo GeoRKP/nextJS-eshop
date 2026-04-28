@@ -36,16 +36,18 @@ export default function WishlistButton({
     <Button
       variant="ghost"
       size="icon"
-      className="rounded-full"
+      className="rounded-full hover:bg-red-500/10"
       onClick={handleToggle}
       disabled={isPending}
+      aria-pressed={isInWishlist}
     >
       <Heart
+        key={isInWishlist ? "filled" : "empty"}
         className={cn(
           "w-5 h-5 transition-colors",
           isInWishlist
-            ? "fill-red-500 text-red-500"
-            : "text-muted-foreground"
+            ? "fill-red-500 text-red-500 animate-[heart-pop_0.4s_cubic-bezier(0.16,1,0.3,1)]"
+            : "text-muted-foreground hover:text-red-500"
         )}
       />
     </Button>

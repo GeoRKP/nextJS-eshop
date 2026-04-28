@@ -59,7 +59,7 @@ export default function Pagination({
   const desktopPages = useMemo(() => getPageNumbers(7), [currentPage, totalPages]);
 
   return (
-    <nav aria-label="Pagination">
+    <nav aria-label={t("pagination")}>
       <div className="inline-flex items-center gap-1.5 bg-card border border-border/50 rounded-xl p-1.5 shadow-card-subtle">
         <Button
           variant="ghost"
@@ -89,7 +89,7 @@ export default function Pagination({
                 size="icon"
                 className={`w-10 h-10 rounded-lg text-xs font-medium ${
                   p === currentPage
-                    ? "bg-brand-accent text-white shadow-sm hover:bg-brand-accent-dark"
+                    ? "bg-brand-accent text-accent-foreground shadow-sm hover:bg-brand-accent-dark"
                     : "hover:bg-brand-accent/10"
                 }`}
                 onClick={() => handleClick(p)}
@@ -116,7 +116,7 @@ export default function Pagination({
                 size="icon"
                 className={`w-10 h-10 rounded-lg text-xs font-medium ${
                   p === currentPage
-                    ? "bg-brand-accent text-white shadow-sm hover:bg-brand-accent-dark"
+                    ? "bg-brand-accent text-accent-foreground shadow-sm hover:bg-brand-accent-dark"
                     : "hover:bg-brand-accent/10"
                 }`}
                 onClick={() => handleClick(p)}

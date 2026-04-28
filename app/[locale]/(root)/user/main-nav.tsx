@@ -45,15 +45,15 @@ export default function MainNav({
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200",
                 active
-                  ? "bg-brand-accent text-white font-bold"
+                  ? "bg-brand-accent text-accent-foreground font-bold"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               )}
             >
               <div className={cn(
                 "h-8 w-8 rounded-lg flex items-center justify-center",
-                active ? "bg-white/20" : "bg-brand-accent/10"
+                active ? "bg-accent-foreground/10" : "bg-brand-accent/10"
               )}>
-                <Icon className={cn("w-4 h-4", active ? "text-white" : "text-brand-accent")} />
+                <Icon className={cn("w-4 h-4", active ? "text-accent-foreground" : "text-brand-accent")} />
               </div>
               {link.title}
             </Link>

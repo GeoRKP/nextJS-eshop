@@ -32,33 +32,34 @@ export default async function CategoryCards() {
 
   if (treeCategories.length > 0) {
     return (
-      <div className="my-10">
-        <div className="flex items-center justify-between mb-6">
+      <div className="my-12 md:my-16 lg:my-20">
+        <div className="flex items-end justify-between mb-8 pb-4 border-b border-foreground/15">
           <div>
-            <span className="text-label text-brand-accent block mb-1">
+            <span className="text-stamp text-accent block mb-2 hazard-mark">
               {tHome("categoryLabel")}
             </span>
             <h2 className="h2-bold">{t("shopByCategory")}</h2>
           </div>
           <Link
             href="/search"
-            className="text-brand-accent text-sm font-semibold hover:underline flex items-center gap-1"
+            className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground hover:text-accent transition-colors flex items-center gap-2 border-b border-foreground hover:border-accent pb-1"
           >
             {tHome("viewAllCategories")}
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-12 gap-4 auto-rows-[200px]">
+        <div className="grid grid-cols-2 lg:grid-cols-12 gap-3 auto-rows-[210px] lg:auto-rows-[260px] 2xl:auto-rows-[320px]">
           {treeCategories.map((cat, i) => {
             const Icon = getCategoryIcon(cat.name);
             const subcategoryCount = cat.children?.length ?? 0;
             const span = bentoSpans[i % bentoSpans.length];
+            const moduleNum = String(i + 1).padStart(2, "0");
 
             return (
               <Link
                 key={cat.id}
                 href={`/search?category=${encodeURIComponent(cat.name)}`}
-                className={`group relative flex flex-col justify-end rounded-xl overflow-hidden ${span}`}
+                className={`group relative flex flex-col justify-end overflow-hidden border border-foreground/15 hover:border-foreground transition-all duration-300 ${span}`}
               >
                 {/* Background image or gradient */}
                 {cat.image ? (
@@ -66,36 +67,48 @@ export default async function CategoryCards() {
                     src={cat.image}
                     alt={cat.name}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
                 ) : (
-                  <div className="absolute inset-0 bg-gradient-industrial" />
+                  <div className="absolute inset-0 bg-gradient-industrial bg-blueprint-grid" />
                 )}
-                {/* Dark overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                {/* Graphite overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/40 to-transparent" />
 
-                {/* Hover arrow top-right */}
-                <div className="absolute top-3 right-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                  <ArrowUpRight className="h-5 w-5 text-white" />
+                {/* Yellow scan-bar revealed on hover */}
+                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-accent origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+
+                {/* Top-left module number badge */}
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 bg-foreground/85 border border-accent/40">
+                  <span className="font-mono text-[10px] font-bold tracking-[0.12em] text-accent">
+                    M.{moduleNum}
+                  </span>
+                </div>
+
+                {/* Top-right arrow */}
+                <div className="absolute top-3 right-3 h-7 w-7 flex items-center justify-center bg-accent text-accent-foreground opacity-0 md:group-hover:opacity-100 transition-opacity">
+                  <ArrowUpRight className="h-4 w-4" />
                 </div>
 
                 {/* Content at bottom */}
                 <div className="relative p-4 md:p-5">
-                  <Icon className="h-7 w-7 text-brand-accent mb-2" />
-                  <p className="font-bold text-white text-base md:text-lg">
+                  <Icon className="h-7 w-7 text-accent mb-2.5 stroke-[1.75]" />
+                  <p className="font-heading font-bold uppercase text-background text-base md:text-lg leading-tight tracking-[0.04em]">
                     {cat.name}
                   </p>
-                  {subcategoryCount > 0 && (
-                    <p className="text-xs text-white/60 mt-1">
-                      {subcategoryCount} subcategories
-                    </p>
-                  )}
-                  {cat._count?.products ? (
-                    <span className="inline-block mt-2 text-brand-accent text-xs font-medium">
-                      {t("productCount", { count: cat._count.products })}
-                    </span>
-                  ) : null}
+                  <div className="flex items-center gap-2.5 mt-2 text-background/80">
+                    {subcategoryCount > 0 && (
+                      <span className="font-mono text-[10px] uppercase tracking-[0.1em]">
+                        {t("subcategoriesCount", { count: subcategoryCount })}
+                      </span>
+                    )}
+                    {cat._count?.products ? (
+                      <span className="font-mono text-[10px] tracking-[0.05em] text-accent">
+                        [{String(cat._count.products).padStart(4, "0")}]
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </Link>
             );
@@ -110,43 +123,48 @@ export default async function CategoryCards() {
   if (categories.length === 0) return null;
 
   return (
-    <div className="my-10">
-      <div className="flex items-center justify-between mb-6">
+    <div className="my-12 md:my-16 lg:my-20">
+      <div className="flex items-end justify-between mb-8 pb-4 border-b border-foreground/15">
         <div>
-          <span className="text-label text-brand-accent block mb-1">
+          <span className="text-stamp text-accent block mb-2 hazard-mark">
             {tHome("categoryLabel")}
           </span>
           <h2 className="h2-bold">{t("shopByCategory")}</h2>
         </div>
         <Link
           href="/search"
-          className="text-brand-accent text-sm font-semibold hover:underline flex items-center gap-1"
+          className="font-mono text-[11px] uppercase tracking-[0.18em] text-foreground hover:text-accent transition-colors flex items-center gap-2 border-b border-foreground hover:border-accent pb-1"
         >
           {tHome("viewAllCategories")}
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-12 gap-4 auto-rows-[200px]">
+      <div className="grid grid-cols-2 lg:grid-cols-12 gap-3 auto-rows-[210px] lg:auto-rows-[260px] 2xl:auto-rows-[320px]">
         {categories.map((cat, i) => {
           const Icon = getCategoryIcon(cat.name) || ShoppingBag;
           const span = bentoSpans[i % bentoSpans.length];
+          const moduleNum = String(i + 1).padStart(2, "0");
 
           return (
             <Link
               key={cat.name}
               href={`/search?category=${encodeURIComponent(cat.name)}`}
-              className={`group relative flex flex-col justify-end rounded-xl overflow-hidden ${span}`}
+              className={`group relative flex flex-col justify-end overflow-hidden border border-foreground/15 hover:border-foreground transition-all duration-300 ${span}`}
             >
-              <div className="absolute inset-0 bg-gradient-industrial" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-              <div className="absolute top-3 right-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                <ArrowUpRight className="h-5 w-5 text-white" />
+              <div className="absolute inset-0 bg-gradient-industrial bg-blueprint-grid" />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-accent origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+              <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 bg-foreground/85 border border-accent/40">
+                <span className="font-mono text-[10px] font-bold tracking-[0.12em] text-accent">M.{moduleNum}</span>
+              </div>
+              <div className="absolute top-3 right-3 h-7 w-7 flex items-center justify-center bg-accent text-accent-foreground opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <ArrowUpRight className="h-4 w-4" />
               </div>
               <div className="relative p-4 md:p-5">
-                <Icon className="h-7 w-7 text-brand-accent mb-2" />
-                <p className="font-bold text-white text-base">{cat.name}</p>
-                <span className="inline-block mt-2 text-brand-accent text-xs font-medium">
-                  {t("productCount", { count: cat.productCount })}
+                <Icon className="h-7 w-7 text-accent mb-2.5 stroke-[1.75]" />
+                <p className="font-heading font-bold uppercase text-background text-base leading-tight tracking-[0.04em]">{cat.name}</p>
+                <span className="inline-block mt-2 font-mono text-[10px] tracking-[0.05em] text-accent">
+                  [{String(cat.productCount ?? 0).padStart(4, "0")}]
                 </span>
               </div>
             </Link>

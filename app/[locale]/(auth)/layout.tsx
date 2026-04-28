@@ -32,7 +32,7 @@ export default async function AuthLayout({
               { icon: Star, label: t("statRating") },
             ].map((item) => (
               <div key={item.label} className="glass-card flex items-center gap-3 p-3">
-                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center">
                   <item.icon className="w-5 h-5 text-brand-accent" />
                 </div>
                 <span className="text-sm text-primary-foreground/80">{item.label}</span>

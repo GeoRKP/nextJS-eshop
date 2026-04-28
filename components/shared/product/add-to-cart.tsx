@@ -38,7 +38,7 @@ export default function AddToCart({
         action: (
           <ToastAction
             altText={t("goToCart")}
-            className="bg-primary text-white hover:bg-gray-800"
+            className="bg-primary text-background hover:bg-primary/90"
             onClick={() => router.push("/cart")}
           >
             {t("goToCart")}
@@ -58,7 +58,7 @@ export default function AddToCart({
         action: (
           <ToastAction
             altText={t("goToCart")}
-            className="bg-primary text-white hover:bg-gray-800"
+            className="bg-primary text-background hover:bg-primary/90"
             onClick={() => router.push("/cart")}
           >
             {t("goToCart")}
@@ -75,13 +75,13 @@ export default function AddToCart({
     cart && cart.items.find((x) => x.productId === item.productId);
 
   return existItem ? (
-    <div className="flex items-center gap-3 w-full">
-      <div className="flex items-center border-2 border-border rounded-lg overflow-hidden">
+    <div className="flex items-stretch gap-2 w-full">
+      <div className="flex items-stretch border-2 border-foreground bg-card">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="rounded-none h-12 w-12 hover:bg-brand-accent/10"
+          className="rounded-none h-13 w-13 hover:bg-accent hover:text-accent-foreground btn-stamp"
           onClick={handleRemoveFromCart}
         >
           {isPending ? (
@@ -90,12 +90,14 @@ export default function AddToCart({
             <Minus className="h-4 w-4" />
           )}
         </Button>
-        <span className="w-14 text-center font-semibold text-lg tabular-nums select-none">{existItem.qty}</span>
+        <span className="w-14 flex items-center justify-center font-mono font-bold text-lg tabular-nums select-none border-x border-border bg-muted/40">
+          {String(existItem.qty).padStart(2, "0")}
+        </span>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="rounded-none h-12 w-12 hover:bg-brand-accent/10"
+          className="rounded-none h-13 w-13 hover:bg-accent hover:text-accent-foreground btn-stamp"
           onClick={handleAddToCart}
         >
           {isPending ? (
@@ -106,17 +108,17 @@ export default function AddToCart({
         </Button>
       </div>
       <Button
-        className="flex-1 h-12 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
+        className="flex-1 h-13 rounded-none bg-foreground hover:bg-accent text-background hover:text-accent-foreground font-heading font-bold uppercase tracking-[0.16em] text-sm btn-stamp transition-colors"
         type="button"
         onClick={() => router.push("/cart")}
       >
         <ShoppingCart className="h-4 w-4 mr-2" />
-        {t("goToCart")}
+        {t("goToCart")} →
       </Button>
     </div>
   ) : (
     <Button
-      className="w-full h-13 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide shadow-md hover:shadow-lg active:scale-[0.98] transition-all"
+      className="w-full h-14 rounded-none bg-accent hover:bg-foreground text-accent-foreground hover:text-background font-heading font-extrabold text-base uppercase tracking-[0.16em] btn-stamp transition-colors border-2 border-accent hover:border-foreground"
       type="button"
       onClick={handleAddToCart}
     >
@@ -125,7 +127,7 @@ export default function AddToCart({
       ) : (
         <ShoppingCart className="h-5 w-5 mr-2" />
       )}
-      {t("addToCart")}
+      {t("addToCart")} →
     </Button>
   );
 }

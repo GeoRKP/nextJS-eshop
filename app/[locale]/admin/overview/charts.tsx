@@ -21,17 +21,17 @@ import { formatCurrency } from "@/lib/utils";
 // -- Color palette --
 
 const CHART_COLORS = [
-  "hsl(var(--brand-accent))", // brand accent (amber gold)
-  "hsl(var(--primary))", // primary (deep navy)
-  "hsl(150, 60%, 45%)", // green
-  "hsl(0, 70%, 55%)", // red
-  "hsl(270, 60%, 55%)", // purple
-  "hsl(190, 70%, 50%)", // cyan
-  "hsl(330, 60%, 55%)", // pink
-  "hsl(90, 60%, 45%)", // lime
+  "oklch(var(--brand-accent))", // brand accent (signal yellow)
+  "oklch(var(--primary))", // primary (graphite)
+  "oklch(0.65 0.15 150)", // green
+  "oklch(0.58 0.20 28)",  // red
+  "oklch(0.55 0.18 295)", // purple
+  "oklch(0.68 0.12 210)", // cyan
+  "oklch(0.62 0.18 350)", // pink
+  "oklch(0.68 0.16 135)", // lime
 ];
 
-const AXIS_STROKE = "hsl(var(--muted-foreground))";
+const AXIS_STROKE = "oklch(var(--muted-foreground))";
 
 // -- Types --
 
@@ -147,8 +147,8 @@ function NoData({ label }: { label: string }) {
 
 const tooltipStyle = {
   borderRadius: "8px",
-  border: "1px solid hsl(var(--border))",
-  background: "hsl(var(--background))",
+  border: "1px solid oklch(var(--border))",
+  background: "oklch(var(--background))",
 };
 
 // -- 1. Revenue & Orders Over Time (ComposedChart) --

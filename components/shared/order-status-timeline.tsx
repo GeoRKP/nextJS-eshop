@@ -46,8 +46,8 @@ const statusConfig: Record<
     icon: RotateCcw,
   },
   refunded: {
-    color: "text-gray-600",
-    bgColor: "bg-gray-500/10",
+    color: "text-muted-foreground",
+    bgColor: "bg-muted",
     icon: DollarSign,
   },
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import { Category } from "@/types";
@@ -12,9 +13,7 @@ type Translations = {
   viewAll: string;
   featured: string;
   allCategories: string;
-  deals: string;
   newArrivals: string;
-  shopByBrand: string;
   popularBrands: string;
   allBrands: string;
   viewAllIn: string;
@@ -129,15 +128,21 @@ function MegaMenuShell({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-foreground/70 z-40" onClick={onClose} />
       <div
         ref={panelRef}
         role="menu"
-        className="absolute left-0 right-0 z-50 bg-black/70 backdrop-blur-2xl border-t-2 border-t-brand-accent border-b shadow-elevated"
-        style={{ boxShadow: "inset 0 1px 30px -10px hsl(var(--brand-accent) / 0.15), var(--shadow-elevated)" }}
+        className="absolute left-0 right-0 z-50 bg-foreground text-background border-t-[3px] border-t-accent border-b border-b-foreground"
+        style={{ boxShadow: "0 16px 40px -16px oklch(var(--foreground) / 0.6)" }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
+        {/* Stencil command console header strip */}
+        <div className="wrapper !py-2 border-b border-background/10">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
+            ▲ COMMAND ROUTING / CATALOG INDEX
+          </span>
+        </div>
         <div className="wrapper !py-6">
           <div className="max-h-[520px] overflow-y-auto">{children}</div>
         </div>
@@ -184,7 +189,7 @@ function SingleCategoryMegaMenu({
                       role="menuitem"
                       href={`/search?category=${encodeURIComponent(sub.name)}`}
                       onClick={onClose}
-                      className="flex items-center gap-2 text-brand-accent font-bold uppercase text-xs tracking-widest hover:opacity-80 transition-opacity mb-2 pb-1 border-b border-brand-accent/20"
+                      className="flex items-center gap-2 text-accent font-heading font-bold uppercase text-[11px] tracking-[0.18em] hover:text-accent/80 transition-colors mb-2 pb-1.5 border-b border-accent/30"
                     >
                       <SubIcon className="h-4 w-4" />
                       {sub.name}
@@ -197,12 +202,12 @@ function SingleCategoryMegaMenu({
                               role="menuitem"
                               href={`/search?category=${encodeURIComponent(item.name)}`}
                               onClick={onClose}
-                              className="block text-sm text-muted-foreground border-l-2 border-transparent pl-2 hover:text-brand-accent hover:border-brand-accent transition-all py-0.5"
+                              className="block text-[13px] text-background/65 pl-2 hover:text-accent hover:translate-x-0.5 transition-all py-1"
                             >
                               {item.name}
                               {item._count?.products ? (
-                                <span className="text-xs ml-1 opacity-60">
-                                  ({item._count.products})
+                                <span className="font-mono text-[10px] ml-1.5 text-background/40 tracking-[0.05em]">
+                                  [{String(item._count.products).padStart(3, "0")}]
                                 </span>
                               ) : null}
                             </Link>
@@ -219,7 +224,7 @@ function SingleCategoryMegaMenu({
               <Link
                 href={`/search?category=${encodeURIComponent(category.name)}`}
                 onClick={onClose}
-                className="text-sm text-brand-accent hover:underline font-medium"
+                className="text-sm text-accent hover:underline font-medium uppercase tracking-[0.12em] font-heading"
               >
                 {translations.viewAll} {category.name} →
               </Link>
@@ -227,26 +232,42 @@ function SingleCategoryMegaMenu({
           )}
         </div>
 
-        {/* Right panel: CTA card — wider */}
-        <div className="w-64 shrink-0 hidden xl:flex flex-col items-center justify-center rounded-xl bg-gradient-industrial p-6 text-center text-primary-foreground">
-          <CategoryIcon className="h-10 w-10 text-brand-accent/70 mb-3" />
-          <p className="text-sm font-bold mb-1">{category.name}</p>
-          {category._count?.products ? (
-            <p className="text-xs text-primary-foreground/60 mb-3">
-              {translations.products.replace(
-                "{count}",
-                String(category._count.products)
-              )}
-            </p>
-          ) : null}
-          <Link
-            href={`/search?category=${encodeURIComponent(category.name)}`}
-            onClick={onClose}
-            className="inline-flex items-center gap-1 text-xs font-bold bg-brand-accent text-white px-4 py-2 rounded-md hover:bg-brand-accent-dark transition-colors"
-          >
-            {translations.viewAll}
-            <ArrowRight className="h-3 w-3" />
-          </Link>
+        {/* Right panel: CTA card — workshop info plate with optional image bg */}
+        <div className="w-64 shrink-0 hidden xl:flex flex-col rounded-none border border-accent/40 bg-foreground/40 p-5 text-background relative overflow-hidden">
+          {category.image && (
+            <>
+              <Image
+                src={category.image}
+                alt=""
+                fill
+                sizes="256px"
+                className="object-cover opacity-50"
+                aria-hidden="true"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/85 to-foreground/40" aria-hidden="true" />
+              <div className="absolute inset-0 bg-blueprint-grid-sm opacity-[0.08]" aria-hidden="true" />
+            </>
+          )}
+          <div className="relative flex flex-col h-full">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent mb-3">
+              ▲ MODULE
+            </span>
+            <CategoryIcon className="h-12 w-12 text-accent stroke-[1.5] mb-4" />
+            <p className="font-heading font-bold uppercase text-base tracking-[0.06em] leading-tight mb-1">{category.name}</p>
+            {category._count?.products ? (
+              <p className="font-mono text-[11px] text-background/75 mb-4 tracking-[0.05em]">
+                [{String(category._count.products).padStart(4, "0")}] {translations.products.replace("{count}", "").trim()}
+              </p>
+            ) : null}
+            <Link
+              href={`/search?category=${encodeURIComponent(category.name)}`}
+              onClick={onClose}
+              className="mt-auto inline-flex items-center justify-between gap-1 text-[11px] font-bold uppercase tracking-[0.16em] bg-accent text-accent-foreground px-4 py-2.5 rounded-none hover:bg-background hover:text-foreground transition-colors font-heading"
+            >
+              {translations.viewAll}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         </div>
       </div>
     </MegaMenuShell>
@@ -297,7 +318,7 @@ function AllCategoriesMegaMenu({
     >
       <div className="flex gap-6 min-h-[250px]">
         {/* LEFT: Category list — always visible */}
-        <div className="w-2/5 max-h-[400px] overflow-y-auto border-r border-border pr-3 space-y-0.5">
+        <div className="w-2/5 max-h-[400px] overflow-y-auto border-r border-background/15 pr-3 space-y-px">
           {categories.map((cat) => {
             const Icon = getCategoryIcon(cat.name);
             const isActive = activeRoot === cat.id;
@@ -306,18 +327,18 @@ function AllCategoriesMegaMenu({
                 key={cat.id}
                 href={`/search?category=${encodeURIComponent(cat.name)}`}
                 onClick={onClose}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-all ${
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-all ${
                   isActive
-                    ? "bg-brand-accent/10 border-l-2 border-brand-accent"
-                    : "border-l-2 border-transparent hover:bg-muted/50"
+                    ? "bg-accent text-accent-foreground font-semibold"
+                    : "text-background/80 hover:text-accent hover:bg-background/5"
                 }`}
                 onMouseEnter={() => handleCategoryHover(cat.id)}
                 onMouseLeave={handleCategoryLeave}
               >
-                <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? "text-brand-accent" : "text-muted-foreground"}`} />
-                <span className="text-sm font-medium truncate flex-1">{cat.name}</span>
+                <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? "text-accent-foreground" : "text-background/55"}`} />
+                <span className="text-[13px] truncate flex-1">{cat.name}</span>
                 <ChevronRight className={`h-3.5 w-3.5 shrink-0 transition-all ${
-                  isActive ? "text-brand-accent" : "text-muted-foreground opacity-0"
+                  isActive ? "text-accent-foreground" : "text-background/40 opacity-0"
                 }`} />
               </Link>
             );
@@ -328,12 +349,12 @@ function AllCategoriesMegaMenu({
         <div className="flex-1 min-w-0 max-h-[400px] overflow-y-auto">
           {activeCat && (
             <>
-              <div className="flex items-center gap-2 mb-3">
-                <h4 className="font-bold text-sm">{activeCat.name}</h4>
+              <div className="flex items-center gap-3 mb-4 pb-2 border-b border-background/10">
+                <h4 className="font-heading font-bold text-sm uppercase tracking-[0.1em]">{activeCat.name}</h4>
                 <Link
                   href={`/search?category=${encodeURIComponent(activeCat.name)}`}
                   onClick={onClose}
-                  className="text-[11px] text-muted-foreground hover:text-brand-accent transition-colors"
+                  className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent hover:text-accent/80 transition-colors ml-auto"
                 >
                   {translations.viewAll} →
                 </Link>
@@ -347,7 +368,7 @@ function AllCategoriesMegaMenu({
                         role="menuitem"
                         href={`/search?category=${encodeURIComponent(sub.name)}`}
                         onClick={onClose}
-                        className="flex items-center gap-2 text-brand-accent font-bold uppercase text-xs tracking-widest hover:opacity-80 transition-opacity mb-2 pb-1 border-b border-brand-accent/20"
+                        className="flex items-center gap-2 text-accent font-heading font-bold uppercase text-[11px] tracking-[0.18em] hover:text-accent/80 transition-colors mb-2 pb-1.5 border-b border-accent/30"
                       >
                         <SubIcon className="h-3.5 w-3.5" />
                         {sub.name}
@@ -360,7 +381,7 @@ function AllCategoriesMegaMenu({
                                 role="menuitem"
                                 href={`/search?category=${encodeURIComponent(child.name)}`}
                                 onClick={onClose}
-                                className="block text-sm text-muted-foreground border-l-2 border-transparent pl-2 hover:text-brand-accent hover:border-brand-accent transition-all py-0.5"
+                                className="block text-[13px] text-background/65 pl-2 hover:text-accent hover:translate-x-0.5 transition-all py-1"
                               >
                                 {child.name}
                               </Link>
@@ -431,11 +452,11 @@ function BrandsMegaMenu({
                 key={b.brand}
                 href={`/search?q=all&category=all&brand=${encodeURIComponent(b.brand)}`}
                 onClick={onClose}
-                className="flex items-center justify-between px-4 py-3 text-sm bg-card border border-border hover:border-brand-accent hover:shadow-card-glow rounded-lg transition-all font-medium"
+                className="flex items-center justify-between px-4 py-3 text-sm bg-background/5 border border-background/10 hover:border-accent hover:bg-background/10 hover:text-accent transition-all font-medium uppercase tracking-[0.06em] font-heading"
               >
                 <span>{b.brand}</span>
-                <span className="text-xs text-muted-foreground">
-                  ({b._count})
+                <span className="font-mono text-[10px] text-background/40 tracking-[0.05em]">
+                  [{String(b._count).padStart(3, "0")}]
                 </span>
               </Link>
             ))}
@@ -447,13 +468,13 @@ function BrandsMegaMenu({
       {sortedLetters.length > 0 && (
         <div className="flex gap-4">
           <div className="flex-1">
-            <h3 className="text-label text-foreground mb-3">
+            <h3 className="text-label text-background mb-3">
               {translations.allBrands}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-4">
               {sortedLetters.map((letter) => (
                 <div key={letter} id={`brand-letter-${letter}`}>
-                  <p className="text-lg font-black text-brand-accent mb-1">
+                  <p className="font-mono text-2xl font-bold text-accent mb-1.5 leading-none border-b border-accent/30 pb-1">
                     {letter}
                   </p>
                   <ul className="space-y-0.5">
@@ -462,7 +483,7 @@ function BrandsMegaMenu({
                         <Link
                           href={`/search?q=all&category=all&brand=${encodeURIComponent(b.brand)}`}
                           onClick={onClose}
-                          className="text-sm hover:text-brand-accent transition-colors"
+                          className="text-[13px] text-background/75 hover:text-accent transition-colors"
                         >
                           {b.brand}
                         </Link>
@@ -477,13 +498,13 @@ function BrandsMegaMenu({
           {/* A-Z sticky jump bar */}
           <div
             ref={jumpBarRef}
-            className="hidden lg:flex flex-col gap-0.5 sticky top-0 self-start pl-2 border-l border-border"
+            className="hidden lg:flex flex-col gap-0.5 sticky top-0 self-start pl-2 border-l border-background/15"
           >
             {sortedLetters.map((letter) => (
               <button
                 key={letter}
                 onClick={() => scrollToLetter(letter)}
-                className="text-xs font-bold text-muted-foreground hover:text-brand-accent transition-colors px-1 py-0.5"
+                className="font-mono text-xs font-bold text-background/55 hover:text-accent transition-colors px-1.5 py-0.5"
               >
                 {letter}
               </button>

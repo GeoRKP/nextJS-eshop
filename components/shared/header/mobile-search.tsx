@@ -7,6 +7,7 @@ import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 type Props = {
   onClose: () => void;
@@ -30,6 +31,9 @@ export default function MobileSearch({ onClose }: Props) {
     clearResults,
   } = useSearchSuggestions({ onNavigate: onClose });
 
+  const t = useTranslations("Search");
+  const tCommon = useTranslations("Common");
+
   // Auto-focus on mount
   useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100);
@@ -48,18 +52,18 @@ export default function MobileSearch({ onClose }: Props) {
     >
       {/* Search header — dark themed */}
       <div className="flex items-center gap-2 px-3 py-2 bg-primary text-primary-foreground">
-        <Button variant="ghost" size="icon" onClick={onClose} className="text-primary-foreground hover:bg-white/10">
+        <Button variant="ghost" size="icon" onClick={onClose} className="text-primary-foreground hover:bg-background/10">
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <form onSubmit={handleSubmit} className="flex-1 flex items-center gap-2">
-          <div className="flex-1 flex items-center bg-white/10 rounded-full border border-white/20 px-3">
+          <div className="flex-1 flex items-center bg-background/10 rounded-full border border-background/20 px-3">
             <SearchIcon className="h-4 w-4 text-primary-foreground/60 shrink-0" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => handleInputChange(e.target.value)}
-              placeholder="Search..."
+              placeholder={tCommon("searchPlaceholder")}
               className="flex-1 h-11 bg-transparent pl-2 text-sm text-primary-foreground placeholder:text-primary-foreground/50 focus:outline-none"
               autoComplete="off"
             />
@@ -76,7 +80,7 @@ export default function MobileSearch({ onClose }: Props) {
               </button>
             )}
           </div>
-          <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-white flex items-center justify-center shrink-0">
+          <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-accent-foreground flex items-center justify-center shrink-0">
             <SearchIcon className="h-4 w-4" />
           </button>
         </form>
@@ -89,13 +93,13 @@ export default function MobileSearch({ onClose }: Props) {
           <div className="p-3">
             <div className="flex items-center justify-between mb-2">
               <span className="text-label text-muted-foreground">
-                Recent Searches
+                {t("recentSearches")}
               </span>
               <button
                 onClick={handleClearRecents}
                 className="text-xs text-brand-accent hover:underline"
               >
-                Clear all
+                {t("clearAll")}
               </button>
             </div>
             {recentSearches.map((term) => (
@@ -125,7 +129,7 @@ export default function MobileSearch({ onClose }: Props) {
         {showProducts && (
           <div className="p-3">
             <span className="text-label text-muted-foreground">
-              Products
+              {t("productsSection")}
             </span>
             {products.map((product) => (
               <button
@@ -157,7 +161,7 @@ export default function MobileSearch({ onClose }: Props) {
         {showCategories && (
           <div className="p-3 border-t">
             <span className="text-label text-muted-foreground">
-              Categories
+              {t("categoriesSection")}
             </span>
             {categories.map((cat) => (
               <button
@@ -182,7 +186,7 @@ export default function MobileSearch({ onClose }: Props) {
               className="flex items-center gap-2 w-full py-3 px-3 text-sm bg-brand-accent/10 hover:bg-brand-accent/20 rounded-lg transition-colors font-medium"
             >
               <SearchIcon className="h-4 w-4 text-brand-accent" />
-              Search for &quot;{query}&quot;
+              {t("searchFor", { query })}
               <ArrowRight className="h-4 w-4 ml-auto text-brand-accent" />
             </button>
           </div>

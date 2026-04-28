@@ -13,9 +13,9 @@ export default async function BrandShowcase({
   if (brands.length === 0) return null;
 
   return (
-    <section className="border-y border-border/50 py-10">
-      <div className="text-center mb-8">
-        <span className="text-label text-brand-accent block mb-1">
+    <section className="border-y border-border py-12 md:py-16 bg-muted/30">
+      <div className="text-center mb-10 wrapper">
+        <span className="text-stamp text-accent block mb-2 hazard-mark">
           {t("trustedBy")}
         </span>
         <h2 className="h2-bold">{t("shopByBrand")}</h2>

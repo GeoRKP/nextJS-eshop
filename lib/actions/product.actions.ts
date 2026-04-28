@@ -508,7 +508,7 @@ export const getFeaturedProducts = unstable_cache(
       orderBy: {
         createdAt: "desc",
       },
-      take: 4,
+      take: 5,
     });
 
     return toPlainObject(data);

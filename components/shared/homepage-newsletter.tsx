@@ -6,22 +6,28 @@ export default async function HomepageNewsletter() {
 
   return (
     <section className="wrapper">
-      <div className="relative rounded-xl bg-primary overflow-hidden">
-        {/* Industrial stripe overlay */}
-        <div className="absolute inset-0 industrial-stripe" />
+      <div className="relative bg-foreground overflow-hidden border border-foreground">
+        {/* Industrial stripe + blueprint overlay */}
+        <div className="absolute inset-0 industrial-stripe pointer-events-none" />
+        <div className="absolute inset-0 bg-blueprint-grid opacity-[0.04] pointer-events-none" />
 
-        {/* Amber accent bars */}
-        <div className="absolute top-0 left-0 w-20 h-1 bg-brand-accent" />
-        <div className="absolute bottom-0 right-0 w-20 h-1 bg-brand-accent" />
+        {/* Yellow accent bars + corner brackets */}
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-accent" />
+        <div className="absolute top-4 left-4 h-5 w-5 border-t-2 border-l-2 border-accent" />
+        <div className="absolute top-4 right-4 h-5 w-5 border-t-2 border-r-2 border-accent" />
+        <div className="absolute bottom-4 left-4 h-5 w-5 border-b-2 border-l-2 border-accent" />
+        <div className="absolute bottom-4 right-4 h-5 w-5 border-b-2 border-r-2 border-accent" />
 
-        <div className="relative py-12 md:py-16 px-6 md:px-12 flex flex-col items-center text-center">
-          <span className="text-label text-brand-accent mb-3">
-            {t("stayUpdated")}
+        <div className="relative py-14 md:py-20 px-6 md:px-12 flex flex-col items-center text-center">
+          <span className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent mb-4 inline-flex items-center gap-2">
+            <span className="h-px w-8 bg-accent" />
+            ▲ {t("stayUpdated")}
+            <span className="h-px w-8 bg-accent" />
           </span>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight text-white mb-3">
+          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-extrabold uppercase text-background mb-4 leading-[1.02]" style={{ letterSpacing: "-0.02em" }}>
             {t("newsletterTitle")}
           </h2>
-          <p className="text-white/60 text-sm md:text-base max-w-lg mb-8">
+          <p className="text-background/65 text-sm md:text-base max-w-lg mb-8 leading-relaxed">
             {t("newsletterSubtitle")}
           </p>
           <div className="w-full max-w-md">

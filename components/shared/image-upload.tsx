@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Upload } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function ImageUploadButton({
   onUploadComplete,
@@ -13,6 +14,7 @@ export function ImageUploadButton({
 }) {
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations("Common");
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -30,13 +32,13 @@ export function ImageUploadButton({
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Upload failed");
+        throw new Error(data.error || t("uploadFailed"));
       }
 
       const data = await res.json();
       onUploadComplete([{ url: data.url }]);
     } catch (err) {
-      onUploadError(err instanceof Error ? err : new Error("Upload failed"));
+      onUploadError(err instanceof Error ? err : new Error(t("uploadFailed")));
     } finally {
       setIsUploading(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -64,7 +66,7 @@ export function ImageUploadButton({
         ) : (
           <Upload className="h-4 w-4 mr-2" />
         )}
-        {isUploading ? "Uploading..." : "Upload"}
+        {isUploading ? t("uploading") : t("upload")}
       </Button>
     </div>
   );

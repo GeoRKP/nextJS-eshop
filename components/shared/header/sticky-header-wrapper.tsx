@@ -17,7 +17,7 @@ export default function StickyHeaderWrapper({
         {announcementBar}
       </div>
       {/* Main header + category nav */}
-      <div className="bg-background">
+      <div className="bg-background border-b border-border">
         {children}
       </div>
     </div>

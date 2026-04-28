@@ -21,49 +21,60 @@ function ProductDetailTabs({
 }: ProductDetailTabsProps) {
   const t = useTranslations("Product");
 
+  // Synthetic OEM-style code from slug for visual interest
+  const oemCode = `${brand.slice(0, 3).toUpperCase()}-${slug.slice(0, 8).toUpperCase()}`;
+
   const specs = [
-    { label: t("sku"), value: slug },
-    { label: t("brandLabel"), value: brand },
-    { label: t("categoryLabel"), value: category },
-    { label: t("stockLabel"), value: stock.toString() },
+    { label: t("sku"), value: slug.toUpperCase() },
+    { label: "OEM REF", value: oemCode },
+    { label: t("brandLabel"), value: brand.toUpperCase() },
+    { label: t("categoryLabel"), value: category.toUpperCase() },
+    { label: t("stockLabel"), value: `${String(stock).padStart(4, "0")} UNITS` },
   ];
 
   return (
     <Tabs defaultValue="description" className="w-full">
-      <TabsList className="bg-transparent border-b border-border/50 rounded-none h-auto p-0 w-full justify-start gap-0 overflow-x-auto">
+      <TabsList className="bg-transparent border-b-2 border-foreground rounded-none h-auto p-0 w-full justify-start gap-0 overflow-x-auto">
         <TabsTrigger
           value="description"
-          className="tab-indicator rounded-none bg-transparent shadow-none px-3 sm:px-4 md:px-6 py-3 text-sm font-semibold data-[state=active]:text-brand-accent data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground min-h-[44px] active:scale-95 transition-transform"
+          className="tab-indicator rounded-none bg-transparent shadow-none px-4 sm:px-6 py-3.5 font-heading text-[12px] font-bold uppercase tracking-[0.16em] data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground min-h-[44px] hover:text-foreground transition-colors"
         >
           {t("description")}
         </TabsTrigger>
         <TabsTrigger
           value="specifications"
-          className="tab-indicator rounded-none bg-transparent shadow-none px-3 sm:px-4 md:px-6 py-3 text-sm font-semibold data-[state=active]:text-brand-accent data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground min-h-[44px] active:scale-95 transition-transform"
+          className="tab-indicator rounded-none bg-transparent shadow-none px-4 sm:px-6 py-3.5 font-heading text-[12px] font-bold uppercase tracking-[0.16em] data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground min-h-[44px] hover:text-foreground transition-colors"
         >
           {t("specifications")}
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="description" className="mt-6">
-        <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">
+        <p className="text-foreground/80 text-sm leading-relaxed whitespace-pre-line">
           {description}
         </p>
       </TabsContent>
 
       <TabsContent value="specifications" className="mt-6">
-        <div className="rounded-lg border border-border/50 overflow-hidden">
-          {specs.map((spec, i) => (
-            <div
-              key={spec.label}
-              className={`flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 py-3 text-sm gap-1 ${
-                i % 2 === 0 ? "bg-muted/30" : "bg-transparent"
-              }`}
-            >
-              <span className="font-medium text-muted-foreground">{spec.label}</span>
-              <span className="font-semibold">{spec.value}</span>
-            </div>
-          ))}
+        {/* Workshop spec sheet — dot-leader rows */}
+        <div className="border border-border bg-card p-5">
+          <div className="flex items-center justify-between mb-4 pb-2 border-b border-dashed border-border">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
+              ▲ TECHNICAL SHEET
+            </span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+              REV 01
+            </span>
+          </div>
+          <div className="space-y-0.5">
+            {specs.map((spec) => (
+              <div key={spec.label} className="dot-leader">
+                <span className="label">{spec.label}</span>
+                <span className="leader" />
+                <span className="value">{spec.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </TabsContent>
     </Tabs>

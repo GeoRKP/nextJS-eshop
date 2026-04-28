@@ -33,7 +33,7 @@ export default async function SignInPage(props: {
             width={64}
             height={64}
             alt={`${APP_NAME} logo`}
-            preload={true}
+            priority
           />
         </Link>
         <h1 className="h2-bold">{t("welcomeBack")}</h1>

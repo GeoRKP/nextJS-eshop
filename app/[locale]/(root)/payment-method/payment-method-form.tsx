@@ -28,6 +28,13 @@ const paymentDescKeys: Record<string, string> = {
   CashOnDelivery: "payOnDelivery",
 };
 
+const paymentNameKeys: Record<string, string> = {
+  Stripe: "paymentStripe",
+  Paypal: "paymentPaypal",
+  PayPal: "paymentPaypal",
+  CashOnDelivery: "paymentCashOnDelivery",
+};
+
 export default function PaymentMethodForm({
   preferredPaymentMethod,
 }: {
@@ -104,13 +111,13 @@ export default function PaymentMethodForm({
                               <Icon className="w-6 h-6" />
                             </div>
                             <div className="flex-1">
-                              <p className="font-semibold">{paymentMethod}</p>
+                              <p className="font-semibold">{t(paymentNameKeys[paymentMethod] as Parameters<typeof t>[0])}</p>
                               <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                                 {t(paymentDescKeys[paymentMethod] as Parameters<typeof t>[0])}
                               </p>
                             </div>
                             {isSelected && (
-                              <div className="w-6 h-6 rounded-full bg-brand-accent text-white flex items-center justify-center">
+                              <div className="w-6 h-6 rounded-full bg-brand-accent text-accent-foreground flex items-center justify-center">
                                 <Check className="w-4 h-4" strokeWidth={3} />
                               </div>
                             )}
@@ -126,7 +133,7 @@ export default function PaymentMethodForm({
               <Button
                 type="submit"
                 disabled={isPending}
-                className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
+                className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-semibold text-base uppercase tracking-wide active:scale-[0.98] transition-all"
               >
                 {isPending ? (
                   <Loader2 className="w-5 h-5 animate-spin mr-2" />

@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { getAllCoupons, deleteCoupon } from "@/lib/actions/coupon.actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +26,7 @@ export default async function AdminCouponsPage(props: {
   searchParams: Promise<{ page?: string; query?: string }>;
 }) {
   await requireAdmin();
+  const locale = await getLocale();
   const t = await getTranslations("AdminCoupons");
   const tCommon = await getTranslations("Common");
   const searchParams = await props.searchParams;
@@ -78,7 +79,7 @@ export default async function AdminCouponsPage(props: {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
+                  <TableHead>{t("id")}</TableHead>
                   <TableHead>{t("code")}</TableHead>
                   <TableHead>{t("type")}</TableHead>
                   <TableHead>{t("value")}</TableHead>
@@ -107,7 +108,7 @@ export default async function AdminCouponsPage(props: {
                     </TableCell>
                     <TableCell>
                       {coupon.validUntil
-                        ? new Date(coupon.validUntil).toLocaleDateString()
+                        ? new Date(coupon.validUntil).toLocaleDateString(locale)
                         : "-"}
                     </TableCell>
                     <TableCell>{getStatusBadge(coupon)}</TableCell>

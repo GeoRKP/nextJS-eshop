@@ -16,7 +16,7 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen flex flex-col border-t-2 border-brand-accent">
       {/* Top bar */}
-      <div className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="border-b border-border bg-background">
         <div className="container mx-auto flex items-center h-16 px-4">
           <Link href="/" className="flex items-center gap-2">
             <Image

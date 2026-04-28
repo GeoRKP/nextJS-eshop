@@ -164,7 +164,7 @@ export default function DashboardFilters({
             <SelectItem value="all">{t("allPayments")}</SelectItem>
             {PAYMENT_METHODS.map((m) => (
               <SelectItem key={m} value={m}>
-                {m}
+                {t(`payment${m}` as Parameters<typeof t>[0])}
               </SelectItem>
             ))}
           </SelectContent>

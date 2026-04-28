@@ -53,8 +53,10 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
     };
   }, [api, onSelect]);
 
+  const totalSlides = products.length;
+
   return (
-    <section className="relative w-full">
+    <section className="relative w-full border-y border-foreground/10 bg-foreground">
       <Carousel
         setApi={setApi}
         opts={{ loop: true }}
@@ -65,7 +67,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
             const slide = slides[index % slides.length];
             return (
               <CarouselItem key={product.id}>
-                <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
+                <div className="relative w-full h-[440px] sm:h-[520px] md:h-[620px] lg:h-[720px] xl:h-[780px] 2xl:h-[860px] overflow-hidden">
                   {product.banner ? (
                     product.banner.endsWith('.svg') ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
@@ -79,58 +81,92 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                         src={product.banner}
                         alt={product.name}
                         fill
-                        preload={index === 0}
+                        priority={index === 0}
                         className="object-cover"
                         sizes="100vw"
                       />
                     )
                   ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/80 to-primary/40" />
+                    <div className="absolute inset-0 bg-foreground" />
                   )}
-                  {/* Multi-layer overlay: directional gradient + bottom fade */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent" />
+
+                  {/* Blueprint grid overlay — signature touch */}
+                  <div
+                    className="absolute inset-0 bg-blueprint-grid opacity-[0.06] pointer-events-none"
+                    aria-hidden="true"
+                  />
+
+                  {/* Directional graphite overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-foreground/85 via-foreground/45 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-foreground/80 to-transparent" />
+
+                  {/* Stencil corner brackets — top-left & bottom-right */}
+                  <div className="absolute top-6 left-6 hidden md:block pointer-events-none" aria-hidden="true">
+                    <div className="h-6 w-6 border-t-2 border-l-2 border-accent" />
+                  </div>
+                  <div className="absolute bottom-6 right-6 hidden md:block pointer-events-none" aria-hidden="true">
+                    <div className="h-6 w-6 border-b-2 border-r-2 border-accent" />
+                  </div>
+
+                  {/* Slide counter — top right */}
+                  <div className="absolute top-6 right-6 hidden md:flex items-center gap-3 pointer-events-none" aria-hidden="true">
+                    <span className="font-mono text-[11px] tracking-[0.18em] text-background/70 uppercase">
+                      {String(index + 1).padStart(2, "0")} / {String(totalSlides).padStart(2, "0")}
+                    </span>
+                    <div className="h-px w-16 bg-background/30 relative overflow-hidden">
+                      {current === index && (
+                        <div key={slideKey} className="absolute inset-y-0 left-0 bg-accent animate-progress-fill" />
+                      )}
+                    </div>
+                  </div>
 
                   {/* Content anchored at bottom */}
-                  <div className="relative h-full wrapper flex flex-col justify-end pb-10 md:pb-24">
+                  <div className="relative h-full wrapper flex flex-col justify-end pb-12 md:pb-24">
                     {current === index && (
                       <div key={slideKey}>
-                        {/* Label badge */}
+                        {/* Stencil label */}
                         <span
-                          className="inline-block text-label text-brand-accent mb-4 opacity-0 animate-fade-up"
+                          className="inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent mb-5 opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_0}
                         >
-                          {slide.label}
+                          <span className="h-px w-8 bg-accent" />
+                          ▲ MODULE {String(index + 1).padStart(2, "0")} / {slide.label}
                         </span>
 
                         {/* Main heading */}
                         <h1
-                          className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white max-w-3xl leading-[0.92] tracking-tight uppercase opacity-0 animate-fade-up"
-                          style={ANIMATION_STYLE_100}
+                          className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-background max-w-3xl leading-[0.95] uppercase opacity-0 animate-fade-up"
+                          style={{ ...ANIMATION_STYLE_100, letterSpacing: "-0.025em" }}
                         >
                           {slide.tagline}
                         </h1>
 
                         {/* Subtitle */}
                         <p
-                          className="text-lg md:text-xl text-white/80 max-w-xl font-light mt-4 opacity-0 animate-fade-up"
+                          className="text-base md:text-lg text-background/75 max-w-xl mt-5 leading-relaxed opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_200}
                         >
                           {slide.subtitle}
                         </p>
 
-                        {/* CTA */}
+                        {/* CTA cluster */}
                         <div
-                          className="mt-6 opacity-0 animate-fade-up"
+                          className="mt-8 flex flex-wrap items-center gap-4 opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_300}
                         >
                           <Button
                             size="lg"
                             asChild
-                            className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold text-base md:text-lg px-8 py-5 rounded-md uppercase tracking-wide border-0"
+                            className="bg-accent hover:bg-background text-accent-foreground hover:text-foreground font-heading font-bold text-sm md:text-base px-8 py-6 rounded-none uppercase tracking-[0.16em] border-0 btn-stamp"
                           >
-                            <Link href="/search">{translations.shopNow}</Link>
+                            <Link href="/search">{translations.shopNow} →</Link>
                           </Button>
+                          <Link
+                            href={`/product/${product.slug}`}
+                            className="font-mono text-xs uppercase tracking-[0.18em] text-background/70 hover:text-accent transition-colors border-b border-background/30 hover:border-accent pb-1"
+                          >
+                            VIEW SPECS →
+                          </Link>
                         </div>
                       </div>
                     )}
@@ -141,7 +177,6 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
           })}
         </CarouselContent>
       </Carousel>
-
     </section>
   );
 }

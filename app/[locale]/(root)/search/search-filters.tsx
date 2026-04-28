@@ -13,6 +13,7 @@ import { Slider } from "@/components/ui/slider";
 import { SlidersHorizontal, ChevronDown, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 type CategoryItem = {
   name: string;
@@ -184,6 +185,7 @@ function PriceSlider({
 }
 
 function CategoryNode({ cat }: { cat: CategoryItem }) {
+  const tCommon = useTranslations("Common");
   const hasChildren = cat.children && cat.children.length > 0;
   const isChildActive = hasChildren && cat.children!.some((c) => c.isActive);
   const isExpanded = cat.isActive || isChildActive;
@@ -195,7 +197,7 @@ function CategoryNode({ cat }: { cat: CategoryItem }) {
         <Link
           className={`text-sm py-2 px-3 flex-1 flex items-center justify-between rounded-lg transition-all ${
             cat.isActive
-              ? "font-semibold text-brand-accent bg-brand-accent/8 border-l-2 border-brand-accent"
+              ? "font-bold text-accent-foreground bg-accent"
               : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
           }`}
           href={cat.href}
@@ -209,7 +211,7 @@ function CategoryNode({ cat }: { cat: CategoryItem }) {
           <button
             onClick={() => setOpen(!open)}
             className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Toggle subcategories"
+            aria-label={tCommon("toggleSubcategories")}
           >
             <ChevronDown
               className={`h-3.5 w-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
@@ -232,7 +234,7 @@ function CategoryNode({ cat }: { cat: CategoryItem }) {
                   <Link
                     className={`text-xs py-1.5 px-3 flex items-center justify-between rounded-lg transition-all ${
                       child.isActive
-                        ? "font-semibold text-brand-accent bg-brand-accent/8 border-l-2 border-brand-accent"
+                        ? "font-bold text-accent-foreground bg-accent"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                     }`}
                     href={child.href}
@@ -284,7 +286,7 @@ function FilterContent({ filterData }: { filterData: FilterData }) {
               className={`text-sm py-2 px-3 block rounded-lg transition-all ${
                 filterData.activeCategory === "all" ||
                 filterData.activeCategory === ""
-                  ? "font-semibold text-brand-accent bg-brand-accent/8 border-l-2 border-brand-accent"
+                  ? "font-bold text-accent-foreground bg-accent"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               }`}
               href={anyHref.category}
@@ -314,7 +316,7 @@ function FilterContent({ filterData }: { filterData: FilterData }) {
             <Link
               className={`text-sm py-2 px-3 block rounded-lg transition-all ${
                 filterData.activeRating === "all"
-                  ? "font-semibold text-brand-accent bg-brand-accent/8 border-l-2 border-brand-accent"
+                  ? "font-bold text-accent-foreground bg-accent"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               }`}
               href={anyHref.rating}
@@ -327,7 +329,7 @@ function FilterContent({ filterData }: { filterData: FilterData }) {
               <Link
                 className={`text-sm py-2 px-3 flex items-center gap-2 rounded-lg transition-all ${
                   r.isActive
-                    ? "font-semibold text-brand-accent bg-brand-accent/8 border-l-2 border-brand-accent"
+                    ? "font-bold text-accent-foreground bg-accent"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
                 href={r.href}
@@ -354,7 +356,7 @@ export default function SearchFilters({ filterData, filterCount }: Props) {
               <SlidersHorizontal className="h-4 w-4" />
               {filterData.translations.filters}
               {filterCount > 0 && (
-                <span className="bg-brand-accent text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="bg-brand-accent text-accent-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {filterCount}
                 </span>
               )}

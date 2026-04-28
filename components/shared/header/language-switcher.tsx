@@ -44,6 +44,7 @@ export function LanguageToggle({ className }: { className?: string }) {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const tCommon = useTranslations("Common");
 
   const nextLocale = locale === "el" ? "en" : "el";
   const flag = locale === "el" ? "🇬🇷" : "🇬🇧";
@@ -52,7 +53,7 @@ export function LanguageToggle({ className }: { className?: string }) {
     <button
       onClick={() => router.replace(pathname, { locale: nextLocale })}
       className={className ?? "h-9 w-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-background/60 transition-all"}
-      aria-label={`Switch to ${nextLocale}`}
+      aria-label={tCommon("switchTo", { locale: nextLocale })}
     >
       <span className="text-base">{flag}</span>
     </button>

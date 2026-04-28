@@ -45,6 +45,7 @@ type Props = {
 
 export default function MobileMenu({ categories, brands, userName }: Props) {
   const t = useTranslations("MobileNav");
+  const tCommon = useTranslations("Common");
   const tMenu = useTranslations("MegaMenu");
   const [open, setOpen] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
@@ -119,7 +120,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
             </SheetTitle>
             <div className="flex items-center gap-1">
               <LanguageToggle />
-              <Button variant="ghost" size="icon" onClick={closeMenu} className="text-primary-foreground hover:bg-white/10">
+              <Button variant="ghost" size="icon" onClick={closeMenu} className="text-primary-foreground hover:bg-background/10">
                 <X className="h-5 w-5" />
               </Button>
             </div>
@@ -152,7 +153,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
                 <X className="h-3.5 w-3.5" />
               </button>
             )}
-            <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-white flex items-center justify-center shrink-0 mr-1">
+            <button type="submit" className="h-10 w-10 rounded-full bg-brand-accent text-accent-foreground flex items-center justify-center shrink-0 mr-1">
               <SearchIcon className="h-3.5 w-3.5" />
             </button>
           </form>
@@ -273,19 +274,19 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{userName}</p>
-                <p className="text-xs text-muted-foreground">View Profile</p>
+                <p className="text-xs text-muted-foreground">{tCommon("viewProfile")}</p>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </Link>
           ) : (
             <div className="space-y-2">
               <Link href="/sign-in" onClick={closeMenu}>
-                <Button className="w-full bg-brand-accent hover:bg-brand-accent-dark text-white" size="sm">
+                <Button className="w-full bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground" size="sm">
                   {t("signIn")}
                 </Button>
               </Link>
               <p className="text-[10px] text-center text-muted-foreground">
-                Trusted by 10,000+ professionals
+                {tCommon("trustedByCount")}
               </p>
             </div>
           )}
@@ -418,7 +419,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
         </div>
 
         {/* Bottom: theme + language with gradient divider */}
-        <div>
+        <div style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
           <div className="divider-gradient" />
           <div className="px-4 py-3 flex items-center gap-2 bg-card">
             <LanguageSwitcher />
@@ -450,7 +451,7 @@ function CategoryAccordion({
   const Icon = level === 0 ? getCategoryIcon(category.name) : null;
 
   return (
-    <div className={isExpanded && level === 0 ? "border-l-2 border-l-brand-accent" : ""}>
+    <div className={isExpanded && level === 0 ? "bg-muted/30" : ""}>
       <div
         className={`flex items-center hover:bg-accent transition-colors ${isExpanded ? "bg-muted/30" : ""}`}
         style={{ paddingLeft }}

@@ -9,6 +9,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 
 export default function ProductScrollSection({
   children,
@@ -25,6 +26,7 @@ export default function ProductScrollSection({
   viewAllHref?: string;
   viewAllLabel?: string;
 }) {
+  const t = useTranslations("Common");
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -49,7 +51,7 @@ export default function ProductScrollSection({
   if (count === 0) return null;
 
   return (
-    <div className="my-10">
+    <div className="my-10 md:my-14 lg:my-16">
       {/* Section header with inline controls */}
       <div className="flex items-end justify-between mb-4">
         <div>
@@ -66,7 +68,7 @@ export default function ProductScrollSection({
             onClick={() => api?.scrollPrev()}
             disabled={!canScrollPrev}
             className="hidden md:flex items-center justify-center w-9 h-9 rounded-lg border border-border hover:border-brand-accent hover:text-brand-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            aria-label="Previous"
+            aria-label={t("previous")}
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -74,7 +76,7 @@ export default function ProductScrollSection({
             onClick={() => api?.scrollNext()}
             disabled={!canScrollNext}
             className="hidden md:flex items-center justify-center w-9 h-9 rounded-lg border border-border hover:border-brand-accent hover:text-brand-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            aria-label="Next"
+            aria-label={t("next")}
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -112,7 +114,7 @@ export function ProductScrollItem({
   children: React.ReactNode;
 }) {
   return (
-    <CarouselItem className="pl-3 basis-[70%] sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+    <CarouselItem className="pl-3 basis-[70%] sm:basis-1/2 md:basis-1/3 lg:basis-1/4 2xl:basis-1/5">
       {children}
     </CarouselItem>
   );

@@ -58,7 +58,7 @@ function MarkAsPaidButton({ orderId }: { orderId: string }) {
     <Button
       type="button"
       disabled={isPending}
-      className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
+      className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
       onClick={() => startTransition(async () => {
         const res = await updateOrderToPaidCOD(orderId);
         toast({
@@ -82,7 +82,7 @@ function MarkAsDeliveredButton({ orderId }: { orderId: string }) {
     <Button
       type="button"
       disabled={isPending}
-      className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
+      className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
       onClick={() => startTransition(async () => {
         const res = await deliverOrder(orderId);
         toast({

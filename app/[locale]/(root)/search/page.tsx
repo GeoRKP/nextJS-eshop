@@ -320,7 +320,7 @@ export default async function SearchPage(props: {
       </div>
 
       {/* Layout: Sidebar + Products */}
-      <div className="grid md:grid-cols-[280px_1fr] md:gap-10">
+      <div className="grid md:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr] 2xl:grid-cols-[360px_1fr] md:gap-10 2xl:gap-14">
         {/* Sidebar filters */}
         <SearchFilters
           filterData={filterData}
@@ -356,7 +356,7 @@ export default async function SearchPage(props: {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5 2xl:gap-6">
               {products.data.map((product) => (
                 <ProductCard
                   key={product.id}

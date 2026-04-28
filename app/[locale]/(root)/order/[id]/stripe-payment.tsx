@@ -33,6 +33,7 @@ export default function StripePayment({
     const stripe = useStripe();
     const elements = useElements();
     const t = useTranslations("Order");
+    const tCommon = useTranslations("Common");
 
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -60,9 +61,9 @@ export default function StripePayment({
             error?.type === "card_error" ||
             error?.type === "validation_error"
           ) {
-            setErrorMessage(error?.message ?? "An unknown error occurred");
+            setErrorMessage(error?.message ?? tCommon("unknownError"));
           } else if (error) {
-            setErrorMessage("An unknown error occurred");
+            setErrorMessage(tCommon("unknownError"));
           }
         })
         .finally(() => {
@@ -83,7 +84,7 @@ export default function StripePayment({
           />
         </div>
         <Button
-          className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold text-sm sm:text-base uppercase tracking-wide active:scale-[0.98] transition-all"
+          className="w-full h-12 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-semibold text-sm sm:text-base uppercase tracking-wide active:scale-[0.98] transition-all"
           type="submit"
           disabled={isLoading || !stripe || !elements}
         >

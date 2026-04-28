@@ -26,7 +26,7 @@ export async function generateMetadata() {
 }
 
 function HeroSkeleton() {
-  return <Skeleton className="w-full h-[50vh] md:h-[60vh]" />;
+  return <Skeleton className="w-full h-[440px] sm:h-[520px] md:h-[620px] lg:h-[720px] xl:h-[780px] 2xl:h-[860px]" />;
 }
 
 function CategoryCardsSkeleton() {
@@ -46,7 +46,7 @@ function ProductGridSkeleton() {
   return (
     <div className="my-10">
       <Skeleton className="h-6 w-48 mb-6" />
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 2xl:gap-5">
         {Array.from({ length: 8 }).map((_, i) => (
           <ProductCardSkeleton key={i} />
         ))}

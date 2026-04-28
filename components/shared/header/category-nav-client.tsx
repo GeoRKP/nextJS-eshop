@@ -1,25 +1,19 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Link } from "@/i18n/navigation";
-import { Grid3X3, ChevronDown, Tag, Layers } from "lucide-react";
+import { Grid3X3, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
 import MegaMenu from "./mega-menu";
 
-type BrandItem = { brand: string; _count: number };
-
 type Props = {
   categories: Category[];
-  brands: BrandItem[];
   translations: {
     allCategories: string;
     viewAll: string;
-    deals: string;
     newArrivals: string;
     featured: string;
-    shopByBrand: string;
     popularBrands: string;
     allBrands: string;
     viewAllIn: string;
@@ -30,7 +24,6 @@ type Props = {
 
 export default function CategoryNavClient({
   categories,
-  brands,
   translations,
 }: Props) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -82,10 +75,10 @@ export default function CategoryNavClient({
           <button
             aria-expanded={activeCategory === "__all__"}
             aria-haspopup="menu"
-            className={`flex items-center gap-1.5 px-4 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all border-b-2 ${
+            className={`flex items-center gap-1.5 px-4 h-full font-heading text-[12px] font-bold uppercase tracking-[0.12em] transition-all border-b-2 ${
               activeCategory === "__all__"
-                ? "bg-brand-accent/15 border-brand-accent text-white"
-                : "border-transparent hover:border-brand-accent/50"
+                ? "border-accent text-accent"
+                : "border-transparent text-primary-foreground/85 hover:text-accent hover:border-accent/40"
             }`}
             onMouseEnter={() => handleMouseEnter("__all__")}
             onMouseLeave={handleMouseLeave}
@@ -114,10 +107,10 @@ export default function CategoryNavClient({
                 key={category.id}
                 aria-expanded={isActive}
                 aria-haspopup="menu"
-                className={`flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all border-b-2 ${
+                className={`flex items-center gap-1.5 px-3 h-full font-heading text-[12px] font-bold uppercase tracking-[0.12em] transition-all border-b-2 ${
                   isActive
-                    ? "bg-brand-accent/15 border-brand-accent text-white"
-                    : "border-transparent hover:border-brand-accent/50"
+                    ? "bg-brand-accent/15 border-brand-accent text-brand-accent"
+                    : "border-transparent text-primary-foreground/85 hover:text-brand-accent hover:border-brand-accent/50"
                 }`}
                 onMouseEnter={() => handleMouseEnter(category.id)}
                 onMouseLeave={handleMouseLeave}
@@ -139,48 +132,6 @@ export default function CategoryNavClient({
             );
           })}
 
-          {/* Shop by Brand button */}
-          {brands.length > 0 && (
-            <>
-              <div className="h-4 w-px bg-primary-foreground/20 mx-1" />
-              <button
-                aria-expanded={activeCategory === "__brands__"}
-                aria-haspopup="menu"
-                className={`flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-semibold uppercase tracking-wide transition-all border-b-2 ${
-                  activeCategory === "__brands__"
-                    ? "bg-brand-accent/15 border-brand-accent text-white"
-                    : "border-transparent hover:border-brand-accent/50"
-                }`}
-                onMouseEnter={() => handleMouseEnter("__brands__")}
-                onMouseLeave={handleMouseLeave}
-                onClick={() => handleClick("__brands__")}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleClick("__brands__");
-                  }
-                  if (e.key === "Escape") setActiveCategory(null);
-                }}
-              >
-                <Layers className="h-3.5 w-3.5 shrink-0" />
-                <span className="whitespace-nowrap">{translations.shopByBrand}</span>
-                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${activeCategory === "__brands__" ? "rotate-180" : ""}`} />
-              </button>
-            </>
-          )}
-
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          {/* Quick links */}
-          <Link
-            href="/search?price=1-50"
-            className="flex items-center gap-1.5 px-3 h-full font-heading text-[13px] font-bold uppercase tracking-wide text-brand-accent border-b-2 border-transparent hover:border-brand-accent/50 transition-all"
-          >
-            <Tag className="h-3.5 w-3.5" />
-            <span className="hidden md:inline">{translations.deals}</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-accent animate-pulse-dot" />
-          </Link>
         </div>
       </nav>
 
@@ -188,7 +139,6 @@ export default function CategoryNavClient({
       <AnimatePresence>
         {activeCategory &&
           activeCategory !== "__all__" &&
-          activeCategory !== "__brands__" &&
           activeCategoryData && (
             <motion.div
               key="single"
@@ -227,24 +177,6 @@ export default function CategoryNavClient({
           </motion.div>
         )}
 
-        {activeCategory === "__brands__" && brands.length > 0 && (
-          <motion.div
-            key="brands"
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <MegaMenu
-              mode="brands"
-              brands={brands}
-              translations={translations}
-              onMouseEnter={handleMegaMenuEnter}
-              onMouseLeave={handleMegaMenuLeave}
-              onClose={() => setActiveCategory(null)}
-            />
-          </motion.div>
-        )}
       </AnimatePresence>
     </div>
   );

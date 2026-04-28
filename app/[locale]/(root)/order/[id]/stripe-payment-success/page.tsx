@@ -60,7 +60,7 @@ export default async function StripePaymentSuccess(props: {
         {/* CTA */}
         <Button
           asChild
-          className="h-12 px-8 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-white font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
+          className="h-12 px-8 rounded-lg bg-brand-accent hover:bg-brand-accent-dark text-accent-foreground font-semibold uppercase tracking-wide active:scale-[0.98] transition-all"
         >
           <Link href={`/order/${id}`}>{t("viewOrder")}</Link>
         </Button>
