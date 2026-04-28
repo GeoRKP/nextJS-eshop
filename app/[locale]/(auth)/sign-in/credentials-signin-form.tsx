@@ -87,7 +87,15 @@ export default function CredentialsSignInForm() {
           name="password"
           render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>{t("password")}</FormLabel>
+              <div className="flex items-center justify-between">
+                <FormLabel>{t("password")}</FormLabel>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-muted-foreground hover:text-accent transition-colors"
+                >
+                  {t("forgotPassword")}
+                </Link>
+              </div>
               <FormControl>
                 <FormInput
                   icon={Lock}

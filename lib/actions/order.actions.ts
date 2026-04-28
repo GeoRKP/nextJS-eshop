@@ -1,19 +1,24 @@
 "use server";
 
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { formatError, toPlainObject } from "../utils";
+import { formatError, toPlainObject, formatCurrency } from "../utils";
 import { getAuthSession } from "@/lib/auth-session";
 import { getMyCart } from "./cart.actions";
 import { getUserById } from "./user.actions";
 import { createInsertOrderSchema } from "../validators";
 import { prisma } from "@/db/prisma";
-import { CartItem, PaymentResult } from "@/types";
+import { CartItem, PaymentResult, ShippingAddress } from "@/types";
 import { paypal } from "../paypal";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { assertAdmin } from "@/lib/auth-guard";
+import {
+  sendOrderConfirmationEmail,
+  sendOrderStatusEmail,
+} from "@/lib/email";
+import { logAuditEvent } from "@/lib/audit-log";
 
 export async function createOrder() {
   try {
@@ -343,6 +348,47 @@ export async function updateOrderToPaid({
     }
   });
 
+  // Send order confirmation email (best-effort — won't break order flow)
+  try {
+    const fullOrder = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: { select: { name: true, email: true } },
+        orderitems: true,
+      },
+    });
+
+    if (fullOrder?.user?.email) {
+      const shippingAddr = fullOrder.shippingAddress as ShippingAddress;
+      await sendOrderConfirmationEmail(fullOrder.user.email, {
+        orderId: fullOrder.id,
+        orderIdFormatted: fullOrder.id.slice(0, 8).toUpperCase(),
+        customerName: fullOrder.user.name || shippingAddr.fullName,
+        items: fullOrder.orderitems.map((item) => ({
+          name: item.name,
+          qty: item.qty,
+          price: formatCurrency(Number(item.price)),
+        })),
+        itemsPrice: formatCurrency(Number(fullOrder.itemsPrice)),
+        shippingPrice: formatCurrency(Number(fullOrder.shippingPrice)),
+        taxPrice: formatCurrency(Number(fullOrder.taxPrice)),
+        totalPrice: formatCurrency(Number(fullOrder.totalPrice)),
+        discountAmount: formatCurrency(Number(fullOrder.discountAmount)),
+        couponCode: fullOrder.couponCode,
+        shippingAddress: {
+          fullName: shippingAddr.fullName,
+          address: shippingAddr.address,
+          city: shippingAddr.city,
+          postalCode: shippingAddr.postalCode,
+          country: shippingAddr.country,
+        },
+        paymentMethod: fullOrder.paymentMethod,
+      });
+    }
+  } catch (emailError) {
+    console.error("Order confirmation email failed:", emailError);
+  }
+
   revalidatePath(`/order/${orderId}`);
   revalidatePath(`/en/order/${orderId}`);
   revalidateTag("orders", "max");
@@ -502,6 +548,12 @@ export async function deleteOrder(id: string) {
     const t = await getTranslations("Actions");
     await prisma.order.delete({ where: { id } });
 
+    await logAuditEvent({
+      action: "order.delete",
+      entity: "Order",
+      entityId: id,
+    });
+
     revalidatePath("/admin/orders");
     revalidateTag("orders", "max");
 
@@ -622,6 +674,32 @@ export async function updateOrderStatus({
           changedBy: session?.user?.id,
         },
       });
+    });
+
+    // Send status update email to customer (best-effort)
+    try {
+      const fullOrder = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: { user: { select: { name: true, email: true } } },
+      });
+      if (fullOrder?.user?.email) {
+        await sendOrderStatusEmail(fullOrder.user.email, {
+          customerName: fullOrder.user.name || "",
+          orderId: fullOrder.id,
+          orderIdFormatted: fullOrder.id.slice(0, 8).toUpperCase(),
+          status,
+          note: note || null,
+        });
+      }
+    } catch (emailError) {
+      console.error("Order status email failed:", emailError);
+    }
+
+    await logAuditEvent({
+      action: "order.statusUpdate",
+      entity: "Order",
+      entityId: orderId,
+      details: { status, note: note || undefined },
     });
 
     revalidatePath(`/order/${orderId}`);

@@ -148,16 +148,30 @@ const Footer = async () => {
               {t("customerService")}
             </h3>
             <ul className="space-y-2.5">
-              {["contactUs", "faq", "returns", "shippingInfo"].map((key) => (
-                <li key={key}>
-                  <a
-                    href="#"
-                    className="text-[13px] text-background/80 hover:text-accent transition-colors py-1 inline-block"
-                  >
-                    → {t(key as "contactUs" | "faq" | "returns" | "shippingInfo")}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <Link
+                  href="/returns"
+                  className="text-[13px] text-background/80 hover:text-accent transition-colors py-1 inline-block"
+                >
+                  → {t("returns")}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/shipping"
+                  className="text-[13px] text-background/80 hover:text-accent transition-colors py-1 inline-block"
+                >
+                  → {t("shippingInfo")}
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="mailto:info@avl.gr"
+                  className="text-[13px] text-background/80 hover:text-accent transition-colors py-1 inline-block"
+                >
+                  → {t("contactUs")}
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -235,9 +249,9 @@ const Footer = async () => {
             </div>
             <span className="text-background/20">·</span>
             <div className="flex items-center gap-4 font-mono text-[11px] text-background/70 uppercase tracking-[0.05em]">
-              <a href="#" className="hover:text-accent transition-colors">{t("privacyPolicy")}</a>
-              <a href="#" className="hover:text-accent transition-colors">{t("termsOfService")}</a>
-              <a href="#" className="hover:text-accent transition-colors">{t("cookies")}</a>
+              <Link href="/privacy" className="hover:text-accent transition-colors">{t("privacyPolicy")}</Link>
+              <Link href="/terms" className="hover:text-accent transition-colors">{t("termsOfService")}</Link>
+              <Link href="/cookies" className="hover:text-accent transition-colors">{t("cookies")}</Link>
             </div>
             <span className="text-background/20">·</span>
             <a

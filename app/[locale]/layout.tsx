@@ -6,6 +6,7 @@ import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from "@/lib/constants";
 import { Toaster } from "@/components/ui/toaster";
 import { WishlistProvider } from "@/components/shared/product/wishlist-provider";
 import { MotionProvider } from "@/components/shared/motion-provider";
+import CookieConsent from "@/components/shared/cookie-consent";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { routing, Locale } from "@/i18n/routing";
@@ -124,6 +125,7 @@ export default async function LocaleLayout({
               {children}
             </WishlistProvider>
           </MotionProvider>
+          <CookieConsent />
           <Toaster />
         </NextIntlClientProvider>
       </body>

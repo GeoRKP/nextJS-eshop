@@ -9,6 +9,7 @@ import { z } from "zod/v3";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { assertAdmin } from "@/lib/auth-guard";
+import { logAuditEvent } from "@/lib/audit-log";
 
 export async function getLatestProducts(limit?: number) {
   const data = await prisma.product.findMany({
@@ -304,6 +305,13 @@ export async function deleteProduct(id: string) {
       data: { deletedAt: new Date() },
     });
 
+    await logAuditEvent({
+      action: "product.delete",
+      entity: "Product",
+      entityId: id,
+      details: { name: productExists.name },
+    });
+
     revalidatePath("/admin/products");
     revalidatePath("/products");
     revalidatePath("/en/products");
@@ -324,8 +332,20 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
     const tV = await getTranslations("Validation");
     const product = createInsertProductSchema(tV).parse(data);
 
-    await prisma.product.create({
+    const created = await prisma.product.create({
       data: product,
+    });
+
+    // Initialize price history with creation price
+    await prisma.priceHistory.create({
+      data: { productId: created.id, price: product.price },
+    });
+
+    await logAuditEvent({
+      action: "product.create",
+      entity: "Product",
+      entityId: created.id,
+      details: { name: product.name, price: String(product.price) },
     });
 
     revalidatePath("/admin/products");
@@ -357,11 +377,31 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
 
     if (!productExists) throw new Error(t("productNotFound"));
 
+    // Track price change for compliance/audit (Greek tax authority)
+    const oldPrice = Number(productExists.price);
+    const newPrice = Number(product.price);
+    const priceChanged = oldPrice !== newPrice;
+
     await prisma.product.update({
       where: {
         id: product.id,
       },
       data: product,
+    });
+
+    if (priceChanged) {
+      await prisma.priceHistory.create({
+        data: { productId: product.id, price: product.price },
+      });
+    }
+
+    await logAuditEvent({
+      action: "product.update",
+      entity: "Product",
+      entityId: product.id,
+      details: priceChanged
+        ? { name: product.name, oldPrice, newPrice }
+        : { name: product.name },
     });
 
     revalidatePath("/admin/products");
