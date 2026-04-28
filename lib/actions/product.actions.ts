@@ -8,6 +8,7 @@ import { insertProductSchema, updateProductSchema, createInsertProductSchema, cr
 import { z } from "zod/v3";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
+import { assertAdmin } from "@/lib/auth-guard";
 
 export async function getLatestProducts(limit?: number) {
   const data = await prisma.product.findMany({
@@ -288,6 +289,7 @@ export async function getAllProducts({
 // Delete product (soft delete)
 export async function deleteProduct(id: string) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     const productExists = await prisma.product.findFirst({
       where: {
@@ -317,6 +319,7 @@ export async function deleteProduct(id: string) {
 // Create a product
 export async function createProduct(data: z.infer<typeof insertProductSchema>) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     const tV = await getTranslations("Validation");
     const product = createInsertProductSchema(tV).parse(data);
@@ -340,6 +343,7 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
 // Update a product
 export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     const tV = await getTranslations("Validation");
     const product = createUpdateProductSchema(tV).parse(data);

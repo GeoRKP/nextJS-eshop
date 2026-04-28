@@ -52,6 +52,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     ...authConfig.callbacks,
+    // SECURITY: prevent open redirect attacks via callbackUrl.
+    // Reject any redirect to a different origin than our own.
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+      // Same-origin relative paths are safe
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      try {
+        if (new URL(url).origin === baseUrl) return url;
+      } catch {
+        // malformed URL — fall through
+      }
+      return baseUrl;
+    },
     async session({ session, user, trigger, token }: any) {
       session.user.id = token.sub as string;
       session.user.role = token.role as string;

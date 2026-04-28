@@ -18,6 +18,7 @@ import { z } from "zod/v3";
 import { PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import { assertAdmin } from "@/lib/auth-guard";
 
 export async function signInWithCredentials(
   prevState: unknown,
@@ -61,7 +62,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
     const plainPassword = user.password;
 
-    user.password = hashSync(user.password, 10);
+    user.password = hashSync(user.password, 12);
 
     await prisma.user.create({
       data: {
@@ -200,6 +201,7 @@ export async function getAllUsers({
   page: number;
   query: string;
 }) {
+  await assertAdmin();
   const data = await prisma.user.findMany({
     where: {
       name: {
@@ -231,6 +233,7 @@ export async function getAllUsers({
 // Delete a user
 export async function deleteUser(id: string) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     await prisma.user.delete({
       where: { id },
@@ -247,6 +250,7 @@ export async function deleteUser(id: string) {
 // Update a user
 export async function updateUser(user: z.infer<typeof updateUserSchema>) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     await prisma.user.update({
       where: { id: user.id },

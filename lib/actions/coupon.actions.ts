@@ -9,6 +9,7 @@ import { z } from "zod/v3";
 import { insertCouponSchema, updateCouponSchema } from "../validators";
 import { PAGE_SIZE } from "../constants";
 import { getTranslations } from "next-intl/server";
+import { assertAdmin } from "@/lib/auth-guard";
 
 // Validate a coupon code (for cart/checkout)
 export async function validateCoupon(code: string) {
@@ -112,6 +113,7 @@ export async function getAllCoupons({
   page: number;
   query?: string;
 }) {
+  await assertAdmin();
   const where = query && query !== "all"
     ? {
         OR: [
@@ -139,6 +141,7 @@ export async function getAllCoupons({
 
 // Get coupon by id
 export async function getCouponById(id: string) {
+  await assertAdmin();
   const data = await prisma.coupon.findFirst({
     where: { id },
     include: {
@@ -153,6 +156,7 @@ export async function getCouponById(id: string) {
 // Create coupon
 export async function createCoupon(data: z.infer<typeof insertCouponSchema>) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     const tV = await getTranslations("Validation");
     const parsed = createInsertCouponSchema(tV).parse(data);
@@ -190,6 +194,7 @@ export async function createCoupon(data: z.infer<typeof insertCouponSchema>) {
 // Update coupon
 export async function updateCoupon(data: z.infer<typeof updateCouponSchema>) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     const tV = await getTranslations("Validation");
     const parsed = createUpdateCouponSchema(tV).parse(data);
@@ -241,6 +246,7 @@ export async function updateCoupon(data: z.infer<typeof updateCouponSchema>) {
 // Delete coupon
 export async function deleteCoupon(id: string) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     await prisma.coupon.delete({ where: { id } });
 

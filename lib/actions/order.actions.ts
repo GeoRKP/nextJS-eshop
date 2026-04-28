@@ -13,6 +13,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
+import { assertAdmin } from "@/lib/auth-guard";
 
 export async function createOrder() {
   try {
@@ -131,13 +132,19 @@ export async function createOrder() {
   }
 }
 
-// Get order by id
+// Get order by id (with ownership check — non-admin can only see own orders)
 
 export async function getOrderById(orderId: string) {
+  const session = await getAuthSession();
+  if (!session?.user?.id) return null;
+
+  const where: Prisma.OrderWhereInput =
+    session.user.role === "admin"
+      ? { id: orderId }
+      : { id: orderId, userId: session.user.id };
+
   const data = await prisma.order.findFirst({
-    where: {
-      id: orderId,
-    },
+    where,
     include: {
       orderitems: true,
       user: { select: { name: true, email: true } },
@@ -155,11 +162,15 @@ export async function getOrderById(orderId: string) {
 export async function createPaypalOrder(orderId: string) {
   try {
     const t = await getTranslations("Actions");
-    const order = await prisma.order.findFirst({
-      where: {
-        id: orderId,
-      },
-    });
+    const session = await getAuthSession();
+    if (!session?.user?.id) throw new Error(t("userNotAuthenticated"));
+
+    const where: Prisma.OrderWhereInput =
+      session.user.role === "admin"
+        ? { id: orderId }
+        : { id: orderId, userId: session.user.id };
+
+    const order = await prisma.order.findFirst({ where });
 
     if (order) {
       const paypalOrder = await paypal.createOrder(Number(order.totalPrice));
@@ -201,11 +212,15 @@ export async function approvePaypalOrder(
 ) {
   try {
     const t = await getTranslations("Actions");
-    const order = await prisma.order.findFirst({
-      where: {
-        id: orderId,
-      },
-    });
+    const session = await getAuthSession();
+    if (!session?.user?.id) throw new Error(t("userNotAuthenticated"));
+
+    const where: Prisma.OrderWhereInput =
+      session.user.role === "admin"
+        ? { id: orderId }
+        : { id: orderId, userId: session.user.id };
+
+    const order = await prisma.order.findFirst({ where });
 
     if (!order) throw new Error(t("orderNotFound"));
 
@@ -219,8 +234,19 @@ export async function approvePaypalOrder(
       throw new Error(t("errorInPaypalPayment"));
     }
 
+    // Verify PayPal capture amount matches order total before marking paid
+    const capturedAmount = Number(
+      captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value
+    );
+    if (
+      Number.isNaN(capturedAmount) ||
+      capturedAmount + 0.01 < Number(order.totalPrice)
+    ) {
+      throw new Error(t("errorInPaypalPayment"));
+    }
+
     //Update order to paid
-    updateOrderToPaid({
+    await updateOrderToPaid({
       orderId,
       paymentResult: {
         id: captureData.id,
@@ -264,15 +290,17 @@ export async function updateOrderToPaid({
   if (order.isPaid) throw new Error(t("orderAlreadyPaid"));
 
   await prisma.$transaction(async (tx) => {
-    // Batch update stock for all order items
-    await Promise.all(
-      order.orderitems.map((item) =>
-        tx.product.update({
-          where: { id: item.productId },
-          data: { stock: { increment: -item.qty } },
-        })
-      )
-    );
+    // ATOMIC stock decrement — only succeeds if stock is sufficient.
+    // Prevents overselling when 2 users simultaneously buy the last item.
+    for (const item of order.orderitems) {
+      const result = await tx.product.updateMany({
+        where: { id: item.productId, stock: { gte: item.qty } },
+        data: { stock: { decrement: item.qty } },
+      });
+      if (result.count === 0) {
+        throw new Error(t("notEnoughStock"));
+      }
+    }
 
     await tx.order.update({
       where: { id: orderId },
@@ -292,6 +320,27 @@ export async function updateOrderToPaid({
         note: t("orderHasBeenPaid"),
       },
     });
+
+    // Record coupon usage atomically with order payment.
+    // Prevents users from re-using single-use coupons across multiple orders.
+    if (order.couponCode && order.userId) {
+      const coupon = await tx.coupon.findUnique({
+        where: { code: order.couponCode },
+      });
+      if (coupon) {
+        await tx.couponUsage.create({
+          data: {
+            couponId: coupon.id,
+            userId: order.userId,
+            orderId: order.id,
+          },
+        });
+        await tx.coupon.update({
+          where: { id: coupon.id },
+          data: { usedCount: { increment: 1 } },
+        });
+      }
+    }
   });
 
   revalidatePath(`/order/${orderId}`);
@@ -345,6 +394,7 @@ type SalesDataType = {
 // Get sales data and order summary
 
 export async function getOrderSummary() {
+  await assertAdmin();
   // Get counts for each resource
   const ordersCount = await prisma.order.count();
   const productsCount = await prisma.product.count();
@@ -401,6 +451,7 @@ export async function getAllOrders({
   query: string;
   status?: string;
 }) {
+  await assertAdmin();
 
   const queryFilter: Prisma.OrderWhereInput = query && query !== "all" ? {
     user: {
@@ -447,6 +498,7 @@ export async function getAllOrders({
 
 export async function deleteOrder(id: string) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     await prisma.order.delete({ where: { id } });
 
@@ -463,6 +515,7 @@ export async function deleteOrder(id: string) {
 
 export async function updateOrderToPaidCOD(orderId: string) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     await updateOrderToPaid({ orderId });
 
@@ -481,6 +534,7 @@ export async function updateOrderToPaidCOD(orderId: string) {
 
 export async function deliverOrder(orderId: string) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     const order = await prisma.order.findFirst({
       where: { id: orderId },
@@ -533,8 +587,8 @@ export async function updateOrderStatus({
   note?: string | null;
 }) {
   try {
+    const session = await assertAdmin();
     const t = await getTranslations("Actions");
-    const session = await getAuthSession();
 
     const order = await prisma.order.findFirst({
       where: { id: orderId },
@@ -581,8 +635,21 @@ export async function updateOrderStatus({
   }
 }
 
-// Get order status history
+// Get order status history (with ownership check)
 export async function getOrderStatusHistory(orderId: string) {
+  const session = await getAuthSession();
+  if (!session?.user?.id) return [];
+
+  // Verify order ownership before exposing history
+  const order = await prisma.order.findFirst({
+    where: { id: orderId },
+    select: { userId: true },
+  });
+  if (!order) return [];
+  if (session.user.role !== "admin" && order.userId !== session.user.id) {
+    return [];
+  }
+
   const data = await prisma.orderStatusHistory.findMany({
     where: { orderId },
     orderBy: { createdAt: "asc" },

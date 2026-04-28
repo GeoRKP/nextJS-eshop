@@ -1,6 +1,6 @@
 {
   "Common": {
-    "appName": "Geo Store",
+    "appName": "AVL",
     "loading": "Loading...",
     "search": "Search",
     "searchPlaceholder": "Search...",
@@ -445,6 +445,7 @@
     "updatedInCart": "{name} updated in cart",
     "removedFromCart": "{name} removed from cart",
     "notEnoughStock": "Not enough stock",
+    "mustPurchaseToReview": "You must purchase this product before reviewing it",
     "cartSessionNotFound": "Cart session not found",
     "productNotFound": "Product not found",
     "cartNotFound": "Cart not found",
@@ -826,13 +827,13 @@
   "Testimonials": {
     "whatCustomersSay": "What Our Customers Say",
     "trustedByProfessionals": "TRUSTED BY PROFESSIONALS",
-    "quote1": "Outstanding quality parts and lightning-fast delivery. Our fleet has never run better since we switched to Geo Store.",
+    "quote1": "Outstanding quality parts and lightning-fast delivery. Our fleet has never run better since we switched to AVL.",
     "name1": "Dimitris K.",
     "role1": "Fleet Manager",
     "quote2": "The best selection of truck parts I've found online. Competitive prices and genuine OEM quality every time.",
     "name2": "Yannis M.",
     "role2": "Independent Mechanic",
-    "quote3": "24/7 support and hassle-free returns make Geo Store our go-to supplier. Highly recommended for professionals.",
+    "quote3": "24/7 support and hassle-free returns make AVL our go-to supplier. Highly recommended for professionals.",
     "name3": "Maria P.",
     "role3": "Owner-Operator"
   },

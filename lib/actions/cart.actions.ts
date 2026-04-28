@@ -35,11 +35,20 @@ const calcPrice = (
     maxDiscount?: string | number | null;
   } | null
 ) => {
+  // Greek VAT: standard 24%, reduced 13%/6%. Configurable via env for flexibility.
+  const VAT_RATE = Number(process.env.VAT_RATE ?? 0.24);
+  const FREE_SHIPPING_THRESHOLD = Number(
+    process.env.FREE_SHIPPING_THRESHOLD ?? 100
+  );
+  const SHIPPING_COST = Number(process.env.SHIPPING_COST ?? 10);
+
   const itemsPrice = round2(
       items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0)
     ),
-    shippingPrice = round2(itemsPrice > 100 ? 0 : 10),
-    taxPrice = round2(itemsPrice * 0.15);
+    shippingPrice = round2(
+      itemsPrice >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
+    ),
+    taxPrice = round2(itemsPrice * VAT_RATE);
 
   // Calculate discount
   let discountAmount = 0;
@@ -86,15 +95,26 @@ export async function addItemToCart(data: CartItem) {
 
     const cart = await getMyCart();
 
-    const item = cartItemSchema.parse(data);
+    const clientItem = cartItemSchema.parse(data);
 
+    // SECURITY: never trust client-provided price/name/image.
+    // Re-fetch from DB and override — protects against DevTools price manipulation.
     const product = await prisma.product.findFirst({
       where: {
-        id: item.productId,
+        id: clientItem.productId,
+        deletedAt: null,
       },
     });
 
     if (!product) throw new Error(t("productNotFound"));
+
+    const item = {
+      ...clientItem,
+      name: product.name,
+      slug: product.slug,
+      image: product.images[0] ?? clientItem.image,
+      price: product.price.toString(),
+    };
 
     if (!cart) {
       const newCart = insertCartSchema.parse({

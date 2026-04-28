@@ -1,6 +1,6 @@
 {
-  "name": "Geo Store",
-  "short_name": "Geo Store",
+  "name": "AVL",
+  "short_name": "AVL",
   "description": "Modern e-commerce store built with Next.js and Tailwind CSS",
   "start_url": "/",
   "display": "standalone",

@@ -1,9 +1,14 @@
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Geo Store";
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "AVL";
 export const APP_DESCRIPTION =
   process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
   "Modern e-commerce store built with Next.js and Tailwind CSS";
+// SERVER_URL must be set in production via NEXT_PUBLIC_SERVER_URL.
+// Localhost fallback is only for local dev — never assume it in prod code paths.
 export const SERVER_URL =
-  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+  process.env.NEXT_PUBLIC_SERVER_URL ||
+  (process.env.NODE_ENV === "production"
+    ? ""
+    : "http://localhost:3000");
 export const LATEST_PRODUCTS_LIMIT =
   Number(process.env.LATEST_PRODUCTS_LIMIT) || 4;
 

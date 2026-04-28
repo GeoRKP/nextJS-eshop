@@ -39,6 +39,21 @@ export async function createUpdateReview(
 
     if (!product) throw new Error(t("productNotFound"));
 
+    // SECURITY: only verified purchasers can review.
+    // Prevents fake reviews from competitors/spammers.
+    const purchased = await prisma.orderItem.findFirst({
+      where: {
+        productId: review.productId,
+        order: {
+          userId: review.userId,
+          isPaid: true,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (!purchased) throw new Error(t("mustPurchaseToReview"));
+
     // Check if user has already reviewed this product
     const reviewExists = await prisma.review.findFirst({
       where: {

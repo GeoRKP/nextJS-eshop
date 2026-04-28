@@ -81,7 +81,7 @@ export default async function OrderDetailPage(props: {
           shippingAddress: order.shippingAddress as ShippingAddress,
         }}
         stripeClientSecret={client_secret}
-        paypalClientId={process.env.PAYPAL_CLIENT_ID || "sb"}
+        paypalClientId={process.env.PAYPAL_CLIENT_ID ?? ""}
         isAdmin={isAdmin}
       />
       <div className="mt-6 grid md:grid-cols-3 md:gap-5">
