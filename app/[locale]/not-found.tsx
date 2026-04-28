@@ -30,17 +30,14 @@ export default function NotFoundPage() {
         </div>
 
         {/* Logo as stamp */}
-        <div className="flex items-center justify-center gap-3 mb-6 mt-4">
+        <div className="flex items-center justify-center mb-6 mt-4">
           <Image
             src="/images/logo.png"
-            width={36}
-            height={36}
+            width={64}
+            height={64}
             alt={`${APP_NAME} logo`}
             priority
           />
-          <span className="font-heading font-black text-base uppercase tracking-[0.16em]">
-            {APP_NAME}
-          </span>
         </div>
 
         {/* Title + description */}

@@ -4,6 +4,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { compareSync } from "bcrypt-ts";
 import { authConfig } from "./auth.config";
 
+// Refresh ban/suspension status from DB at most once per this interval
+const BAN_SYNC_INTERVAL_MS = 60 * 1000; // 60 seconds
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   providers: [
@@ -28,6 +31,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
 
           if (isMatch) {
+            // Banned / actively suspended users cannot establish a session.
+            // We treat this as a failed login (return null) — proxy + layout
+            // also enforce the ban for users with already-issued sessions.
+            if (user.isBanned) return null;
+            if (user.suspendedUntil && user.suspendedUntil > new Date()) {
+              return null;
+            }
+
             // Generate name from email if user has default "NO_NAME"
             let name = user.name;
             if (name === "NO_NAME") {
@@ -68,6 +79,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.id = token.sub as string;
       session.user.role = token.role as string;
       session.user.name = token.name as string;
+      session.user.isBanned = Boolean(token.isBanned);
+      session.user.suspendedUntil = (token.suspendedUntil as string | null) ?? null;
       if (trigger === "update") {
         session.user.name = user.name;
       }
@@ -76,6 +89,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user, session, trigger }: any) {
       if (user) {
         token.role = user.role;
+        token.isBanned = false;
+        token.suspendedUntil = null;
+        token.banSyncedAt = Date.now();
+      }
+
+      // Periodically refresh ban/suspension status from DB so admin actions
+      // take effect within BAN_SYNC_INTERVAL_MS without invalidating the JWT.
+      const lastSync = (token.banSyncedAt as number | undefined) ?? 0;
+      const isStale = Date.now() - lastSync > BAN_SYNC_INTERVAL_MS;
+      if (token.sub && (trigger === "update" || isStale)) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.sub as string },
+            select: { isBanned: true, suspendedUntil: true, role: true },
+          });
+          if (dbUser) {
+            token.isBanned = dbUser.isBanned;
+            token.suspendedUntil = dbUser.suspendedUntil
+              ? dbUser.suspendedUntil.toISOString()
+              : null;
+            token.role = dbUser.role;
+            token.banSyncedAt = Date.now();
+          }
+        } catch {
+          // Fail open — DB hiccup must not lock everyone out.
+        }
       }
 
       if (session?.user.name && trigger === "update") {
