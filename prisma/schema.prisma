@@ -54,6 +54,8 @@ model Product {
   lowStockThreshold Int      @default(5)
   deletedAt        DateTime? @db.Timestamp(6)
   createdAt        DateTime  @default(now()) @db.Timestamp(6)
+  // Full-text search column (managed via custom migration / trigger)
+  search_vector    Unsupported("tsvector")?
 
   categoryRef     Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   orderitems      OrderItem[]
