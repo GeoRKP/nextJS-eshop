@@ -49,7 +49,7 @@ export async function createUpdateReview(
           isPaid: true,
         },
       },
-      select: { id: true },
+      select: { productId: true },
     });
 
     if (!purchased) throw new Error(t("mustPurchaseToReview"));
