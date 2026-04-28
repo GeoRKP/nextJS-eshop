@@ -11,6 +11,10 @@ import MobileBottomNav from "@/components/shared/header/mobile-bottom-nav";
 import MobileCategoryChips from "@/components/shared/header/mobile-category-chips";
 import { auth } from "@/auth";
 
+// Storefront pages query the DB (products, brands, cart, session) on every
+// render — keep them runtime-rendered so build doesn't try to reach the DB.
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
