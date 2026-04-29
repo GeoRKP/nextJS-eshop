@@ -92,7 +92,7 @@
   .transition-slow    { @apply transition-all duration-300 ease-out; }
 
   /* ─── Header heights ─────────────────────────────────────────────── */
-  .header-row       { @apply h-[4.25rem]; }
+  .header-row       { @apply h-[5.5rem]; }
   .announcement-bar { @apply h-8; }
 
   /* ─── Header scrolled state — solid + thicker bottom border ─────── */

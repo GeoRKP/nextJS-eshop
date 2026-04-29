@@ -22,16 +22,16 @@ const Header = () => {
             <Image
               src="/images/logo.png"
               alt={`${APP_NAME} logo`}
-              width={60}
-              height={60}
+              width={76}
+              height={76}
               priority
               className="hidden md:block transition-transform group-hover:scale-105"
             />
             <Image
               src="/images/logo.png"
               alt={`${APP_NAME} logo`}
-              width={52}
-              height={52}
+              width={64}
+              height={64}
               priority
               className="md:hidden"
             />
