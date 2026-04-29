@@ -514,7 +514,7 @@ const sampleData = {
       categorySlug: 'fysoynes-tampouro',
       description:
         'Φυσούνα διπλής ενέργειας T24 για ταμπούρο. Κωδικός AVL: FA1034A. Υψηλής αντοχής ελαστικό, θερμοκρασίες -40°C έως +80°C.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/fa1034a/01.png'],
       price: 12.0,
       brand: 'AVL',
       rating: 4.6,
@@ -536,7 +536,7 @@ const sampleData = {
       categorySlug: 'fysoynes-tampouro',
       description:
         'Πρεσσαριστή φυσούνα Δ.Ε. T24 για ταμπούρο. Κωδικός AVL: FA1078C. Μεταλλικό στεφάνι πρεσσαρισμένο για αυξημένη στεγανότητα.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/fa1078c/01.png'],
       price: 14.5,
       brand: 'AVL',
       rating: 4.5,
@@ -558,7 +558,7 @@ const sampleData = {
       categorySlug: 'fysoynes-tampouro',
       description:
         'Ενισχυμένη φυσούνα Δ.Ε. T24 για ταμπούρο. Κωδικός AVL: FA1032A. Διπλό ύφασμα ενίσχυσης, μεγάλη διάρκεια ζωής.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/fa1032a/01.png'],
       price: 16.0,
       brand: 'AVL',
       rating: 4.7,
@@ -580,7 +580,7 @@ const sampleData = {
       categorySlug: 'fysoynes-tampouro',
       description:
         'Φυσούνα με διπλά μεταλλικά στεφάνια και ενσωματωμένο άξονα. Κωδικός AVL: FA1026A. Για βαρέα οχήματα.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/fa1026a/01.png'],
       price: 18.5,
       brand: 'AVL',
       rating: 4.3,
@@ -602,7 +602,7 @@ const sampleData = {
       categorySlug: 'fysoynes-tampouro',
       description:
         'Φυσούνα με σπείρωμα M16 για ειδικές εφαρμογές. Κωδικός AVL: FA1043D. Σύνδεση απευθείας σε σώμα θαλάμου.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/fa1043d/01.png'],
       price: 15.0,
       brand: 'AVL',
       rating: 4.1,
@@ -674,7 +674,7 @@ const sampleData = {
       categorySlug: 'fysoynes-diskofrenoy',
       description:
         'Φυσούνα μονής ενέργειας για δισκόφρενα. Κωδικός AVL: FA1021B. Σχεδιασμένη για τα σύγχρονα δισκόφρενα φορτηγών.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/fa1021b/01.png'],
       price: 10.5,
       brand: 'AVL',
       rating: 4.5,
@@ -696,7 +696,7 @@ const sampleData = {
       categorySlug: 'fysoynes-diskofrenoy',
       description:
         'Φυσούνα διπλής ενέργειας T16/24 για δισκόφρενα. Κωδικός AVL: FA1065B. Η δημοφιλέστερη φυσούνα δισκοφρένου.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/fa1065b/01.png'],
       price: 14.0,
       brand: 'AVL',
       rating: 4.7,
@@ -718,7 +718,7 @@ const sampleData = {
       categorySlug: 'fysoynes-diskofrenoy',
       description:
         'Ενισχυμένη φυσούνα Δ.Ε. για δισκόφρενα. Κωδικός AVL: FA1090A. Ενισχυμένο ελαστικό με διπλό ύφασμα.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/fa1090a/01.png'],
       price: 18.0,
       brand: 'AVL',
       rating: 4.6,
@@ -740,7 +740,7 @@ const sampleData = {
       categorySlug: 'fysoynes-diskofrenoy',
       description:
         'Φυσούνα με διπλά μεταλλικά στεφάνια για δισκόφρενα. Κωδικός AVL: FA1037A. Εξαιρετική στεγανότητα.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/fa1037a/01.png'],
       price: 20.0,
       brand: 'AVL',
       rating: 4.4,
@@ -785,7 +785,7 @@ const sampleData = {
       categorySlug: 'fysoynes-diskofrenoy',
       description:
         'Φυσούνα Δ.Ε. δισκοφρένου SORL με αλουμινένιο στεφάνι. Κωδικός: 35303901710. Ελαφρύτερη, ανθεκτική στη διάβρωση.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/35303901710/01.png'],
       price: 28.0,
       brand: 'SORL',
       rating: 4.5,
@@ -834,7 +834,7 @@ const sampleData = {
       categorySlug: 'aytomatoi-syndesmoi-aeros',
       description:
         'Αυτόματος σύνδεσμος γωνία αρσενικό-θηλυκό 6mm. Κωδικός: EF0310601. Push-in τεχνολογία, εύκολη σύνδεση/αποσύνδεση.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/0310601/01.png'],
       price: 2.6,
       brand: 'Camozzi',
       rating: 4.3,
@@ -856,7 +856,7 @@ const sampleData = {
       categorySlug: 'aytomatoi-syndesmoi-aeros',
       description:
         'Αυτόματος σύνδεσμος ταφ Α-Θ-Α (τρελλό στη μέση) 6mm. Κωδικός: TF0330601. Πλήρως αεροστεγής σύνδεση.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/0330601/01.png'],
       price: 3.88,
       brand: 'Camozzi',
       rating: 4.2,
@@ -878,7 +878,7 @@ const sampleData = {
       categorySlug: 'aytomatoi-syndesmoi-aeros',
       description:
         'Αυτόματος σύνδεσμος ταφ Θ-Α-Θ (τρελλό στην άκρη) 6mm. Κωδικός: TF0340601. Στεγανοποίηση με O-ring.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/0340601/01.png'],
       price: 3.88,
       brand: 'Camozzi',
       rating: 4.1,
@@ -900,7 +900,7 @@ const sampleData = {
       categorySlug: 'aytomatoi-syndesmoi-aeros',
       description:
         'Αυτόματος σύνδεσμος ταφ στη μέση κόντρα (αρσενικό). Κωδικός: TF0441822. Σπείρωμα M18x22.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/0441822/01.png'],
       price: 3.7,
       brand: 'Camozzi',
       rating: 4.0,
@@ -944,7 +944,7 @@ const sampleData = {
       categorySlug: 'aytomatoi-syndesmoi-aeros',
       description:
         'Μεταλλοπλαστικός σύνδεσμος βάσεως NPT ίσιος. Κωδικός: PM1250618. Σπείρωμα NPT 6mm, σωλήνα 18mm.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/1250618/01.png'],
       price: 0.62,
       brand: 'Camozzi',
       rating: 4.1,
@@ -966,7 +966,7 @@ const sampleData = {
       categorySlug: 'aytomatoi-syndesmoi-aeros',
       description:
         'Μεταλλοπλαστικός σύνδεσμος βάσεως NPT γωνία. Κωδικός: PM1260618. Push-in σύνδεση 6mm, σπείρωμα 18mm.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/1260618/01.png'],
       price: 0.78,
       brand: 'Camozzi',
       rating: 4.2,
@@ -1077,7 +1077,7 @@ const sampleData = {
       categorySlug: 'aytomatoi-syndesmoi-aeros',
       description:
         'Μεταλλικός σύνδεσμος βάσεως NPT 4mm σωλήνα, 18mm σπείρωμα. Κωδικός: PF1360418.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/1360418/01.png'],
       price: 1.31,
       brand: 'Camozzi',
       rating: 4.1,
@@ -1123,7 +1123,7 @@ const sampleData = {
       categorySlug: 'aytomatoi-syndesmoi-aeros',
       description:
         'Μεταλλικός σύνδεσμος βάσεως NPT γωνία 4mm σωλήνα, 18mm σπείρωμα. Κωδικός: PF1380418.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/1380418/01.png'],
       price: 2.48,
       brand: 'Camozzi',
       rating: 4.0,
@@ -1146,7 +1146,7 @@ const sampleData = {
       categorySlug: 'aytomatoi-syndesmoi-aeros',
       description:
         'Αυτόματος ορειχάλκινος σύνδεσμος ασφαλείας για οχήματα. Κωδικός: PB2050604. DOT πιστοποίηση.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/2050604/01.png'],
       price: 3.5,
       brand: 'Camozzi',
       rating: 4.6,
@@ -1168,7 +1168,7 @@ const sampleData = {
       categorySlug: 'aytomatoi-syndesmoi-aeros',
       description:
         'Αυτόματος ορειχάλκινος σύνδεσμος με θηλυκό σπείρωμα 12mm/64mm. Κωδικός: PB2201264. Βαρέος τύπου.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/2201264/01.png'],
       price: 100.0,
       brand: 'Camozzi',
       rating: 4.7,
@@ -1237,7 +1237,7 @@ const sampleData = {
       categorySlug: 'rakor-frenon',
       description:
         'Βίδα ρακόρ για θηλιά φρένων M6. Κωδικός: BA030601. Χαλκός με νικέλιο.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/030601/01.png'],
       price: 0.58,
       brand: 'AVL',
       rating: 4.0,
@@ -1258,7 +1258,7 @@ const sampleData = {
       categorySlug: 'rakor-frenon',
       description:
         'Διπλή λαδοβίδα M6 για σύνδεση σωλήνων φρένων. Κωδικός: BA060601. Ορείχαλκος υψηλής ποιότητας.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/060601/01.png'],
       price: 2.06,
       brand: 'AVL',
       rating: 4.2,
@@ -1279,7 +1279,7 @@ const sampleData = {
       categorySlug: 'rakor-frenon',
       description:
         'Θηλιά αέρος για πλαστική σωλήνα 8x6mm. Κωδικός: BA020806. Ορειχάλκινη, σπείρωμα BSP.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/020806/01.png'],
       price: 3.4,
       brand: 'AVL',
       rating: 4.1,
@@ -1301,7 +1301,7 @@ const sampleData = {
       categorySlug: 'rakor-frenon',
       description:
         'Θηλιά για ελαστική σωλήνα 6mm, σπείρωμα 31mm. Κωδικός: BA040631.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/040631/01.png'],
       price: 1.2,
       brand: 'AVL',
       rating: 4.0,
@@ -1323,7 +1323,7 @@ const sampleData = {
       categorySlug: 'rakor-frenon',
       description:
         'Ταφ (T-piece) υδραυλικών φρένων. Κωδικός: HB051001B. Τριπλή διακλάδωση υγρών φρένων.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/hb051001b/01.png'],
       price: 7.75,
       brand: 'AVL',
       rating: 4.5,
@@ -1343,7 +1343,7 @@ const sampleData = {
       categorySlug: 'rakor-frenon',
       description:
         'Σταυρός (cross-piece) υδραυλικών φρένων. Κωδικός: HB071001B. Τετραπλή διακλάδωση.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/hb071001b/01.png'],
       price: 8.7,
       brand: 'AVL',
       rating: 4.4,
@@ -1363,7 +1363,7 @@ const sampleData = {
       categorySlug: 'rakor-frenon',
       description:
         'Εξαερωτήρας (bleeder) υδραυλικών φρένων M6. Κωδικός: HB080601. Για εξαέρωση κυκλώματος φρένων.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/080601/01.png'],
       price: 1.4,
       brand: 'AVL',
       rating: 4.0,
@@ -1408,7 +1408,7 @@ const sampleData = {
       categorySlug: 'antistaseis-solinas',
       description:
         'Πλαστική σωλήνα αέρος 2x4mm. Κωδικός: PT-010204. Τιμή ανά μέτρο. Πολυαμίδιο PA12.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/010204/01.png'],
       price: 0.53,
       brand: 'AVL',
       rating: 4.0,
@@ -1429,7 +1429,7 @@ const sampleData = {
       categorySlug: 'antistaseis-solinas',
       description:
         'Πλαστική σφήνα (αντίσταση) για σωλήνα αέρος 2x4mm. Κωδικός: IT-010204. Πωλείται ανά τεμάχιο.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/010204/01.png'],
       price: 0.26,
       brand: 'AVL',
       rating: 4.0,
@@ -1450,7 +1450,7 @@ const sampleData = {
       categorySlug: 'antistaseis-solinas',
       description:
         'Πλαστική σφήνα για σωλήνα αέρος 4x6mm. Κωδικός: IT-010406. Η πιο δημοφιλής διάσταση.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/010406/01.png'],
       price: 0.26,
       brand: 'AVL',
       rating: 4.1,
@@ -1471,7 +1471,7 @@ const sampleData = {
       categorySlug: 'antistaseis-solinas',
       description:
         'Πλαστική σφήνα για σωλήνα αέρος 5x8mm. Κωδικός: IT-010508.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/010508/01.png'],
       price: 0.28,
       brand: 'AVL',
       rating: 4.0,
@@ -1492,7 +1492,7 @@ const sampleData = {
       categorySlug: 'antistaseis-solinas',
       description:
         'Πλαστική σφήνα για σωλήνα αέρος 6x8mm. Κωδικός: IT-010608.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/010608/01.png'],
       price: 0.3,
       brand: 'AVL',
       rating: 4.0,
@@ -1513,7 +1513,7 @@ const sampleData = {
       categorySlug: 'antistaseis-solinas',
       description:
         'Πλαστική σφήνα για σωλήνα αέρος 8x10mm. Κωδικός: IT-010810.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/010810/01.png'],
       price: 0.35,
       brand: 'AVL',
       rating: 4.0,
@@ -1576,7 +1576,7 @@ const sampleData = {
       categorySlug: 'antistaseis-solinas',
       description:
         'Πλαστική σφήνα για σωλήνα αέρος 14x18mm. Κωδικός: IT-011418. Η μεγαλύτερη διάσταση.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/011418/01.png'],
       price: 0.55,
       brand: 'AVL',
       rating: 4.0,
@@ -1601,7 +1601,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Αρσενικό σιδηροσωλήνας M8, σωλήνα 3mm. Κωδικός: HB010803. Γαλβανιζέ.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/010803/01.png'],
       price: 0.46,
       brand: 'AVL',
       rating: 4.0,
@@ -1622,7 +1622,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Τάπα υδραυλικών φρένων M10. Κωδικός: HB021001. Ορείχαλκος νικελαρισμένος.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/021001/01.png'],
       price: 0.57,
       brand: 'AVL',
       rating: 4.1,
@@ -1642,7 +1642,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Θηλυκή μούφα M10 για σωλήνες φρένων. Κωδικός: HB031001B. Ορείχαλκος.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/hb031001b/01.png'],
       price: 3.4,
       brand: 'AVL',
       rating: 4.3,
@@ -1682,7 +1682,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Ουρά σύνδεσης πλαστικής σωλήνας 6mm. Κωδικός: HN010606. Ορείχαλκος.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/010606/01.png'],
       price: 1.32,
       brand: 'AVL',
       rating: 4.0,
@@ -1723,7 +1723,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Ουρά κομφλέρ για ελαστική σωλήνα με λινά 10mm/6mm. Κωδικός: HN031006.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/031006/01.png'],
       price: 1.15,
       brand: 'AVL',
       rating: 4.1,
@@ -1744,7 +1744,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Συνδετική ουρά πλαστικής σωλήνας 6mm/14mm. Κωδικός: HN04614.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/hn04614/01.png'],
       price: 1.54,
       brand: 'AVL',
       rating: 4.0,
@@ -1765,7 +1765,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Συστολική ουρά πλαστικής σωλήνας 6mm σε 8mm. Κωδικός: HN050608. Για αλλαγή διαμέτρου.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/050608/01.png'],
       price: 1.54,
       brand: 'AVL',
       rating: 4.0,
@@ -1785,7 +1785,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Ταφ (T-piece) πλαστικής σωλήνας 6mm/14mm. Κωδικός: HN060614.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/060614/01.png'],
       price: 3.2,
       brand: 'AVL',
       rating: 4.2,
@@ -1806,7 +1806,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Αρσενικό βάσης με ουρά για πλαστική σωλήνα 12mm, σπείρωμα 6mm. Κωδικός: HN141206.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/141206/01.png'],
       price: 2.29,
       brand: 'AVL',
       rating: 4.1,
@@ -1848,7 +1848,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Μούφα Αμερικής (flare fitting) 22mm/12mm. Κωδικός: AF052212. Χαλύβδινη γαλβανιζέ.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/052212/01.png'],
       price: 1.74,
       brand: 'AVL',
       rating: 4.2,
@@ -1930,7 +1930,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Ροδέλα αλουμινίου M6. Κωδικός: SR030006. Μαλακή, για στεγανοποίηση ρακόρ.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/030006/01.png'],
       price: 0.05,
       brand: 'AVL',
       rating: 4.0,
@@ -1950,7 +1950,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Χαλκοροδέλα M6. Κωδικός: SR040006. Ανθεκτική σε υψηλές θερμοκρασίες.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/040006/01.png'],
       price: 0.1,
       brand: 'AVL',
       rating: 4.0,
@@ -1970,7 +1970,7 @@ const sampleData = {
       categorySlug: 'oyres-moyfes-tapes',
       description:
         'Μαστός αέρος κομπλέ 22mm/22mm. Κωδικός: RF072222. Ορείχαλκος, για σύνδεση σωληνώσεων αέρος.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/072222/01.png'],
       price: 6.6,
       brand: 'AVL',
       rating: 4.3,
@@ -2060,7 +2060,7 @@ const sampleData = {
       categorySlug: 'solines-lastixa',
       description:
         'Μεταλλική εύκαμπτη σωλήνα φρένων 3/16". Κωδικός: HO-1200316. Τιμή ανά μέτρο. Πλεγμένη ατσάλινη.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/1200316/01.png'],
       price: 3.5,
       brand: 'AVL',
       rating: 4.4,
@@ -2081,7 +2081,7 @@ const sampleData = {
       categorySlug: 'solines-lastixa',
       description:
         'Σωλήνα R6 λαδιού 1/4". Κωδικός: HO-060014. Τιμή ανά μέτρο. Ελαστική με πλέξη λινών.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/060014/01.png'],
       price: 4.66,
       brand: 'AVL',
       rating: 4.3,
@@ -2101,7 +2101,7 @@ const sampleData = {
       categorySlug: 'solines-lastixa',
       description:
         'Σωλήνα Teflon σκληρή με 1 σύρμα ατσάλι 18mm. Κωδικός: HO-090018. Τιμή ανά μέτρο. Αντοχή σε θερμοκρασίες έως 260°C.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/090018/01.png'],
       price: 13.69,
       brand: 'AVL',
       rating: 4.6,
@@ -2225,7 +2225,7 @@ const sampleData = {
       categorySlug: 'solines-lastixa',
       description:
         'Κυλινδρικός σύνδεσμος βάσης 6mm/10mm. Κωδικός: DF-010610. Ατσάλι γαλβανιζέ.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/010610/01.png'],
       price: 1.15,
       brand: 'AVL',
       rating: 4.0,
@@ -2245,7 +2245,7 @@ const sampleData = {
       categorySlug: 'solines-lastixa',
       description:
         'Ταφ αναμονών σκέτο (χωρίς βαλβίδα). Κωδικός: TP020001. Χαλύβδινο γαλβανιζέ.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/020001/01.png'],
       price: 8.4,
       brand: 'AVL',
       rating: 4.3,
@@ -2289,7 +2289,7 @@ const sampleData = {
       categorySlug: 'markoutsia-teflon',
       description:
         'Έτοιμο μαρκούτσι Teflon σκληρό ημιεύκαμπτο 0.55m με πρεσσαριστά άκρα. Κωδικός: TH010157. Αντοχή σε θερμοκρασίες -60°C έως +260°C.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/010157/01.png'],
       price: 35.0,
       brand: 'AVL',
       rating: 4.7,
@@ -2418,7 +2418,7 @@ const sampleData = {
       categorySlug: 'markoutsia-frenon',
       description:
         'Σύνδεσμος φρένων ειδικός Volvo. Κωδικός: SF-070018. OEM αντικατάσταση, πρεσσαρισμένος.',
-      images: ['/images/placeholder.svg'],
+      images: ['/images/products/070018/01.png'],
       price: 2.77,
       brand: 'AVL',
       rating: 4.2,

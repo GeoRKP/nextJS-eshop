@@ -10,6 +10,7 @@ import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { assertAdmin } from "@/lib/auth-guard";
 import { logAuditEvent } from "@/lib/audit-log";
+import { deleteUploadedImages, diffImages } from "@/lib/file-cleanup";
 
 export async function getLatestProducts(limit?: number) {
   const data = await prisma.product.findMany({
@@ -387,12 +388,20 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
     const newPrice = Number(product.price);
     const priceChanged = oldPrice !== newPrice;
 
+    const removedImages = diffImages(productExists.images, product.images);
+    const removedBanner =
+      productExists.banner && productExists.banner !== product.banner
+        ? [productExists.banner]
+        : [];
+
     await prisma.product.update({
       where: {
         id: product.id,
       },
       data: product,
     });
+
+    await deleteUploadedImages([...removedImages, ...removedBanner]);
 
     if (priceChanged) {
       await prisma.priceHistory.create({
