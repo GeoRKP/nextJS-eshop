@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import sampleData from './sample-data'
+import { categoryTranslationsEn } from '../lib/data/category-translations-en'
+import { productTranslationsEn } from '../lib/data/product-translations-en'
 
 const prisma = new PrismaClient()
 
@@ -50,11 +52,14 @@ async function main() {
   const categoryMap = new Map<string, string>()
 
   for (const cat of parentCategories) {
+    const en = categoryTranslationsEn[cat.slug]
     const created = await prisma.category.create({
       data: {
         name: cat.name,
+        nameEn: en?.name ?? null,
         slug: cat.slug,
         description: cat.description,
+        descriptionEn: en?.description ?? null,
         image: cat.image,
         sortOrder: cat.sortOrder,
         isActive: true,
@@ -72,11 +77,14 @@ async function main() {
       console.warn(`  ⚠ Parent slug "${cat.parentSlug}" not found for "${cat.name}"`)
       continue
     }
+    const en = categoryTranslationsEn[cat.slug]
     const created = await prisma.category.create({
       data: {
         name: cat.name,
+        nameEn: en?.name ?? null,
         slug: cat.slug,
         description: cat.description,
+        descriptionEn: en?.description ?? null,
         image: cat.image,
         parentId,
         sortOrder: cat.sortOrder,
@@ -99,14 +107,17 @@ async function main() {
 
   for (const product of sampleData.products) {
     const categoryId = categoryMap.get(product.categorySlug) ?? null
+    const en = productTranslationsEn[product.slug]
 
     const created = await prisma.product.create({
       data: {
         name: product.name,
+        nameEn: en?.name ?? null,
         slug: product.slug,
         category: product.category,
         categoryId,
         description: product.description,
+        descriptionEn: en?.description ?? null,
         images: product.images,
         price: product.price,
         brand: product.brand,
