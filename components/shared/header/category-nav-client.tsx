@@ -70,7 +70,7 @@ export default function CategoryNavClient({
   return (
     <div ref={navRef} className="relative">
       <nav className="hidden md:block bg-primary text-primary-foreground relative z-[45]">
-        <div className="wrapper flex items-center gap-0 h-11 !py-0 overflow-x-auto scrollbar-hide">
+        <div className="wrapper flex items-center gap-0 h-12 !py-0 overflow-x-auto scrollbar-hide">
           {/* All Categories button */}
           <button
             aria-expanded={activeCategory === "__all__"}
