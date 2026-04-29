@@ -63,7 +63,7 @@ export function useSearchSuggestions(config: UseSearchSuggestionsConfig = {}) {
       setIsOpen(true);
 
       if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => fetchSuggestions(value), 250);
+      debounceRef.current = setTimeout(() => fetchSuggestions(value), 150);
     },
     [fetchSuggestions]
   );
