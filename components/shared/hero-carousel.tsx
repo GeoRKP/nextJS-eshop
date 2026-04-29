@@ -67,7 +67,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
             const slide = slides[index % slides.length];
             return (
               <CarouselItem key={product.id}>
-                <div className="relative w-full h-[440px] sm:h-[520px] md:h-[620px] lg:h-[720px] xl:h-[780px] 2xl:h-[860px] overflow-hidden">
+                <div className="relative w-full h-[320px] sm:h-[380px] md:h-[440px] lg:h-[500px] xl:h-[540px] 2xl:h-[600px] overflow-hidden">
                   {product.banner ? (
                     product.banner.endsWith('.svg') ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
