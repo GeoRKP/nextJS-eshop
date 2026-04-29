@@ -11,16 +11,18 @@ datasource db {
 // ─── Category (hierarchical) ───────────────────────────────────
 
 model Category {
-  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  slug        String     @unique
-  description String?
-  image       String?
-  parentId    String?    @db.Uuid
-  sortOrder   Int        @default(0)
-  isActive    Boolean    @default(true)
-  createdAt   DateTime   @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime   @updatedAt @db.Timestamp(6)
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  nameEn        String?
+  slug          String     @unique
+  description   String?
+  descriptionEn String?
+  image         String?
+  parentId      String?    @db.Uuid
+  sortOrder     Int        @default(0)
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime   @updatedAt @db.Timestamp(6)
 
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
   children Category[] @relation("CategoryTree")
@@ -38,12 +40,14 @@ model Category {
 model Product {
   id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name             String
+  nameEn           String?
   slug             String    @unique(map: "product_slug_idx")
   category         String
   categoryId       String?   @db.Uuid
   images           String[]
   brand            String
   description      String
+  descriptionEn    String?
   stock            Int
   price            Decimal   @default(0) @db.Decimal(12, 2)
   rating           Decimal   @default(0) @db.Decimal(10, 2)
