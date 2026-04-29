@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
-import Image from "next/image";
 import { Link } from "@/i18n/navigation";
-import { ChevronRight, ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
 
@@ -166,7 +165,6 @@ function SingleCategoryMegaMenu({
   onClose: () => void;
 }) {
   const subcategories = category.children ?? [];
-  const CategoryIcon = getCategoryIcon(category.name);
 
   const columns = subcategories.length > 0 ? subcategories : [];
 
@@ -230,44 +228,6 @@ function SingleCategoryMegaMenu({
               </Link>
             </div>
           )}
-        </div>
-
-        {/* Right panel: CTA card — workshop info plate with optional image bg */}
-        <div className="w-64 shrink-0 hidden xl:flex flex-col rounded-none border border-accent/40 bg-foreground/40 p-5 text-background relative overflow-hidden">
-          {category.image && (
-            <>
-              <Image
-                src={category.image}
-                alt=""
-                fill
-                sizes="256px"
-                className="object-cover opacity-50"
-                aria-hidden="true"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/85 to-foreground/40" aria-hidden="true" />
-              <div className="absolute inset-0 bg-blueprint-grid-sm opacity-[0.08]" aria-hidden="true" />
-            </>
-          )}
-          <div className="relative flex flex-col h-full">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent mb-3">
-              ▲ MODULE
-            </span>
-            <CategoryIcon className="h-12 w-12 text-accent stroke-[1.5] mb-4" />
-            <p className="font-heading font-bold uppercase text-base tracking-[0.06em] leading-tight mb-1">{category.name}</p>
-            {category._count?.products ? (
-              <p className="font-mono text-[11px] text-background/75 mb-4 tracking-[0.05em]">
-                [{String(category._count.products).padStart(4, "0")}] {translations.products.replace("{count}", "").trim()}
-              </p>
-            ) : null}
-            <Link
-              href={`/search?category=${encodeURIComponent(category.name)}`}
-              onClick={onClose}
-              className="mt-auto inline-flex items-center justify-between gap-1 text-[11px] font-bold uppercase tracking-[0.16em] bg-accent text-accent-foreground px-4 py-2.5 rounded-none hover:bg-background hover:text-foreground transition-colors font-heading"
-            >
-              {translations.viewAll}
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
         </div>
       </div>
     </MegaMenuShell>

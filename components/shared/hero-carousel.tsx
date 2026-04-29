@@ -161,12 +161,6 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                           >
                             <Link href="/search">{translations.shopNow} →</Link>
                           </Button>
-                          <Link
-                            href={`/product/${product.slug}`}
-                            className="font-mono text-xs uppercase tracking-[0.18em] text-background/70 hover:text-accent transition-colors border-b border-background/30 hover:border-accent pb-1"
-                          >
-                            VIEW SPECS →
-                          </Link>
                         </div>
                       </div>
                     )}

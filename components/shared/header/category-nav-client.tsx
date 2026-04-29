@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Grid3X3, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "@/i18n/navigation";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
 import MegaMenu from "./mega-menu";
@@ -98,13 +99,15 @@ export default function CategoryNavClient({
 
           <div className="h-4 w-px bg-primary-foreground/20 mx-1" />
 
-          {/* Root category items with icons */}
+          {/* Root category items with icons — click goes to category page,
+              hover opens the mega menu for subcategory discovery */}
           {categories.map((category) => {
             const Icon = getCategoryIcon(category.name);
             const isActive = activeCategory === category.id;
             return (
-              <button
+              <Link
                 key={category.id}
+                href={`/search?category=${encodeURIComponent(category.name)}`}
                 aria-expanded={isActive}
                 aria-haspopup="menu"
                 className={`flex items-center gap-1.5 px-3 h-full font-heading text-[12px] font-bold uppercase tracking-[0.12em] transition-all border-b-2 ${
@@ -114,12 +117,8 @@ export default function CategoryNavClient({
                 }`}
                 onMouseEnter={() => handleMouseEnter(category.id)}
                 onMouseLeave={handleMouseLeave}
-                onClick={() => handleClick(category.id)}
+                onClick={() => setActiveCategory(null)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleClick(category.id);
-                  }
                   if (e.key === "Escape") setActiveCategory(null);
                 }}
               >
@@ -128,7 +127,7 @@ export default function CategoryNavClient({
                 {category.children && category.children.length > 0 && (
                   <ChevronDown className={`h-3 w-3 hidden md:block shrink-0 transition-transform duration-200 ${isActive ? "rotate-180" : ""}`} />
                 )}
-              </button>
+              </Link>
             );
           })}
 
