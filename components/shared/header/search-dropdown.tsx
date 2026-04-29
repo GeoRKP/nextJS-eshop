@@ -5,7 +5,8 @@ import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import type { ProductSuggestion, CategorySuggestion } from "@/types/search";
 import { Clock, SearchIcon, Tag, X } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { localizedName } from "@/lib/i18n-helpers";
 
 type Props = {
   query: string;
@@ -33,6 +34,7 @@ function SearchDropdown({
   onClearRecents,
 }: Props) {
   const t = useTranslations("Search");
+  const locale = useLocale();
   const showRecents = !query && recentSearches.length > 0;
   const showProducts = query && products.length > 0;
   const showCategories = query && categories.length > 0;
@@ -153,7 +155,7 @@ function SearchDropdown({
               >
                 <Image
                   src={product.image}
-                  alt={product.name}
+                  alt={localizedName(product, locale)}
                   width={56}
                   height={56}
                   className="w-11 h-11 md:w-14 md:h-14 rounded-none object-cover border border-border bg-muted/30 bg-blueprint-grid-sm shrink-0"
@@ -161,7 +163,7 @@ function SearchDropdown({
                 />
                 <div className="flex-1 min-w-0">
                   <p className="truncate text-sm font-medium">
-                    {product.name}
+                    {localizedName(product, locale)}
                   </p>
                   <p className="text-label text-muted-foreground">
                     {product.brand}
@@ -198,7 +200,7 @@ function SearchDropdown({
                 }}
               >
                 <Tag className="h-3.5 w-3.5 text-muted-foreground" />
-                <span>{cat.category}</span>
+                <span>{locale === "en" && cat.categoryEn ? cat.categoryEn : cat.category}</span>
                 <span className="text-xs text-muted-foreground">
                   ({cat.count})
                 </span>

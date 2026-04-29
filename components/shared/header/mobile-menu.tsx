@@ -2,7 +2,8 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { localizedName } from "@/lib/i18n-helpers";
 import {
   Sheet,
   SheetContent,
@@ -445,10 +446,12 @@ function CategoryAccordion({
   viewAllText: string;
   level: number;
 }) {
+  const locale = useLocale();
   const isExpanded = expanded.has(category.id);
   const hasChildren = category.children && category.children.length > 0;
   const paddingLeft = 16 + level * 16;
   const Icon = level === 0 ? getCategoryIcon(category.name) : null;
+  const displayName = localizedName(category, locale);
 
   return (
     <div className={isExpanded && level === 0 ? "bg-muted/30" : ""}>
@@ -468,7 +471,7 @@ function CategoryAccordion({
           onClick={onClose}
           className="flex-1 min-h-[44px] flex items-center text-sm"
         >
-          {category.name}
+          {displayName}
           {category._count?.products ? (
             <span className="text-xs text-muted-foreground ml-1">
               ({category._count.products})
@@ -505,7 +508,7 @@ function CategoryAccordion({
               className="block min-h-[44px] flex items-center text-xs text-brand-accent font-medium hover:bg-accent/50 transition-colors"
               style={{ paddingLeft: paddingLeft + (Icon ? 40 : 16) }}
             >
-              {viewAllText} {category.name}
+              {viewAllText} {displayName}
             </Link>
             {category.children!.map((child) => (
               <CategoryAccordion

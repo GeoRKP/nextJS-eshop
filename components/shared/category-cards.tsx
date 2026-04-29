@@ -1,10 +1,11 @@
 import { getCategoryTree } from "@/lib/actions/category.actions";
 import { getAllCategories } from "@/lib/actions/product.actions";
 import { Link } from "@/i18n/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
 import { ShoppingBag, ArrowRight, ArrowUpRight } from "lucide-react";
 import { getCategoryIcon } from "@/lib/category-icons";
+import { localizedName } from "@/lib/i18n-helpers";
 
 // Bento grid pattern: spans for 12-col grid on desktop
 // Row 1: 7 + 5, Row 2: 4 + 4 + 4, Row 3: 5 + 7
@@ -21,6 +22,7 @@ const bentoSpans = [
 export default async function CategoryCards() {
   const t = await getTranslations("Categories");
   const tHome = await getTranslations("HomePage");
+  const locale = await getLocale();
 
   // Try hierarchical categories first
   let treeCategories: Awaited<ReturnType<typeof getCategoryTree>> = [];
@@ -65,7 +67,7 @@ export default async function CategoryCards() {
                 {cat.image ? (
                   <Image
                     src={cat.image}
-                    alt={cat.name}
+                    alt={localizedName(cat, locale)}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -95,7 +97,7 @@ export default async function CategoryCards() {
                 <div className="relative p-4 md:p-5">
                   <Icon className="h-7 w-7 text-accent mb-2.5 stroke-[1.75]" />
                   <p className="font-heading font-bold uppercase text-background text-base md:text-lg leading-tight tracking-[0.04em]">
-                    {cat.name}
+                    {localizedName(cat, locale)}
                   </p>
                   <div className="flex items-center gap-2.5 mt-2 text-background/80">
                     {subcategoryCount > 0 && (
@@ -162,7 +164,7 @@ export default async function CategoryCards() {
               </div>
               <div className="relative p-4 md:p-5">
                 <Icon className="h-7 w-7 text-accent mb-2.5 stroke-[1.75]" />
-                <p className="font-heading font-bold uppercase text-background text-base leading-tight tracking-[0.04em]">{cat.name}</p>
+                <p className="font-heading font-bold uppercase text-background text-base leading-tight tracking-[0.04em]">{localizedName(cat, locale)}</p>
                 <span className="inline-block mt-2 font-mono text-[10px] tracking-[0.05em] text-accent">
                   [{String(cat.productCount ?? 0).padStart(4, "0")}]
                 </span>

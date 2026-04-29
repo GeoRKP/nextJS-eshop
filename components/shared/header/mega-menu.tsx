@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
+import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight } from "lucide-react";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
+import { localizedName } from "@/lib/i18n-helpers";
 
 type BrandItem = { brand: string; _count: number };
 
@@ -164,6 +166,7 @@ function SingleCategoryMegaMenu({
   onMouseLeave: () => void;
   onClose: () => void;
 }) {
+  const locale = useLocale();
   const subcategories = category.children ?? [];
 
   const columns = subcategories.length > 0 ? subcategories : [];
@@ -181,6 +184,7 @@ function SingleCategoryMegaMenu({
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-5">
               {columns.map((sub) => {
                 const SubIcon = getCategoryIcon(sub.name);
+                const subDisplay = localizedName(sub, locale);
                 return (
                   <div key={sub.id}>
                     <Link
@@ -190,7 +194,7 @@ function SingleCategoryMegaMenu({
                       className="flex items-center gap-2 text-accent font-heading font-bold uppercase text-[11px] tracking-[0.18em] hover:text-accent/80 transition-colors mb-2 pb-1.5 border-b border-accent/30"
                     >
                       <SubIcon className="h-4 w-4" />
-                      {sub.name}
+                      {subDisplay}
                     </Link>
                     {sub.children && sub.children.length > 0 && (
                       <ul className="space-y-1">
@@ -202,7 +206,7 @@ function SingleCategoryMegaMenu({
                               onClick={onClose}
                               className="block text-[13px] text-background/65 pl-2 hover:text-accent hover:translate-x-0.5 transition-all py-1"
                             >
-                              {item.name}
+                              {localizedName(item, locale)}
                               {item._count?.products ? (
                                 <span className="font-mono text-[10px] ml-1.5 text-background/40 tracking-[0.05em]">
                                   [{String(item._count.products).padStart(3, "0")}]
@@ -224,7 +228,7 @@ function SingleCategoryMegaMenu({
                 onClick={onClose}
                 className="text-sm text-accent hover:underline font-medium uppercase tracking-[0.12em] font-heading"
               >
-                {translations.viewAll} {category.name} →
+                {translations.viewAll} {localizedName(category, locale)} →
               </Link>
             </div>
           )}
@@ -248,6 +252,7 @@ function AllCategoriesMegaMenu({
   onMouseLeave: () => void;
   onClose: () => void;
 }) {
+  const locale = useLocale();
   const [activeRoot, setActiveRoot] = useState<string | null>(
     categories[0]?.id ?? null
   );
@@ -296,7 +301,7 @@ function AllCategoriesMegaMenu({
                 onMouseLeave={handleCategoryLeave}
               >
                 <Icon className={`h-3.5 w-3.5 shrink-0 ${isActive ? "text-accent-foreground" : "text-background/55"}`} />
-                <span className="text-[13px] truncate flex-1">{cat.name}</span>
+                <span className="text-[13px] truncate flex-1">{localizedName(cat, locale)}</span>
                 <ChevronRight className={`h-3.5 w-3.5 shrink-0 transition-all ${
                   isActive ? "text-accent-foreground" : "text-background/40 opacity-0"
                 }`} />
@@ -310,7 +315,7 @@ function AllCategoriesMegaMenu({
           {activeCat && (
             <>
               <div className="flex items-center gap-3 mb-4 pb-2 border-b border-background/10">
-                <h4 className="font-heading font-bold text-sm uppercase tracking-[0.1em]">{activeCat.name}</h4>
+                <h4 className="font-heading font-bold text-sm uppercase tracking-[0.1em]">{localizedName(activeCat, locale)}</h4>
                 <Link
                   href={`/search?category=${encodeURIComponent(activeCat.name)}`}
                   onClick={onClose}
@@ -331,7 +336,7 @@ function AllCategoriesMegaMenu({
                         className="flex items-center gap-2 text-accent font-heading font-bold uppercase text-[11px] tracking-[0.18em] hover:text-accent/80 transition-colors mb-2 pb-1.5 border-b border-accent/30"
                       >
                         <SubIcon className="h-3.5 w-3.5" />
-                        {sub.name}
+                        {localizedName(sub, locale)}
                       </Link>
                       {sub.children && sub.children.length > 0 && (
                         <ul className="space-y-1">
@@ -343,7 +348,7 @@ function AllCategoriesMegaMenu({
                                 onClick={onClose}
                                 className="block text-[13px] text-background/65 pl-2 hover:text-accent hover:translate-x-0.5 transition-all py-1"
                               >
-                                {child.name}
+                                {localizedName(child, locale)}
                               </Link>
                             </li>
                           ))}

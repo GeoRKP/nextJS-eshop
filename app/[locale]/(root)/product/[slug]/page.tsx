@@ -9,7 +9,8 @@ import ReviewList from "./review-list";
 import { getReviews } from "@/lib/actions/review-actions";
 import { getAuthSession } from "@/lib/auth-session";
 import Rating from "@/components/shared/product/rating";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { localizedName, localizedDescription } from "@/lib/i18n-helpers";
 import Breadcrumb from "@/components/shared/breadcrumb";
 import ScrollFadeIn from "@/components/shared/scroll-fade-in";
 import RelatedProducts from "@/components/shared/product/related-products";
@@ -37,12 +38,16 @@ export async function generateMetadata(props: {
     return { title: t("title") };
   }
 
+  const locale = await getLocale();
+  const title = localizedName(product, locale);
+  const description = localizedDescription(product, locale).slice(0, 160);
+
   return {
-    title: product.name,
-    description: product.description.slice(0, 160),
+    title,
+    description,
     openGraph: {
-      title: product.name,
-      description: product.description.slice(0, 160),
+      title,
+      description,
       images: product.images[0] ? [{ url: product.images[0] }] : [],
     },
   };
@@ -66,13 +71,23 @@ export default async function ProductDetailsPage(props: {
 
   const t = await getTranslations("Product");
   const tv = await getTranslations("ValueProps");
+  const locale = await getLocale();
+  const displayName = localizedName(product, locale);
+  const displayDescription = localizedDescription(product, locale);
+  // Resolve the localized category label by joining through the categoryRef
+  // when available. The denormalized `product.category` string is canonical
+  // Greek; we keep it for the link target so /search?category=… still works.
+  const displayCategory =
+    locale === "en" && product.categoryRef?.nameEn
+      ? product.categoryRef.nameEn
+      : product.category;
 
   return (
     <div className="wrapper">
       <Breadcrumb
         items={[
-          { label: product.category, href: `/search?category=${product.category}` },
-          { label: product.name },
+          { label: displayCategory, href: `/search?category=${product.category}` },
+          { label: displayName },
         ]}
       />
       <ScrollFadeIn>
@@ -99,7 +114,7 @@ export default async function ProductDetailsPage(props: {
                 </span>
                 <span className="h-3 w-px bg-border" />
                 <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-                  {product.category}
+                  {displayCategory}
                 </span>
                 <SkuChip label="SKU" value={formatSku(product.id)} className="ml-auto" />
               </div>
@@ -107,7 +122,7 @@ export default async function ProductDetailsPage(props: {
               {/* Product name + wishlist */}
               <div className="flex flex-col-reverse sm:flex-row items-start justify-between gap-4">
                 <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold uppercase leading-[1.05]" style={{ letterSpacing: "-0.02em" }}>
-                  {product.name}
+                  {displayName}
                 </h1>
                 <div className="flex-shrink-0 mt-1 border border-border p-2 bg-card">
                   <WishlistButton productId={product.id} />
@@ -201,10 +216,10 @@ export default async function ProductDetailsPage(props: {
 
               {/* Tabs: Description + Specifications */}
               <ProductDetailTabs
-                description={product.description}
+                description={displayDescription}
                 slug={product.slug}
                 brand={product.brand}
-                category={product.category}
+                category={displayCategory}
                 stock={product.stock}
               />
             </div>

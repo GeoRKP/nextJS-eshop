@@ -30,6 +30,11 @@ export const getProductBySlug = unstable_cache(
         slug: slug,
         deletedAt: null,
       },
+      include: {
+        categoryRef: {
+          select: { id: true, name: true, nameEn: true, slug: true },
+        },
+      },
     });
   },
   ["getProductBySlug"],
@@ -441,10 +446,12 @@ export const getAllCategories = unstable_cache(
       );
       return {
         name: parent.name,
+        nameEn: parent.nameEn,
         slug: parent.slug,
         productCount: parent._count.products + childProductCount,
         children: parent.children.map((child) => ({
           name: child.name,
+          nameEn: child.nameEn,
           slug: child.slug,
           productCount: child._count.products,
         })),

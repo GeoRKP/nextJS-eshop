@@ -55,6 +55,7 @@ export const insertProductSchema = z.object({
   name: z
     .string()
     .min(3, { message: "Name must be at least 3 characters long" }),
+  nameEn: z.string().optional().nullable(),
   slug: z
     .string()
     .min(3, { message: "Slug must be at least 3 characters long" }),
@@ -68,6 +69,7 @@ export const insertProductSchema = z.object({
   description: z
     .string()
     .min(3, { message: "Description must be at least 3 characters long" }),
+  descriptionEn: z.string().optional().nullable(),
   stock: z.coerce.number().min(0, { message: "Stock must be at least 0" }),
   images: z
     .array(z.string())
@@ -227,8 +229,10 @@ export const insertReviewSchema = z.object({
 
 export const insertCategorySchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters long" }),
+  nameEn: z.string().optional().nullable(),
   slug: z.string().min(2, { message: "Slug must be at least 2 characters long" }),
   description: z.string().optional().nullable(),
+  descriptionEn: z.string().optional().nullable(),
   image: z.string().optional().nullable(),
   parentId: z.string().uuid().optional().nullable(),
   sortOrder: z.coerce.number().int().default(0),
@@ -298,11 +302,13 @@ export function createInsertProductSchema(t: T) {
   const cur = createCurrency(t);
   return z.object({
     name: z.string().min(3, { message: t("nameMin") }),
+    nameEn: z.string().optional().nullable(),
     slug: z.string().min(3, { message: t("slugMin") }),
     category: z.string().min(3, { message: t("categoryMin") }),
     categoryId: z.string().uuid().optional().nullable(),
     brand: z.string().min(3, { message: t("brandMin") }),
     description: z.string().min(3, { message: t("descriptionMin") }),
+    descriptionEn: z.string().optional().nullable(),
     stock: z.coerce.number().min(0, { message: t("stockMin") }),
     images: z.array(z.string()).min(1, { message: t("imagesMin") }),
     isFeatured: z.boolean(),
@@ -406,8 +412,10 @@ export function createInsertReviewSchema(t: T) {
 export function createInsertCategorySchema(t: T) {
   return z.object({
     name: z.string().min(2, { message: t("nameMin") }),
+    nameEn: z.string().optional().nullable(),
     slug: z.string().min(2, { message: t("slugMin") }),
     description: z.string().optional().nullable(),
+    descriptionEn: z.string().optional().nullable(),
     image: z.string().optional().nullable(),
     parentId: z.string().uuid().optional().nullable(),
     sortOrder: z.coerce.number().int().default(0),

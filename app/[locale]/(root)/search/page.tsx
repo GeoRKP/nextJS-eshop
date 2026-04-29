@@ -8,7 +8,8 @@ import {
   getProductPriceRange,
 } from "@/lib/actions/product.actions";
 import { Link } from "@/i18n/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { localizedName } from "@/lib/i18n-helpers";
 import SearchFilters from "./search-filters";
 import ViewToggle from "./view-toggle";
 import SortSelect from "./sort-select";
@@ -87,6 +88,7 @@ export default async function SearchPage(props: {
   const t = await getTranslations("Search");
   const tCommon = await getTranslations("Common");
   const tBreadcrumb = await getTranslations("Breadcrumb");
+  const locale = await getLocale();
 
   // Construct filter url
   const getFilterUrl = ({
@@ -126,6 +128,21 @@ export default async function SearchPage(props: {
     getProductPriceRange(),
   ]);
 
+  // Build flat lookup so we can show category names in the active locale
+  // anywhere we only have the canonical Greek name (chips, headlines, etc.).
+  const categoryNameByGreek = new Map<string, { name: string; nameEn: string | null }>();
+  for (const c of categories) {
+    categoryNameByGreek.set(c.name, { name: c.name, nameEn: c.nameEn ?? null });
+    for (const child of c.children) {
+      categoryNameByGreek.set(child.name, {
+        name: child.name,
+        nameEn: child.nameEn ?? null,
+      });
+    }
+  }
+  const localizedCategoryName = (greekName: string) =>
+    localizedName(categoryNameByGreek.get(greekName) ?? { name: greekName }, locale);
+
   // Parse current price filter values for the slider
   const currentMin =
     price !== "all" ? Number(price.split("-")[0]) : priceRange.min;
@@ -147,7 +164,7 @@ export default async function SearchPage(props: {
   }
   if (category !== "all" && category !== "") {
     activeFilters.push({
-      label: `${t("category")} ${category}`,
+      label: `${t("category")} ${localizedCategoryName(category)}`,
       clearUrl: getFilterUrl({ c: "all" }),
     });
   }
@@ -168,11 +185,13 @@ export default async function SearchPage(props: {
   const filterData = {
     categories: categories.map((c) => ({
       name: c.name,
+      nameEn: c.nameEn ?? null,
       count: c.productCount,
       href: getFilterUrl({ c: c.name }),
       isActive: category === c.name,
       children: c.children.map((child) => ({
         name: child.name,
+        nameEn: child.nameEn ?? null,
         count: child.productCount,
         href: getFilterUrl({ c: child.name }),
         isActive: category === child.name,
@@ -241,7 +260,7 @@ export default async function SearchPage(props: {
               </>
             ) : hasCategory ? (
               <>
-                {t("browsing")}: <span className="text-brand-accent">{category}</span>
+                {t("browsing")}: <span className="text-brand-accent">{localizedCategoryName(category)}</span>
               </>
             ) : (
               t("allProducts")

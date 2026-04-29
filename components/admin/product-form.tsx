@@ -123,9 +123,33 @@ export default function ProductForm({
               >;
             }) => (
               <FormItem className="w-full">
-                <FormLabel>{t("name")}</FormLabel>
+                <FormLabel>{t("name")} (EL)</FormLabel>
                 <FormControl>
                   <Input placeholder={t("enterProductName")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="nameEn"
+            render={({
+              field,
+            }: {
+              field: ControllerRenderProps<
+                z.infer<typeof insertProductSchema>,
+                "nameEn"
+              >;
+            }) => (
+              <FormItem className="w-full">
+                <FormLabel>{t("name")} (EN)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Product name in English"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -381,7 +405,7 @@ export default function ProductForm({
               )}
           </div>
         </div>
-        <div>
+        <div className="flex flex-col md:flex-row gap-3 md:gap-5">
           <FormField
             control={form.control}
             name="description"
@@ -394,12 +418,37 @@ export default function ProductForm({
               >;
             }) => (
               <FormItem className="w-full">
-                <FormLabel>{t("description")}</FormLabel>
+                <FormLabel>{t("description")} (EL)</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder={t("enterDescription")}
                     className="resize-none"
                     {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="descriptionEn"
+            render={({
+              field,
+            }: {
+              field: ControllerRenderProps<
+                z.infer<typeof insertProductSchema>,
+                "descriptionEn"
+              >;
+            }) => (
+              <FormItem className="w-full">
+                <FormLabel>{t("description")} (EN)</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Description in English"
+                    className="resize-none"
+                    {...field}
+                    value={field.value ?? ""}
                   />
                 </FormControl>
                 <FormMessage />

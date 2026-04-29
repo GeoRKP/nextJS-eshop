@@ -56,8 +56,10 @@ export default function CategoryForm({
       category && type === "Update"
         ? {
             name: category.name,
+            nameEn: category.nameEn ?? "",
             slug: category.slug,
             description: category.description ?? "",
+            descriptionEn: category.descriptionEn ?? "",
             image: category.image ?? "",
             parentId: category.parentId ?? null,
             sortOrder: category.sortOrder ?? 0,
@@ -65,8 +67,10 @@ export default function CategoryForm({
           }
         : {
             name: "",
+            nameEn: "",
             slug: "",
             description: "",
+            descriptionEn: "",
             image: "",
             parentId: null,
             sortOrder: 0,
@@ -116,7 +120,7 @@ export default function CategoryForm({
             name="name"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>{t("name")}</FormLabel>
+                <FormLabel>{t("name")} (EL)</FormLabel>
                 <FormControl>
                   <Input placeholder={t("enterName")} {...field} />
                 </FormControl>
@@ -126,34 +130,52 @@ export default function CategoryForm({
           />
           <FormField
             control={form.control}
-            name="slug"
+            name="nameEn"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>{t("slug")}</FormLabel>
+                <FormLabel>{t("name")} (EN)</FormLabel>
                 <FormControl>
-                  <div>
-                    <Input placeholder={t("enterSlug")} {...field} />
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      className="mt-2"
-                      onClick={() => {
-                        form.setValue(
-                          "slug",
-                          greekSlugify(form.getValues("name"))
-                        );
-                      }}
-                    >
-                      {tCommon("generate")}
-                    </Button>
-                  </div>
+                  <Input
+                    placeholder="Name in English"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem className="w-full">
+              <FormLabel>{t("slug")}</FormLabel>
+              <FormControl>
+                <div>
+                  <Input placeholder={t("enterSlug")} {...field} />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => {
+                      form.setValue(
+                        "slug",
+                        greekSlugify(form.getValues("name"))
+                      );
+                    }}
+                  >
+                    {tCommon("generate")}
+                  </Button>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
@@ -186,24 +208,44 @@ export default function CategoryForm({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("description")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder={t("enterDescription")}
-                  className="resize-none"
-                  {...field}
-                  value={field.value ?? ""}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="flex flex-col md:flex-row gap-5">
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>{t("description")} (EL)</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={t("enterDescription")}
+                    className="resize-none"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="descriptionEn"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>{t("description")} (EN)</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Description in English"
+                    className="resize-none"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="flex flex-col md:flex-row gap-5">
           <FormField

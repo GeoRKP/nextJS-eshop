@@ -3,9 +3,11 @@
 import { useState, useRef, useCallback } from "react";
 import { Grid3X3, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
+import { localizedName } from "@/lib/i18n-helpers";
 import MegaMenu from "./mega-menu";
 
 type Props = {
@@ -27,6 +29,7 @@ export default function CategoryNavClient({
   categories,
   translations,
 }: Props) {
+  const locale = useLocale();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
@@ -104,6 +107,10 @@ export default function CategoryNavClient({
           {categories.map((category) => {
             const Icon = getCategoryIcon(category.name);
             const isActive = activeCategory === category.id;
+            const displayName = localizedName(category, locale);
+            // The /search?category=… route still keys off the canonical Greek
+            // name (Product.category is denormalized in GR), so we always send
+            // the GR slug regardless of UI locale.
             return (
               <Link
                 key={category.id}
@@ -123,7 +130,7 @@ export default function CategoryNavClient({
                 }}
               >
                 <Icon className="h-3.5 w-3.5 shrink-0" />
-                <span className="hidden md:inline truncate max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]" title={category.name}>{category.name}</span>
+                <span className="hidden md:inline truncate max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]" title={displayName}>{displayName}</span>
                 {category.children && category.children.length > 0 && (
                   <ChevronDown className={`h-3 w-3 hidden md:block shrink-0 transition-transform duration-200 ${isActive ? "rotate-180" : ""}`} />
                 )}

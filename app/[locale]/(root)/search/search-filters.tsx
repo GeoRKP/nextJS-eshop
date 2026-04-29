@@ -13,10 +13,12 @@ import { Slider } from "@/components/ui/slider";
 import { SlidersHorizontal, ChevronDown, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { localizedName } from "@/lib/i18n-helpers";
 
 type CategoryItem = {
   name: string;
+  nameEn?: string | null;
   count: number;
   href: string;
   isActive: boolean;
@@ -186,6 +188,7 @@ function PriceSlider({
 
 function CategoryNode({ cat }: { cat: CategoryItem }) {
   const tCommon = useTranslations("Common");
+  const locale = useLocale();
   const hasChildren = cat.children && cat.children.length > 0;
   const isChildActive = hasChildren && cat.children!.some((c) => c.isActive);
   const isExpanded = cat.isActive || isChildActive;
@@ -202,7 +205,7 @@ function CategoryNode({ cat }: { cat: CategoryItem }) {
           }`}
           href={cat.href}
         >
-          <span>{cat.name}</span>
+          <span>{localizedName(cat, locale)}</span>
           <span className="text-[10px] tabular-nums bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground">
             {cat.count}
           </span>

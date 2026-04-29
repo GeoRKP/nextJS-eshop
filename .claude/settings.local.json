@@ -46,7 +46,9 @@
       "Bash(python3:*)",
       "Bash(mv /c/Users/geoka/WebstormProjects/eshops/lementzogloy/.claude/worktrees.broken /c/Users/geoka/WebstormProjects/eshops/lementzogloy/.claude/worktrees)",
       "Bash(git -C /c/Users/geoka/WebstormProjects/eshops/lementzogloy status)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(cp \"C:/Users/geoka/WebstormProjects/eshops/lementzogloy/LOGO SQUARE ONLY IMAGE.png\" \"C:/Users/geoka/WebstormProjects/eshops/lementzogloy/public/images/logo.png\")",
+      "Bash(cp \"C:/Users/geoka/WebstormProjects/eshops/lementzogloy/LOGO-FULL.png\" \"C:/Users/geoka/WebstormProjects/eshops/lementzogloy/public/images/logo-full.png\")"
     ]
   }
 }

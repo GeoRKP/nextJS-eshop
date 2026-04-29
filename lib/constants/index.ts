@@ -45,12 +45,14 @@ export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 12;
 
 export const productDefaultValues = {
   name: "",
+  nameEn: "",
   slug: "",
   category: "",
   categoryId: null,
   images: [],
   brand: "",
   description: "",
+  descriptionEn: "",
   price: '0',
   stock: 0,
   rating: '0',

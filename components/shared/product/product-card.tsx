@@ -5,7 +5,8 @@ import ProductPrice from "./product-price";
 import { Product } from "@/types";
 import Rating from "@/components/shared/product/rating";
 import HighlightText from "@/lib/highlight-text";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { localizedName, localizedDescription } from "@/lib/i18n-helpers";
 import AnimatedCard from "./animated-card";
 import WishlistButton from "./wishlist-button";
 import AddToCartButton from "./add-to-cart-button";
@@ -27,6 +28,9 @@ export default async function ProductCard({
   variant?: "grid" | "list";
 }) {
   const t = await getTranslations("Product");
+  const locale = await getLocale();
+  const displayName = localizedName(product, locale);
+  const displayDescription = localizedDescription(product, locale);
   const sku = formatSku(product.id ?? product.slug);
   const lowStock = product.stock > 0 && product.stock <= 5;
 
@@ -39,7 +43,7 @@ export default async function ProductCard({
             <div className="w-24 sm:w-28 md:w-44 lg:w-60 h-full image-zoom-container bg-muted relative bg-blueprint-grid-sm">
               <Image
                 src={product.images[0]}
-                alt={product.name}
+                alt={displayName}
                 width={240}
                 height={240}
                 className="object-cover w-full h-full"
@@ -66,7 +70,7 @@ export default async function ProductCard({
             {/* Name */}
             <Link href={`/product/${product.slug}`}>
               <h2 className="font-heading text-base md:text-lg font-bold leading-snug line-clamp-2 group-hover:text-accent transition-colors duration-200">
-                <HighlightText text={product.name} query={searchQuery} />
+                <HighlightText text={displayName} query={searchQuery} />
               </h2>
             </Link>
 
@@ -80,7 +84,7 @@ export default async function ProductCard({
 
             {/* Description */}
             <p className="hidden md:block text-xs text-muted-foreground line-clamp-2 mt-3 leading-relaxed">
-              {product.description}
+              {displayDescription}
             </p>
 
             {/* Price + Actions */}
@@ -132,7 +136,7 @@ export default async function ProductCard({
             <div className="aspect-square md:aspect-[4/3] image-zoom-container bg-card relative bg-blueprint-grid-sm border-b border-border">
               <Image
                 src={product.images[0]}
-                alt={product.name}
+                alt={displayName}
                 width={400}
                 height={300}
                 className="object-cover w-full h-full"

@@ -119,8 +119,10 @@ export async function createCategory(data: z.infer<typeof insertCategorySchema>)
     await prisma.category.create({
       data: {
         name: category.name,
+        nameEn: category.nameEn ?? null,
         slug: category.slug,
         description: category.description,
+        descriptionEn: category.descriptionEn ?? null,
         image: category.image,
         parentId: category.parentId,
         sortOrder: category.sortOrder,
@@ -156,8 +158,10 @@ export async function updateCategory(data: z.infer<typeof updateCategorySchema>)
       where: { id: category.id },
       data: {
         name: category.name,
+        nameEn: category.nameEn ?? null,
         slug: category.slug,
         description: category.description,
+        descriptionEn: category.descriptionEn ?? null,
         image: category.image,
         parentId: category.parentId,
         sortOrder: category.sortOrder,
