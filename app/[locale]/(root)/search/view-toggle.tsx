@@ -1,30 +1,21 @@
 "use client";
 
 import { LayoutGrid, List } from "lucide-react";
-import { useRouter, usePathname } from "@/i18n/navigation";
-import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import { useView } from "./view-context";
 
-export default function ViewToggle({ currentView }: { currentView: string }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+export default function ViewToggle() {
+  const { view, setView } = useView();
   const t = useTranslations("Search");
-
-  const handleToggle = (view: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("view", view);
-    router.push(`${pathname}?${params.toString()}`);
-  };
 
   return (
     <div className="flex items-center bg-muted/50 rounded-lg p-1">
       <button
-        onClick={() => handleToggle("grid")}
+        onClick={() => setView("grid")}
         className={cn(
           "flex items-center justify-center w-9 h-9 rounded-md transition-all",
-          currentView === "grid"
+          view === "grid"
             ? "bg-card shadow-card-subtle text-foreground"
             : "text-muted-foreground hover:text-foreground"
         )}
@@ -34,10 +25,10 @@ export default function ViewToggle({ currentView }: { currentView: string }) {
         <LayoutGrid className="w-4 h-4" />
       </button>
       <button
-        onClick={() => handleToggle("list")}
+        onClick={() => setView("list")}
         className={cn(
           "flex items-center justify-center w-9 h-9 rounded-md transition-all",
-          currentView === "list"
+          view === "list"
             ? "bg-card shadow-card-subtle text-foreground"
             : "text-muted-foreground hover:text-foreground"
         )}

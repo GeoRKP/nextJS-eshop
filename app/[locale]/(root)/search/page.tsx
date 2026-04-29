@@ -14,6 +14,8 @@ import ViewToggle from "./view-toggle";
 import SortSelect from "./sort-select";
 import Pagination from "@/components/shared/pagination";
 import { SearchX } from "lucide-react";
+import { ViewProvider } from "./view-context";
+import ProductsView from "./products-view";
 
 const ratings = [4, 3, 2, 1];
 
@@ -214,6 +216,7 @@ export default async function SearchPage(props: {
   const hasCategory = category !== "all" && category.trim() !== "";
 
   return (
+    <ViewProvider initialView={view === "list" ? "list" : "grid"}>
     <div className="wrapper">
       {/* Results banner */}
       <div className="card-premium overflow-hidden mb-6">
@@ -311,7 +314,7 @@ export default async function SearchPage(props: {
           />
 
           {/* View toggle */}
-          <ViewToggle currentView={view} />
+          <ViewToggle />
         </div>
       </div>
 
@@ -340,27 +343,32 @@ export default async function SearchPage(props: {
                 <Link href="/search">{t("allProducts")}</Link>
               </Button>
             </div>
-          ) : view === "list" ? (
-            <div className="flex flex-col gap-4">
-              {products.data.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  searchQuery={q !== "all" ? q : undefined}
-                  variant="list"
-                />
-              ))}
-            </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5 2xl:gap-6">
-              {products.data.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  searchQuery={q !== "all" ? q : undefined}
-                />
-              ))}
-            </div>
+            <ProductsView
+              listContent={
+                <div className="flex flex-col gap-4">
+                  {products.data.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      searchQuery={q !== "all" ? q : undefined}
+                      variant="list"
+                    />
+                  ))}
+                </div>
+              }
+              gridContent={
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5 2xl:gap-6">
+                  {products.data.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      searchQuery={q !== "all" ? q : undefined}
+                    />
+                  ))}
+                </div>
+              }
+            />
           )}
 
           {/* Pagination */}
@@ -375,6 +383,7 @@ export default async function SearchPage(props: {
         </div>
       </div>
     </div>
+    </ViewProvider>
   );
 }
 
