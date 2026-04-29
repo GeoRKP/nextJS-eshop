@@ -16,22 +16,22 @@ const Header = () => {
           <MobileMenuWrapper />
           <Link
             href="/"
-            className="flex-start group relative z-10 -my-3"
+            className="flex-start group"
             aria-label={`${APP_NAME} — αρχική`}
           >
             <Image
               src="/images/logo.png"
               alt={`${APP_NAME} logo`}
-              width={92}
-              height={92}
+              width={60}
+              height={60}
               priority
               className="hidden md:block transition-transform group-hover:scale-105"
             />
             <Image
               src="/images/logo.png"
               alt={`${APP_NAME} logo`}
-              width={60}
-              height={60}
+              width={52}
+              height={52}
               priority
               className="md:hidden"
             />
