@@ -1,6 +1,7 @@
 import { ShoppingCart, Heart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import UserButton from "./user-button";
+import { LanguageToggle } from "./language-switcher";
 import { getMyCart } from "@/lib/actions/cart.actions";
 import { getTranslations } from "next-intl/server";
 
@@ -19,6 +20,7 @@ export default async function Menu() {
     <div className="flex items-center gap-2">
       {/* Desktop nav — bordered tile group */}
       <nav className="hidden md:flex items-stretch border border-border bg-card divide-x divide-border">
+        <LanguageToggle className="h-11 w-11 flex items-center justify-center text-muted-foreground hover:text-accent hover:bg-muted transition-all" />
         <Link
           href="/user/wishlist"
           aria-label={t("wishlistLabel")}
