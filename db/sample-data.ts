@@ -270,7 +270,7 @@ const sampleData = {
       numReviews: 15,
       stock: 18,
       isFeatured: true,
-      banner: '/images/banners/hero-abs-gears.svg',
+      banner: '/images/banners/photos/ntalika-2-actros-street.jpg',
       specs: {
         teeth: 100,
         material: 'Special Steel',
@@ -474,7 +474,7 @@ const sampleData = {
       numReviews: 2,
       stock: 10,
       isFeatured: true,
-      banner: '/images/banners/hero-cnc.svg',
+      banner: '/images/banners/photos/b-welding-sparks.jpg',
       specs: {
         material: 'Aluminum',
         tolerance: '±0.01mm',
@@ -654,7 +654,7 @@ const sampleData = {
       numReviews: 4,
       stock: 25,
       isFeatured: true,
-      banner: '/images/banners/hero-air-brakes.svg',
+      banner: '/images/banners/photos/ntalika-1-actros.jpg',
       specs: {
         type: 'Double Acting',
         size: 'T30',
@@ -703,7 +703,7 @@ const sampleData = {
       numReviews: 25,
       stock: 90,
       isFeatured: true,
-      banner: '/images/banners/hero-fittings.svg',
+      banner: '/images/banners/photos/cat-brake-disc-1.jpg',
       specs: {
         type: 'Double Acting',
         size: 'T16/24',
@@ -2424,8 +2424,8 @@ const sampleData = {
       rating: 4.2,
       numReviews: 7,
       stock: 50,
-      isFeatured: false,
-      banner: null,
+      isFeatured: true,
+      banner: '/images/banners/photos/eu-1-volvo-road.jpg',
       specs: {
         material: 'Steel',
         compatibleVehicles: ['Volvo'],
