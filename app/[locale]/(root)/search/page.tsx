@@ -51,18 +51,14 @@ export async function generateMetadata(props: {
   const isRatingSet = rating && rating !== "all" && rating.trim() !== "";
 
   if (isQuerySet || isCategorySet || isPriceSet || isRatingSet) {
-    return {
-      title: `
-      ${t("query")} ${isQuerySet ? q : ""}
-      ${isCategorySet ? `${t("category")} ${category}` : ""}
-      ${isPriceSet ? `${t("priceLabel")} ${price}` : ""}
-      ${isRatingSet ? `${t("ratingLabel")} ${rating} ${t("starsAndUp", { count: Number(rating) })}` : ""}`,
-    };
-  } else {
-    return {
-      title: tMeta("searchProducts"),
-    };
+    const parts: string[] = [];
+    if (isCategorySet) parts.push(category);
+    if (isQuerySet) parts.push(q);
+    if (isPriceSet) parts.push(`${t("priceLabel")} ${price}`);
+    if (isRatingSet) parts.push(`${rating}+ ★`);
+    return { title: parts.join(" · ") };
   }
+  return { title: tMeta("searchProducts") };
 }
 
 export default async function SearchPage(props: {
@@ -356,7 +352,7 @@ export default async function SearchPage(props: {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-5 2xl:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5 2xl:gap-6">
               {products.data.map((product) => (
                 <ProductCard
                   key={product.id}
