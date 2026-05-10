@@ -177,7 +177,7 @@ function SingleCategoryMegaMenu({
       onMouseLeave={onMouseLeave}
       onClose={onClose}
     >
-      <div className="flex gap-8 min-h-[240px]">
+      <div className="flex gap-8">
         {/* Main content: multi-column grid of subcategories */}
         <div className="flex-1 min-w-0">
           {columns.length > 0 ? (
@@ -222,7 +222,7 @@ function SingleCategoryMegaMenu({
               })}
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex items-center justify-center py-4">
               <Link
                 href={`/search?category=${encodeURIComponent(category.name)}`}
                 onClick={onClose}
