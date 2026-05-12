@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const SCROLL_THRESHOLD = 80;
-const SCROLL_DELTA = 6;
+const HIDE_AFTER = 80;
+const SHOW_BEFORE = 24;
 
 export default function StickyHeaderWrapper({
   utilityBar,
@@ -15,7 +15,6 @@ export default function StickyHeaderWrapper({
   children: React.ReactNode;
 }) {
   const [hidden, setHidden] = useState(false);
-  const lastYRef = useRef(0);
   const tickingRef = useRef(false);
 
   useEffect(() => {
@@ -24,14 +23,10 @@ export default function StickyHeaderWrapper({
       tickingRef.current = true;
       requestAnimationFrame(() => {
         const y = window.scrollY;
-        const delta = y - lastYRef.current;
-        if (Math.abs(delta) > SCROLL_DELTA) {
-          if (y > SCROLL_THRESHOLD && delta > 0) {
-            setHidden(true);
-          } else {
-            setHidden(false);
-          }
-          lastYRef.current = y;
+        if (y <= SHOW_BEFORE) {
+          setHidden(false);
+        } else if (y > HIDE_AFTER) {
+          setHidden(true);
         }
         tickingRef.current = false;
       });
