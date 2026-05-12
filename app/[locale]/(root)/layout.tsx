@@ -9,6 +9,7 @@ import StickyHeaderWrapper from "@/components/shared/header/sticky-header-wrappe
 // import UtilityBar from "@/components/shared/header/utility-bar";
 import MobileBottomNav from "@/components/shared/header/mobile-bottom-nav";
 import MobileCategoryChips from "@/components/shared/header/mobile-category-chips";
+import MobileMenuWrapper from "@/components/shared/header/mobile-menu-wrapper";
 import { auth } from "@/auth";
 
 // Storefront pages query the DB (products, brands, cart, session) on every
@@ -56,6 +57,7 @@ export default async function RootLayout({
       </main>
       <Footer />
       <MobileBottomNav />
+      <MobileMenuWrapper />
     </div>
   );
 }

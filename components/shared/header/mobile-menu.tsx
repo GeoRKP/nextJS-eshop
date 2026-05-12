@@ -8,11 +8,10 @@ import {
   Sheet,
   SheetContent,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
+import { mobileMenuStore, useMobileMenuOpen } from "@/hooks/use-mobile-menu";
 import { Button } from "@/components/ui/button";
 import {
-  MenuIcon,
   X,
   ChevronDown,
   ChevronRight,
@@ -48,7 +47,8 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
   const t = useTranslations("MobileNav");
   const tCommon = useTranslations("Common");
   const tMenu = useTranslations("MegaMenu");
-  const [open, setOpen] = useState(false);
+  const open = useMobileMenuOpen();
+  const setOpen = (value: boolean) => mobileMenuStore.set(value);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set()
   );
@@ -56,7 +56,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
   const [searchFocused, setSearchFocused] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const closeMenu = () => setOpen(false);
+  const closeMenu = () => mobileMenuStore.close();
 
   const {
     query,
@@ -103,11 +103,6 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <MenuIcon className="h-5 w-5" />
-        </Button>
-      </SheetTrigger>
       <SheetContent
         side="left"
         className="w-[min(340px,85vw)] sm:w-[400px] p-0 flex flex-col"

@@ -6,11 +6,13 @@ import { useTranslations } from "next-intl";
 import { Home, Grid3X3, Search, ShoppingCart, User } from "lucide-react";
 import { useState } from "react";
 import MobileSearch from "./mobile-search";
+import { mobileMenuStore, useMobileMenuOpen } from "@/hooks/use-mobile-menu";
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const t = useTranslations("MobileNav");
   const [searchOpen, setSearchOpen] = useState(false);
+  const menuOpen = useMobileMenuOpen();
 
   const tabs = [
     {
@@ -22,10 +24,11 @@ export default function MobileBottomNav() {
     },
     {
       key: "categories",
-      href: "/search",
+      href: "#",
       icon: Grid3X3,
       label: t("categories"),
-      isActive: pathname.startsWith("/search"),
+      isActive: menuOpen,
+      action: () => mobileMenuStore.open(),
     },
     {
       key: "search",
@@ -80,10 +83,19 @@ export default function MobileBottomNav() {
                 <button
                   key={tab.key}
                   onClick={tab.action}
-                  className="flex flex-col items-center justify-center gap-0.5 text-muted-foreground"
+                  aria-label={tab.label}
+                  aria-pressed={tab.isActive}
+                  className={`flex flex-col items-center justify-center gap-0.5 transition-colors relative ${
+                    tab.isActive
+                      ? "text-brand-accent"
+                      : "text-muted-foreground"
+                  }`}
                 >
+                  {tab.isActive && (
+                    <span className="absolute top-0 left-1/2 -translate-x-1/2 h-1 w-5 bg-brand-accent rounded-full" />
+                  )}
                   <Icon className="h-[22px] w-[22px]" />
-                  <span className="text-xs font-heading">{tab.label}</span>
+                  <span className="text-xs font-heading font-medium">{tab.label}</span>
                 </button>
               );
             }

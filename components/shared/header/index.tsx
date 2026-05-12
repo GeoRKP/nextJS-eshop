@@ -4,16 +4,14 @@ import { APP_NAME } from "@/lib/constants";
 import Menu from "./menu";
 import SearchWrapper from "./search-wrapper";
 import CategoryNavBar from "./category-nav-bar";
-import MobileMenuWrapper from "./mobile-menu-wrapper";
 
 const Header = () => {
   return (
     <header className="w-full">
       {/* Main Header */}
       <div className="wrapper flex items-center gap-4 header-row !py-0">
-        {/* Left: Hamburger (mobile) + Logo */}
+        {/* Left: Logo */}
         <div className="flex items-center gap-2 shrink-0">
-          <MobileMenuWrapper />
           <Link
             href="/"
             className="flex-start group"
@@ -30,8 +28,8 @@ const Header = () => {
             <Image
               src="/images/logo.png"
               alt={`${APP_NAME} logo`}
-              width={64}
-              height={64}
+              width={40}
+              height={40}
               priority
               className="md:hidden"
             />
