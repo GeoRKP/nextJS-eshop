@@ -4,7 +4,8 @@ import { prisma } from "@/db/prisma";
 import { getAuthSession } from "@/lib/auth-session";
 import { formatError, toPlainObject } from "../utils";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { localizedName } from "@/lib/i18n-helpers";
 
 // Get the current user's wishlist with only needed fields
 export async function getMyWishlist() {
@@ -20,6 +21,7 @@ export async function getMyWishlist() {
             select: {
               id: true,
               name: true,
+              nameEn: true,
               slug: true,
               price: true,
               images: true,
@@ -31,6 +33,7 @@ export async function getMyWishlist() {
               isFeatured: true,
               createdAt: true,
               description: true,
+              descriptionEn: true,
             },
           },
         },
@@ -132,7 +135,7 @@ export async function toggleWishlist(productId: string) {
       // Add to wishlist
       const product = await prisma.product.findFirst({
         where: { id: productId },
-        select: { name: true },
+        select: { name: true, nameEn: true },
       });
       if (!product) throw new Error(t("productNotFound"));
 
@@ -145,7 +148,8 @@ export async function toggleWishlist(productId: string) {
       revalidatePath("/user/wishlist");
       revalidatePath("/en/user/wishlist");
       revalidateTag("wishlist", "max");
-      return { success: true, message: t("addedToWishlist", { name: product.name }) };
+      const locale = await getLocale();
+      return { success: true, message: t("addedToWishlist", { name: localizedName(product, locale) }) };
     }
   } catch (error) {
     return { success: false, message: formatError(error) };

@@ -7,7 +7,8 @@ import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { localizedName } from "@/lib/i18n-helpers";
 
 type Props = {
   onClose: () => void;
@@ -33,6 +34,7 @@ export default function MobileSearch({ onClose }: Props) {
 
   const t = useTranslations("Search");
   const tCommon = useTranslations("Common");
+  const locale = useLocale();
 
   // Auto-focus on mount
   useEffect(() => {
@@ -131,29 +133,32 @@ export default function MobileSearch({ onClose }: Props) {
             <span className="text-label text-muted-foreground">
               {t("productsSection")}
             </span>
-            {products.map((product) => (
-              <button
-                key={product.id}
-                onClick={() => handleSelectProduct(product.slug)}
-                className="flex items-center gap-3 w-full py-2.5 text-left hover:bg-accent/50 rounded-lg px-1 transition-colors"
-              >
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  width={52}
-                  height={52}
-                  className="rounded-lg object-cover border"
-                  sizes="52px"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{product.name}</p>
-                  <p className="text-label text-brand-accent">{product.brand}</p>
-                </div>
-                <span className="text-sm font-black">
-                  {formatCurrency(product.price)}
-                </span>
-              </button>
-            ))}
+            {products.map((product) => {
+              const displayName = localizedName(product, locale);
+              return (
+                <button
+                  key={product.id}
+                  onClick={() => handleSelectProduct(product.slug)}
+                  className="flex items-center gap-3 w-full py-2.5 text-left hover:bg-accent/50 rounded-lg px-1 transition-colors"
+                >
+                  <Image
+                    src={product.image}
+                    alt={displayName}
+                    width={52}
+                    height={52}
+                    className="rounded-lg object-cover border"
+                    sizes="52px"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{displayName}</p>
+                    <p className="text-label text-brand-accent">{product.brand}</p>
+                  </div>
+                  <span className="text-sm font-black">
+                    {formatCurrency(product.price)}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -169,7 +174,7 @@ export default function MobileSearch({ onClose }: Props) {
                 onClick={() => handleSelectCategory(cat.category)}
                 className="flex items-center gap-2 w-full py-2.5 text-sm text-left hover:text-brand-accent transition-colors"
               >
-                {cat.category}
+                {locale === "en" && cat.categoryEn ? cat.categoryEn : cat.category}
                 <span className="text-xs text-muted-foreground">
                   ({cat.count})
                 </span>

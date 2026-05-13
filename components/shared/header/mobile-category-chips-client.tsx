@@ -1,8 +1,10 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
+import { useLocale } from "next-intl";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
+import { localizedName } from "@/lib/i18n-helpers";
 import { LayoutGrid, ChevronDown, ChevronRight } from "lucide-react";
 
 type Props = {
@@ -14,6 +16,7 @@ export default function MobileCategoryChipsClient({
   categories,
   allLabel,
 }: Props) {
+  const locale = useLocale();
   return (
     <div className="md:hidden border-b bg-background">
       <div className="relative">
@@ -32,6 +35,8 @@ export default function MobileCategoryChipsClient({
           </Link>
 
           {/* Category chips — industrial rounded-lg */}
+          {/* Display name follows the active locale; the /search?category=…
+              route still keys off the canonical Greek name. */}
           {categories.map((category) => {
             const Icon = getCategoryIcon(category.name);
             return (
@@ -41,7 +46,7 @@ export default function MobileCategoryChipsClient({
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium bg-card border border-border hover:border-brand-accent/50 rounded-lg whitespace-nowrap shrink-0 transition-colors shadow-inner-soft scroll-snap-start"
               >
                 <Icon className="h-3 w-3 text-brand-accent" />
-                {category.name}
+                {localizedName(category, locale)}
               </Link>
             );
           })}

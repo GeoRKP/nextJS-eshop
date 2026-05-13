@@ -98,7 +98,7 @@ export default async function ProductCard({
                     <AddToCartButton
                       item={{
                         productId: product.id,
-                        name: product.name,
+                        name: displayName,
                         slug: product.slug,
                         qty: 1,
                         image: product.images[0],
@@ -165,7 +165,7 @@ export default async function ProductCard({
           {/* Name */}
           <Link href={`/product/${product.slug}`}>
             <h2 className="h5-bold line-clamp-2 min-h-[2.6em] group-hover:text-accent transition-colors duration-200">
-              <HighlightText text={product.name} query={searchQuery} />
+              <HighlightText text={displayName} query={searchQuery} />
             </h2>
           </Link>
 
@@ -187,7 +187,7 @@ export default async function ProductCard({
                 <AddToCartButton
                   item={{
                     productId: product.id,
-                    name: product.name,
+                    name: displayName,
                     slug: product.slug,
                     qty: 1,
                     image: product.images[0],

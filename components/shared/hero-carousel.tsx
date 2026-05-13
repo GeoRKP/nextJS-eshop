@@ -11,7 +11,9 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useState, useEffect, useCallback } from "react";
+import { useLocale } from "next-intl";
 import { Product } from "@/types";
+import { localizedName } from "@/lib/i18n-helpers";
 
 type SlideContent = {
   label: string;
@@ -37,6 +39,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [slideKey, setSlideKey] = useState(0);
+  const locale = useLocale();
 
   const onSelect = useCallback(() => {
     if (!api) return;
@@ -65,6 +68,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
         <CarouselContent>
           {products.map((product, index) => {
             const slide = slides[index % slides.length];
+            const productName = localizedName(product, locale);
             return (
               <CarouselItem key={product.id}>
                 <div className="relative w-full h-[320px] sm:h-[380px] md:h-[440px] lg:h-[500px] xl:h-[540px] 2xl:h-[600px] overflow-hidden">
@@ -73,13 +77,13 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={product.banner}
-                        alt={product.name}
+                        alt={productName}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     ) : (
                       <Image
                         src={product.banner}
-                        alt={product.name}
+                        alt={productName}
                         fill
                         priority={index === 0}
                         className="object-cover"

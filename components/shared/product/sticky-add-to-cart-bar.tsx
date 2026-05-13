@@ -9,8 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { addItemToCart } from "@/lib/actions/cart.actions";
 import { ShoppingCart, Loader, Check } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import ProductPrice from "./product-price";
+import { localizedName } from "@/lib/i18n-helpers";
 import { cn } from "@/lib/utils";
 
 const SCROLL_THRESHOLD = 600;
@@ -27,6 +28,8 @@ export default function StickyAddToCartBar({
   const router = useRouter();
   const { toast } = useToast();
   const t = useTranslations("Product");
+  const locale = useLocale();
+  const displayName = localizedName(product, locale);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,7 +46,7 @@ export default function StickyAddToCartBar({
 
   const cartItem = {
     productId: product.id,
-    name: product.name,
+    name: displayName,
     price: product.price,
     slug: product.slug,
     qty: 1,
@@ -88,7 +91,7 @@ export default function StickyAddToCartBar({
         <div className="flex items-center gap-2.5 px-3 py-2.5">
           <Image
             src={product.images[0]}
-            alt={product.name}
+            alt={displayName}
             width={44}
             height={44}
             className="w-11 h-11 object-cover border border-border flex-shrink-0 bg-muted/30"
@@ -136,7 +139,7 @@ export default function StickyAddToCartBar({
         <div className="wrapper !py-3 flex items-center gap-5">
           <Image
             src={product.images[0]}
-            alt={product.name}
+            alt={displayName}
             width={64}
             height={64}
             className="w-16 h-16 object-cover border border-border flex-shrink-0 bg-muted/30 bg-blueprint-grid-sm"
@@ -147,7 +150,7 @@ export default function StickyAddToCartBar({
               ▲ {product.brand}
             </p>
             <p className="font-heading text-sm font-bold uppercase truncate leading-tight">
-              {product.name}
+              {displayName}
             </p>
           </div>
           <div className="flex items-baseline gap-2.5 flex-shrink-0">

@@ -8,7 +8,8 @@ import { prisma } from "@/db/prisma";
 import { cartItemSchema, insertCartSchema } from "../validators";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { Prisma } from "@prisma/client";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { localizedName } from "@/lib/i18n-helpers";
 
 // Helper to get coupon data for price recalculation
 async function getCouponData(couponCode: string | null | undefined) {
@@ -134,9 +135,10 @@ export async function addItemToCart(data: CartItem) {
       revalidatePath("/en/cart");
       revalidateTag("cart", "max");
 
+      const locale = await getLocale();
       return {
         success: true,
-        message: t("addedToCart", { name: product.name }),
+        message: t("addedToCart", { name: localizedName(product, locale) }),
       };
     } else {
       // Check if the item is already in the cart
@@ -180,11 +182,13 @@ export async function addItemToCart(data: CartItem) {
       revalidatePath("/en/cart");
       revalidateTag("cart", "max");
 
+      const locale = await getLocale();
+      const displayName = localizedName(product, locale);
       return {
         success: true,
         message: existItem
-          ? t("updatedInCart", { name: product.name })
-          : t("addedToCart", { name: product.name }),
+          ? t("updatedInCart", { name: displayName })
+          : t("addedToCart", { name: displayName }),
       };
     }
   } catch (error) {
@@ -330,11 +334,13 @@ export async function removeItemFromCart(productId: string) {
     revalidatePath("/en/cart");
     revalidateTag("cart", "max");
 
+    const locale = await getLocale();
+    const displayName = localizedName(product, locale);
     return {
       success: true,
       message: exist.qty === 1
-        ? t("removedFromCart", { name: product.name })
-        : t("updatedInCart", { name: product.name }),
+        ? t("removedFromCart", { name: displayName })
+        : t("updatedInCart", { name: displayName }),
     };
 
   } catch (error) {

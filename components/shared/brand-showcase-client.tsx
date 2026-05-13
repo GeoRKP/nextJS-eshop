@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 
-type BrandItem = { brand: string; _count: number };
+type BrandItem = { brand: string; _count: number; countLabel: string };
 
 // Map brand names to their SVG logo files in /images/brands/
 const brandLogoMap: Record<string, string> = {
@@ -57,7 +57,7 @@ export default function BrandShowcaseClient({
                 {b.brand}
               </p>
               <p className="text-xs text-muted-foreground">
-                {b._count} products
+                {b.countLabel}
               </p>
             </Link>
           );

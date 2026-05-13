@@ -242,7 +242,7 @@ function CategoryNode({ cat }: { cat: CategoryItem }) {
                     }`}
                     href={child.href}
                   >
-                    <span>{child.name}</span>
+                    <span>{localizedName(child, locale)}</span>
                     <span className="text-[10px] tabular-nums bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground">
                       {child.count}
                     </span>

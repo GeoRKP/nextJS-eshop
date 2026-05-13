@@ -47,6 +47,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
   const t = useTranslations("MobileNav");
   const tCommon = useTranslations("Common");
   const tMenu = useTranslations("MegaMenu");
+  const locale = useLocale();
   const open = useMobileMenuOpen();
   const setOpen = (value: boolean) => mobileMenuStore.set(value);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
@@ -85,12 +86,9 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
     });
   }, []);
 
-  // Focus search input when menu opens; reset state when closed
+  // Reset search state when menu closes
   useEffect(() => {
-    if (open) {
-      const timer = setTimeout(() => searchInputRef.current?.focus(), 300);
-      return () => clearTimeout(timer);
-    } else {
+    if (!open) {
       clearResults();
       setSearchFocused(false);
     }
@@ -199,29 +197,32 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
                 <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   {t("products")}
                 </span>
-                {products.map((product) => (
-                  <button
-                    key={product.id}
-                    onClick={() => handleSelectProduct(product.slug)}
-                    className="flex items-center gap-3 w-full py-2 text-left hover:bg-accent/50 rounded-lg px-1 transition-colors"
-                  >
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      width={44}
-                      height={44}
-                      className="rounded-lg object-cover border shrink-0"
-                      sizes="44px"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{product.name}</p>
-                      <p className="text-xs text-brand-accent">{product.brand}</p>
-                    </div>
-                    <span className="text-sm font-bold whitespace-nowrap shrink-0">
-                      {formatCurrency(product.price)}
-                    </span>
-                  </button>
-                ))}
+                {products.map((product) => {
+                  const productName = localizedName(product, locale);
+                  return (
+                    <button
+                      key={product.id}
+                      onClick={() => handleSelectProduct(product.slug)}
+                      className="flex items-center gap-3 w-full py-2 text-left hover:bg-accent/50 rounded-lg px-1 transition-colors"
+                    >
+                      <Image
+                        src={product.image}
+                        alt={productName}
+                        width={44}
+                        height={44}
+                        className="rounded-lg object-cover border shrink-0"
+                        sizes="44px"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{productName}</p>
+                        <p className="text-xs text-brand-accent">{product.brand}</p>
+                      </div>
+                      <span className="text-sm font-bold whitespace-nowrap shrink-0">
+                        {formatCurrency(product.price)}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             )}
 
@@ -238,7 +239,7 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
                     className="flex items-center gap-2 w-full py-2 text-sm text-left hover:text-brand-accent transition-colors"
                   >
                     <Tag className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                    <span>{cat.category}</span>
+                    <span>{locale === "en" && cat.categoryEn ? cat.categoryEn : cat.category}</span>
                     <span className="text-xs text-muted-foreground">({cat.count})</span>
                   </button>
                 ))}

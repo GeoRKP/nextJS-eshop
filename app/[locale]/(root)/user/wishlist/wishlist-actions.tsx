@@ -20,9 +20,11 @@ type WishlistProduct = {
 export default function WishlistActions({
   productId,
   product,
+  displayName,
 }: {
   productId: string;
   product: WishlistProduct;
+  displayName?: string;
 }) {
   const { toast } = useToast();
   const t = useTranslations("Wishlist");
@@ -42,7 +44,7 @@ export default function WishlistActions({
     startTransition(async () => {
       const res = await addItemToCart({
         productId: product.id,
-        name: product.name,
+        name: displayName ?? product.name,
         slug: product.slug,
         price: product.price,
         qty: 1,

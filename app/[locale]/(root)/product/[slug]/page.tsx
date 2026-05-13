@@ -186,7 +186,7 @@ export default async function ProductDetailsPage(props: {
                   cart={cart as Cart}
                   item={{
                     productId: product.id,
-                    name: product.name,
+                    name: displayName,
                     price: product.price,
                     slug: product.slug,
                     qty: 1,
