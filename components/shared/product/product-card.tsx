@@ -131,9 +131,9 @@ export default async function ProductCard({
   return (
     <AnimatedCard>
       <Card className="w-full group overflow-hidden card-premium relative rounded-none">
-        <CardHeader className="p-0 items-center">
-          <Link href={`/product/${product.slug}`}>
-            <div className="aspect-square md:aspect-[4/3] image-zoom-container bg-card relative bg-blueprint-grid-sm border-b border-border">
+        <CardHeader className="p-0">
+          <Link href={`/product/${product.slug}`} className="block w-full">
+            <div className="w-full aspect-square md:aspect-[4/3] image-zoom-container bg-card relative bg-blueprint-grid-sm border-b border-border">
               <Image
                 src={product.images[0]}
                 alt={displayName}
