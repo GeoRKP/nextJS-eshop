@@ -48,7 +48,7 @@
     "bannerAlt": "Banner",
     "unknownError": "An unknown error occurred",
     "viewProfile": "View Profile",
-    "trustedByCount": "Trusted by 10,000+ professionals",
+    "trustedByCount": "Specialists in heavy-duty vehicle parts",
     "toggleSubcategories": "Toggle subcategories",
     "switchTo": "Switch to {locale}",
     "id": "ID",
@@ -101,10 +101,10 @@
     "hasAccount": "Already have an account?",
     "welcomeBack": "Welcome Back",
     "authTagline": "Premium truck parts and accessories for professionals. Quality you can trust.",
-    "statParts": "10,000+ Parts",
-    "statShipping": "Free Shipping",
-    "statWarranty": "2-Year Warranty",
-    "statRating": "4.8/5 Rating",
+    "statParts": "OEM-Quality Parts",
+    "statShipping": "Free Shipping Over €50",
+    "statWarranty": "30-Day Returns",
+    "statRating": "Secure Payments",
     "forgotPassword": "Forgot password?",
     "forgotPasswordTitle": "Reset Password",
     "forgotPasswordDescription": "Enter your email and we'll send you a reset link.",
@@ -680,11 +680,11 @@
     "viewAll": "View All",
     "trustedBy": "Trusted Brands",
     "viewAllCategories": "View All Categories",
-    "statParts": "10K+ Parts",
-    "statBrands": "500+ Brands",
-    "statSupport": "24/7 Support",
+    "statPartsLabel": "Parts",
+    "statBrandsLabel": "Brands",
+    "statCategoriesLabel": "Categories",
     "promoBadge": "HEAVY DUTY DIVISION",
-    "promoCaption": "Certified workshop. OEM-grade parts. Every part tested."
+    "promoCaption": "Parts and custom fabrication for heavy-duty vehicles."
   },
   "Hero": {
     "shopNow": "Shop Now",
@@ -725,8 +725,8 @@
     "securePaymentDesc": "100% secure checkout",
     "easyReturns": "Easy Returns",
     "easyReturnsDesc": "30-day return policy",
-    "support": "24/7 Support",
-    "supportDesc": "Expert help always available"
+    "support": "Technical Support",
+    "supportDesc": "Expert help from people who know the parts"
   },
   "Categories": {
     "shopByCategory": "Shop by Category",
@@ -889,7 +889,7 @@
     "quote2": "The best selection of truck parts I've found online. Competitive prices and genuine OEM quality every time.",
     "name2": "Yannis M.",
     "role2": "Independent Mechanic",
-    "quote3": "24/7 support and hassle-free returns make them our go-to supplier. Highly recommended for professionals.",
+    "quote3": "Responsive support and hassle-free returns make them our go-to supplier. Highly recommended for professionals.",
     "name3": "Maria P.",
     "role3": "Owner-Operator"
   },

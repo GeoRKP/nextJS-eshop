@@ -1,6 +1,6 @@
 import { APP_NAME } from "@/lib/constants";
 import { getTranslations } from "next-intl/server";
-import { Truck, Shield, Star, Package } from "lucide-react";
+import { Truck, Shield, RotateCcw, Package } from "lucide-react";
 
 export default async function AuthLayout({
   children,
@@ -28,8 +28,8 @@ export default async function AuthLayout({
             {[
               { icon: Package, label: t("statParts") },
               { icon: Truck, label: t("statShipping") },
-              { icon: Shield, label: t("statWarranty") },
-              { icon: Star, label: t("statRating") },
+              { icon: RotateCcw, label: t("statWarranty") },
+              { icon: Shield, label: t("statRating") },
             ].map((item) => (
               <div key={item.label} className="glass-card flex items-center gap-3 p-3">
                 <div className="w-10 h-10 rounded-xl bg-background/10 flex items-center justify-center">

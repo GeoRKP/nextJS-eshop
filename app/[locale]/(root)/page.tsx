@@ -4,7 +4,6 @@ import ValuePropositions from "@/components/shared/value-propositions";
 import CategoryCards from "@/components/shared/category-cards";
 import PromoBanner from "@/components/shared/promo-banner";
 import TestimonialStrip from "@/components/shared/testimonial-strip";
-import HomepageNewsletter from "@/components/shared/homepage-newsletter";
 import ScrollFadeIn from "@/components/shared/scroll-fade-in";
 import ProductCardSkeleton from "@/components/shared/product/product-card-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -94,14 +93,9 @@ const HomePage = async () => {
         <BrandShowcaseWithData />
       </Suspense>
 
-      {/* 8. Testimonials */}
+      {/* 8. Testimonials — the footer's newsletter band closes the page */}
       <ScrollFadeIn>
         <TestimonialStrip />
-      </ScrollFadeIn>
-
-      {/* 9. Newsletter CTA */}
-      <ScrollFadeIn>
-        <HomepageNewsletter />
       </ScrollFadeIn>
     </>
   );

@@ -3,9 +3,29 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { getTranslations } from "next-intl/server";
 import { Wrench } from "lucide-react";
+import { getCatalogStats } from "@/lib/actions/product.actions";
+
+// Round down so the "+" is always honest (e.g. 137 → "130+", 1240 → "1.2K+")
+function formatStat(n: number): string {
+  if (n >= 1000) {
+    const k = Math.floor(n / 100) / 10;
+    return `${k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)}K+`;
+  }
+  if (n >= 50) return `${Math.floor(n / 10) * 10}+`;
+  return String(n);
+}
 
 export default async function PromoBanner() {
-  const t = await getTranslations("HomePage");
+  const [t, catalog] = await Promise.all([
+    getTranslations("HomePage"),
+    getCatalogStats(),
+  ]);
+
+  const stats = [
+    { value: formatStat(catalog.products), label: t("statPartsLabel") },
+    { value: formatStat(catalog.brands), label: t("statBrandsLabel") },
+    { value: formatStat(catalog.categories), label: t("statCategoriesLabel") },
+  ];
 
   return (
     <section className="bg-foreground text-background overflow-hidden border-y border-foreground relative">
@@ -29,24 +49,18 @@ export default async function PromoBanner() {
               {t("promoSubtitle")}
             </p>
 
-            {/* Stats row — workshop spec plate */}
+            {/* Stats row — workshop spec plate, real catalog numbers */}
             <div className="flex gap-px mb-10 border border-background/20 w-fit">
-              {(["statParts", "statBrands", "statSupport"] as const).map((key) => {
-                const value = t(key);
-                const parts = value.split(" ");
-                const number = parts[0];
-                const label = parts.slice(1).join(" ");
-                return (
-                  <div key={key} className="px-5 py-4 bg-foreground/40 min-w-[110px]">
-                    <p className="font-heading text-3xl md:text-4xl font-extrabold text-accent leading-none tabular-nums">
-                      {number}
-                    </p>
-                    <p className="font-mono text-[10px] text-background/55 uppercase tracking-[0.14em] mt-2">
-                      {label}
-                    </p>
-                  </div>
-                );
-              })}
+              {stats.map((stat) => (
+                <div key={stat.label} className="px-5 py-4 bg-foreground/40 min-w-[110px]">
+                  <p className="font-heading text-3xl md:text-4xl font-extrabold text-accent leading-none tabular-nums">
+                    {stat.value}
+                  </p>
+                  <p className="font-mono text-[10px] text-background/55 uppercase tracking-[0.14em] mt-2">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
             </div>
 
             <div className="flex items-center gap-5">

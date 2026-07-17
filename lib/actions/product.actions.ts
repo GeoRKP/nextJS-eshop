@@ -628,3 +628,29 @@ export const getBestSellers = unstable_cache(
   ["getBestSellers"],
   { revalidate: 300, tags: ["products"] }
 );
+
+// Real catalog stats for the promo banner — no invented marketing numbers.
+export const getCatalogStats = unstable_cache(
+  async () => {
+    const [products, brands, categories] = await Promise.all([
+      prisma.product.count({ where: { deletedAt: null } }),
+      prisma.product.findMany({
+        where: { deletedAt: null },
+        distinct: ["brand"],
+        select: { brand: true },
+      }),
+      prisma.product.findMany({
+        where: { deletedAt: null },
+        distinct: ["category"],
+        select: { category: true },
+      }),
+    ]);
+    return {
+      products,
+      brands: brands.length,
+      categories: categories.length,
+    };
+  },
+  ["getCatalogStats"],
+  { revalidate: 3600, tags: ["products"] }
+);
