@@ -18,13 +18,12 @@ export default async function HomepageNewsletter() {
         <div className="absolute bottom-4 left-4 h-5 w-5 border-b-2 border-l-2 border-accent" />
         <div className="absolute bottom-4 right-4 h-5 w-5 border-b-2 border-r-2 border-accent" />
 
-        <div className="relative py-14 md:py-20 px-6 md:px-12 flex flex-col items-center text-center">
+        <div className="relative py-14 md:py-20 px-6 md:px-12 flex flex-col items-start text-left">
           <span className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent mb-4 inline-flex items-center gap-2">
             <span className="h-px w-8 bg-accent" />
             ▲ {t("stayUpdated")}
-            <span className="h-px w-8 bg-accent" />
           </span>
-          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-extrabold uppercase text-background mb-4 leading-[1.02]" style={{ letterSpacing: "-0.02em" }}>
+          <h2 className="h2-display text-background mb-4 max-w-2xl">
             {t("newsletterTitle")}
           </h2>
           <p className="text-background/65 text-sm md:text-base max-w-lg mb-8 leading-relaxed">

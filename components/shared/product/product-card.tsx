@@ -12,12 +12,6 @@ import WishlistButton from "./wishlist-button";
 import AddToCartButton from "./add-to-cart-button";
 import ProductCardWishlist from "./product-card-wishlist";
 
-// Synthetic SKU display — first 8 chars of UUID, formatted as workshop part code
-function formatSku(id: string): string {
-  const clean = id.replace(/-/g, "").toUpperCase();
-  return `${clean.slice(0, 4)}-${clean.slice(4, 8)}`;
-}
-
 export default async function ProductCard({
   product,
   searchQuery,
@@ -31,7 +25,6 @@ export default async function ProductCard({
   const locale = await getLocale();
   const displayName = localizedName(product, locale);
   const displayDescription = localizedDescription(product, locale);
-  const sku = formatSku(product.id ?? product.slug);
   const lowStock = product.stock > 0 && product.stock <= 5;
 
   if (variant === "list") {
@@ -50,20 +43,17 @@ export default async function ProductCard({
                 sizes="(max-width: 768px) 144px, 240px"
               />
               {lowStock && (
-                <span className="corner-tag">LOW</span>
+                <span className="corner-tag">{t("lowTag")}</span>
               )}
             </div>
           </Link>
 
           {/* Content */}
           <div className="flex flex-col flex-1 p-4 md:p-5 min-w-0">
-            {/* Brand · SKU */}
+            {/* Brand */}
             <div className="flex items-center justify-between gap-2 mb-1.5">
               <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-accent">
                 <HighlightText text={product.brand} query={searchQuery} />
-              </span>
-              <span className="font-mono text-[10px] tracking-[0.05em] text-muted-foreground">
-                SKU {sku}
               </span>
             </div>
 
@@ -145,20 +135,17 @@ export default async function ProductCard({
               {/* Subtle hover overlay */}
               <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-foreground/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               {/* Top-right corner notch tag */}
-              {lowStock && <span className="corner-tag">LOW</span>}
+              {lowStock && <span className="corner-tag">{t("lowTag")}</span>}
             </div>
           </Link>
           {/* Wishlist button */}
           <ProductCardWishlist productId={product.id} />
         </CardHeader>
         <CardContent className="p-3.5 grid gap-2">
-          {/* Brand · SKU row */}
+          {/* Brand row */}
           <div className="flex items-center justify-between gap-2">
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-accent truncate">
               <HighlightText text={product.brand} query={searchQuery} />
-            </span>
-            <span className="font-mono text-[10px] tracking-[0.05em] text-muted-foreground shrink-0">
-              {sku}
             </span>
           </div>
 

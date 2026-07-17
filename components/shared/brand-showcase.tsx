@@ -14,12 +14,14 @@ export default async function BrandShowcase({
   if (brands.length === 0) return null;
 
   return (
-    <section className="border-y border-border py-12 md:py-16 bg-muted/30">
-      <div className="text-center mb-10 wrapper">
-        <span className="text-stamp text-accent block mb-2 hazard-mark">
-          {t("trustedBy")}
-        </span>
-        <h2 className="h2-bold">{t("shopByBrand")}</h2>
+    <section className="border-t border-border py-12 md:py-16 bg-background">
+      <div className="wrapper mb-10">
+        <div className="pb-4 border-b border-foreground/15">
+          <span className="text-stamp text-accent block mb-2 hazard-mark">
+            {t("trustedBy")}
+          </span>
+          <h2 className="h2-bold">{t("shopByBrand")}</h2>
+        </div>
       </div>
       <BrandShowcaseClient
         brands={brands.map((b) => ({

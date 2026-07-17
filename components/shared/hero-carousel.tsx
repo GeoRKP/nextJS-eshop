@@ -26,6 +26,7 @@ type Props = {
   slides: SlideContent[];
   translations: {
     shopNow: string;
+    viewAllProducts: string;
   };
 };
 
@@ -40,6 +41,11 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
   const [current, setCurrent] = useState(0);
   const [slideKey, setSlideKey] = useState(0);
   const locale = useLocale();
+
+  const priceFormatter = new Intl.NumberFormat(
+    locale === "el" ? "el-GR" : "en-US",
+    { style: "currency", currency: "EUR" }
+  );
 
   const onSelect = useCallback(() => {
     if (!api) return;
@@ -56,6 +62,21 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
     };
   }, [api, onSelect]);
 
+  // Autoplay must respect prefers-reduced-motion — the global CSS kill-switch
+  // only stops transitions, not Embla's programmatic scrolling.
+  useEffect(() => {
+    if (!api) return;
+    const autoplay = api.plugins()?.autoplay;
+    if (!autoplay) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const stopIfReduced = () => {
+      if (mq.matches) autoplay.stop();
+    };
+    stopIfReduced();
+    mq.addEventListener("change", stopIfReduced);
+    return () => mq.removeEventListener("change", stopIfReduced);
+  }, [api]);
+
   const totalSlides = products.length;
 
   return (
@@ -69,9 +90,10 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
           {products.map((product, index) => {
             const slide = slides[index % slides.length];
             const productName = localizedName(product, locale);
+            const tagline = slide.tagline || productName;
             return (
               <CarouselItem key={product.id}>
-                <div className="relative w-full h-[320px] sm:h-[380px] md:h-[440px] lg:h-[500px] xl:h-[540px] 2xl:h-[600px] overflow-hidden">
+                <div className="relative w-full h-[clamp(360px,58svh,660px)] overflow-hidden">
                   {product.banner ? (
                     product.banner.endsWith('.svg') ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
@@ -125,37 +147,60 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                   </div>
 
                   {/* Content anchored at bottom */}
-                  <div className="relative h-full wrapper flex flex-col justify-end pb-12 md:pb-24">
+                  <div className="relative h-full wrapper flex flex-col justify-end pb-10 md:pb-16">
                     {current === index && (
                       <div key={slideKey}>
                         {/* Stencil label */}
-                        <span
-                          className="inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent mb-5 opacity-0 animate-fade-up"
-                          style={ANIMATION_STYLE_0}
-                        >
-                          <span className="h-px w-8 bg-accent" />
-                          ▲ MODULE {String(index + 1).padStart(2, "0")} / {slide.label}
-                        </span>
+                        {slide.label && (
+                          <span
+                            className="inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent mb-5 opacity-0 animate-fade-up"
+                            style={ANIMATION_STYLE_0}
+                          >
+                            <span className="h-px w-8 bg-accent" />
+                            ▲ {String(index + 1).padStart(2, "0")} / {slide.label}
+                          </span>
+                        )}
 
                         {/* Main heading */}
                         <h1
-                          className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-background max-w-3xl leading-[0.95] uppercase opacity-0 animate-fade-up"
+                          className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-background max-w-3xl leading-[0.95] uppercase [text-wrap:balance] opacity-0 animate-fade-up"
                           style={{ ...ANIMATION_STYLE_100, letterSpacing: "-0.025em" }}
                         >
-                          {slide.tagline}
+                          {tagline}
                         </h1>
 
                         {/* Subtitle */}
-                        <p
-                          className="text-base md:text-lg text-background/75 max-w-xl mt-5 leading-relaxed opacity-0 animate-fade-up"
+                        {slide.subtitle && (
+                          <p
+                            className="text-base md:text-lg text-background/75 max-w-xl mt-5 leading-relaxed opacity-0 animate-fade-up"
+                            style={ANIMATION_STYLE_200}
+                          >
+                            {slide.subtitle}
+                          </p>
+                        )}
+
+                        {/* Featured product spec plate */}
+                        <Link
+                          href={`/product/${product.slug}`}
+                          className="mt-6 inline-flex max-w-full items-center gap-3 border border-background/25 bg-foreground/60 px-4 py-2.5 backdrop-blur-sm transition-colors hover:border-accent opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_200}
                         >
-                          {slide.subtitle}
-                        </p>
+                          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-accent shrink-0">
+                            ▲ {product.brand}
+                          </span>
+                          <span className="h-3 w-px bg-background/25 shrink-0" aria-hidden="true" />
+                          <span className="font-heading text-sm font-bold uppercase tracking-[0.04em] text-background truncate">
+                            {productName}
+                          </span>
+                          <span className="h-3 w-px bg-background/25 shrink-0" aria-hidden="true" />
+                          <span className="font-mono text-sm font-medium text-accent tabular-nums shrink-0">
+                            {priceFormatter.format(Number(product.price))}
+                          </span>
+                        </Link>
 
                         {/* CTA cluster */}
                         <div
-                          className="mt-8 flex flex-wrap items-center gap-4 opacity-0 animate-fade-up"
+                          className="mt-6 flex flex-wrap items-center gap-4 opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_300}
                         >
                           <Button
@@ -163,8 +208,14 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                             asChild
                             className="bg-accent hover:bg-background text-accent-foreground hover:text-foreground font-heading font-bold text-sm md:text-base px-8 py-6 rounded-none uppercase tracking-[0.16em] border-0 btn-stamp"
                           >
-                            <Link href="/search">{translations.shopNow} →</Link>
+                            <Link href={`/product/${product.slug}`}>{translations.shopNow} →</Link>
                           </Button>
+                          <Link
+                            href="/search"
+                            className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-background/80 hover:text-accent transition-colors border-b border-background/40 hover:border-accent pb-1"
+                          >
+                            {translations.viewAllProducts}
+                          </Link>
                         </div>
                       </div>
                     )}

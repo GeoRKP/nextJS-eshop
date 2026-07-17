@@ -6,6 +6,7 @@ import ProductScrollSection, {
 import {
   getLatestProducts,
   getFeaturedProducts,
+  getBestSellers,
 } from "@/lib/actions/product.actions";
 import { getAllBrands } from "@/lib/actions/brand.actions";
 import HeroSection from "@/components/shared/hero-section";
@@ -20,22 +21,22 @@ export async function HeroWithData() {
 }
 
 export async function TrendingProducts() {
-  const [featuredProducts, tHome] = await Promise.all([
-    getFeaturedProducts(),
+  const [bestSellers, tHome] = await Promise.all([
+    getBestSellers(8),
     getTranslations("HomePage"),
   ]);
-  if (featuredProducts.length === 0) return null;
+  if (bestSellers.length === 0) return null;
   return (
     <div className="wrapper">
       <ScrollFadeIn>
         <ProductScrollSection
           title={tHome("trendingProducts")}
           labelText={tHome("trendingLabel")}
-          count={featuredProducts.length}
+          count={bestSellers.length}
           viewAllLabel={tHome("viewAll")}
           viewAllHref="/search"
         >
-          {featuredProducts.map((product) => (
+          {bestSellers.map((product) => (
             <ProductScrollItem key={product.id}>
               <ProductCard product={product} />
             </ProductScrollItem>

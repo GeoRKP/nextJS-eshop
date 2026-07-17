@@ -14,7 +14,7 @@ export default {
   		},
   		fontFamily: {
   			sans: ['var(--font-manrope)', 'system-ui', 'sans-serif'],
-  			heading: ['var(--font-oswald)', 'var(--font-manrope)', 'system-ui', 'sans-serif'],
+  			heading: ['var(--font-heading-condensed)', 'var(--font-manrope)', 'system-ui', 'sans-serif'],
   			mono: ['var(--font-jetbrains-mono)', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
   		},
   		colors: {
@@ -98,7 +98,7 @@ export default {
   			'glow-pulse': 'glow-pulse 2.5s ease-in-out infinite',
   			'mega-reveal': 'mega-reveal 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
   			'badge-bounce': 'badge-bounce 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-  			'progress-fill': 'progress-fill 4s linear forwards',
+  			'progress-fill': 'progress-fill 5s linear forwards',
 			'marquee': 'marquee 28s linear infinite',
 			'spin-slow': 'spin-slow 20s linear infinite',
   		},

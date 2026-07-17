@@ -22,7 +22,7 @@ export default async function PromoBanner() {
               <span className="h-px w-8 bg-accent" />
               ▲ {t("promoLabel")}
             </span>
-            <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase text-background mb-4 leading-[0.98]" style={{ letterSpacing: "-0.02em" }}>
+            <h2 className="h2-display text-background mb-4">
               {t("promoTitle")}
             </h2>
             <p className="text-background/65 mb-10 text-sm md:text-base max-w-lg leading-relaxed">
@@ -85,10 +85,10 @@ export default async function PromoBanner() {
             {/* Content — caption + HEAVY DUTY badge */}
             <div className="absolute inset-x-0 bottom-0 p-6 z-10 flex flex-col gap-3">
               <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent inline-flex items-center gap-2 self-start bg-foreground/50 px-2.5 py-1 border border-accent/40">
-                ▲ HEAVY DUTY DIVISION
+                ▲ {t("promoBadge")}
               </span>
               <p className="font-heading text-lg md:text-xl font-bold uppercase tracking-[0.04em] text-background leading-tight max-w-xs">
-                Certified workshop. OEM-grade parts. Lifetime warranty.
+                {t("promoCaption")}
               </p>
             </div>
 

@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import ViewAllProductsButton from "@/components/view-all-products-button";
 import { getTranslations } from "next-intl/server";
 import ValuePropositions from "@/components/shared/value-propositions";
 import CategoryCards from "@/components/shared/category-cards";
@@ -26,7 +25,7 @@ export async function generateMetadata() {
 }
 
 function HeroSkeleton() {
-  return <Skeleton className="w-full h-[320px] sm:h-[380px] md:h-[440px] lg:h-[500px] xl:h-[540px] 2xl:h-[600px]" />;
+  return <Skeleton className="w-full h-[clamp(360px,58svh,660px)]" />;
 }
 
 function CategoryCardsSkeleton() {
@@ -104,13 +103,6 @@ const HomePage = async () => {
       <ScrollFadeIn>
         <HomepageNewsletter />
       </ScrollFadeIn>
-
-      {/* 10. View All Products */}
-      <div className="wrapper">
-        <ScrollFadeIn>
-          <ViewAllProductsButton />
-        </ScrollFadeIn>
-      </div>
     </>
   );
 };

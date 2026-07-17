@@ -128,6 +128,7 @@
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
     "lowStock": "Only {count} left",
+    "lowTag": "LOW",
     "addToCart": "Add to Cart",
     "goToCart": "Go to cart",
     "reviews": "Customer Reviews",
@@ -681,11 +682,14 @@
     "viewAllCategories": "View All Categories",
     "statParts": "10K+ Parts",
     "statBrands": "500+ Brands",
-    "statSupport": "24/7 Support"
+    "statSupport": "24/7 Support",
+    "promoBadge": "HEAVY DUTY DIVISION",
+    "promoCaption": "Certified workshop. OEM-grade parts. Every part tested."
   },
   "Hero": {
     "shopNow": "Shop Now",
     "browseCollection": "View Details",
+    "viewAllProducts": "All Products",
     "slides": {
       "0": {
         "label": "PRECISION & SAFETY",
@@ -878,13 +882,14 @@
   "Testimonials": {
     "whatCustomersSay": "What Our Customers Say",
     "trustedByProfessionals": "TRUSTED BY PROFESSIONALS",
-    "quote1": "Outstanding quality parts and lightning-fast delivery. Our fleet has never run better since we switched to AVL.",
+    "fieldReport": "FIELD REPORT",
+    "quote1": "Outstanding quality parts and lightning-fast delivery. Our fleet has never run better since we switched suppliers.",
     "name1": "Dimitris K.",
     "role1": "Fleet Manager",
     "quote2": "The best selection of truck parts I've found online. Competitive prices and genuine OEM quality every time.",
     "name2": "Yannis M.",
     "role2": "Independent Mechanic",
-    "quote3": "24/7 support and hassle-free returns make AVL our go-to supplier. Highly recommended for professionals.",
+    "quote3": "24/7 support and hassle-free returns make them our go-to supplier. Highly recommended for professionals.",
     "name3": "Maria P.",
     "role3": "Owner-Operator"
   },

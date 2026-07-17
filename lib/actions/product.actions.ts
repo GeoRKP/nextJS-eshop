@@ -590,3 +590,41 @@ export const getFeaturedProducts = unstable_cache(
   ["getFeaturedProducts"],
   { revalidate: 300, tags: ["products"] }
 );
+
+// Get best sellers by paid order volume — falls back to featured products
+// when there is no sales data yet, so the homepage section never goes empty.
+export const getBestSellers = unstable_cache(
+  async (limit: number = 8) => {
+    const grouped = await prisma.orderItem.groupBy({
+      by: ["productId"],
+      where: { order: { isPaid: true } },
+      _sum: { qty: true },
+      orderBy: { _sum: { qty: "desc" } },
+      take: limit,
+    });
+
+    if (grouped.length > 0) {
+      const products = await prisma.product.findMany({
+        where: {
+          id: { in: grouped.map((g) => g.productId) },
+          deletedAt: null,
+        },
+      });
+      // Preserve sales-volume ordering
+      const byId = new Map(products.map((p) => [p.id, p]));
+      const ordered = grouped
+        .map((g) => byId.get(g.productId))
+        .filter((p): p is NonNullable<typeof p> => Boolean(p));
+      if (ordered.length > 0) return toPlainObject(ordered);
+    }
+
+    const featured = await prisma.product.findMany({
+      where: { isFeatured: true, deletedAt: null },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+    return toPlainObject(featured);
+  },
+  ["getBestSellers"],
+  { revalidate: 300, tags: ["products"] }
+);

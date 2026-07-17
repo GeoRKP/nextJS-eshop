@@ -5,7 +5,7 @@ import { formatError } from "../utils";
 import { insertReviewSchema, createInsertReviewSchema } from "../validators";
 import { z } from "zod/v3";
 import { prisma } from "@/db/prisma";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { getTranslations } from "next-intl/server";
 
 // Create and update reviews
@@ -127,6 +127,28 @@ export async function createUpdateReview(
     };
   }
 }
+
+// Top reviews for the homepage testimonial strip — real, non-hidden,
+// high-rating reviews with text. Invalidated via the "reviews" tag.
+export const getTopReviews = unstable_cache(
+  async (limit: number = 3) => {
+    return await prisma.review.findMany({
+      where: {
+        isHidden: false,
+        rating: { gte: 4 },
+        description: { not: null },
+      },
+      orderBy: [{ rating: "desc" }, { createdAt: "desc" }],
+      take: limit,
+      include: {
+        user: { select: { name: true } },
+        product: { select: { name: true, nameEn: true, slug: true } },
+      },
+    });
+  },
+  ["getTopReviews"],
+  { revalidate: 300, tags: ["reviews"] }
+);
 
 // Get reviews for a product with pagination
 export async function getReviews({

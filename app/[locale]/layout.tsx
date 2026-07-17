@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Oswald, JetBrains_Mono } from "next/font/google";
+import { Manrope, Roboto_Condensed, JetBrains_Mono } from "next/font/google";
 import "../../assets/styles/globals.css";
 import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from "@/lib/constants";
 
@@ -20,12 +20,12 @@ const manrope = Manrope({
   display: "swap",
 });
 
-// Display / headings — Oswald: condensed, industrial-stencil character.
-// Latin only — Greek diacritics fall back per-character to Manrope (full Greek coverage).
-const oswald = Oswald({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-oswald",
+// Display / headings — Roboto Condensed: condensed industrial character
+// WITH full Greek coverage, so el (default locale) gets the display font too.
+const robotoCondensed = Roboto_Condensed({
+  subsets: ["latin", "latin-ext", "greek"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-heading-condensed",
   display: "swap",
 });
 
@@ -153,7 +153,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <body className={`${manrope.variable} ${oswald.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+      <body className={`${manrope.variable} ${robotoCondensed.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <WishlistProvider enabled={Boolean(session?.user)}>
             {children}
