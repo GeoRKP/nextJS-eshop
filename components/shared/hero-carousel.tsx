@@ -93,7 +93,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
             const tagline = slide.tagline || productName;
             return (
               <CarouselItem key={product.id}>
-                <div className="relative w-full h-[clamp(360px,58svh,660px)] overflow-hidden">
+                <div className="relative w-full h-[clamp(440px,62svh,680px)] overflow-hidden">
                   {product.banner ? (
                     product.banner.endsWith('.svg') ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
@@ -147,13 +147,13 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                   </div>
 
                   {/* Content anchored at bottom */}
-                  <div className="relative h-full wrapper flex flex-col justify-end pb-10 md:pb-16">
+                  <div className="relative h-full wrapper flex flex-col justify-end pb-8 md:pb-14">
                     {current === index && (
                       <div key={slideKey}>
                         {/* Stencil label */}
                         {slide.label && (
                           <span
-                            className="inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent mb-5 opacity-0 animate-fade-up"
+                            className="inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent mb-3 md:mb-4 opacity-0 animate-fade-up"
                             style={ANIMATION_STYLE_0}
                           >
                             <span className="h-px w-8 bg-accent" />
@@ -163,7 +163,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
 
                         {/* Main heading */}
                         <h1
-                          className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-background max-w-3xl leading-[0.95] uppercase [text-wrap:balance] opacity-0 animate-fade-up"
+                          className="font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-background max-w-3xl leading-[0.98] uppercase [text-wrap:balance] opacity-0 animate-fade-up"
                           style={{ ...ANIMATION_STYLE_100, letterSpacing: "-0.025em" }}
                         >
                           {tagline}
@@ -172,7 +172,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                         {/* Subtitle */}
                         {slide.subtitle && (
                           <p
-                            className="text-base md:text-lg text-background/75 max-w-xl mt-5 leading-relaxed opacity-0 animate-fade-up"
+                            className="hidden sm:block text-base md:text-lg text-background/75 max-w-xl mt-4 leading-relaxed opacity-0 animate-fade-up"
                             style={ANIMATION_STYLE_200}
                           >
                             {slide.subtitle}
@@ -182,7 +182,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                         {/* Featured product spec plate */}
                         <Link
                           href={`/product/${product.slug}`}
-                          className="mt-6 inline-flex max-w-full items-center gap-3 border border-background/25 bg-foreground/60 px-4 py-2.5 backdrop-blur-sm transition-colors hover:border-accent opacity-0 animate-fade-up"
+                          className="mt-4 md:mt-5 inline-flex max-w-full items-center gap-2.5 md:gap-3 border border-background/25 bg-foreground/60 px-3 py-2 md:px-4 md:py-2.5 backdrop-blur-sm transition-colors hover:border-accent opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_200}
                         >
                           <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-accent shrink-0">
@@ -200,7 +200,7 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
 
                         {/* CTA cluster */}
                         <div
-                          className="mt-6 flex flex-wrap items-center gap-4 opacity-0 animate-fade-up"
+                          className="mt-5 md:mt-6 flex flex-wrap items-center gap-4 opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_300}
                         >
                           <Button

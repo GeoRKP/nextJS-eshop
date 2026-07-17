@@ -25,7 +25,7 @@ export async function generateMetadata() {
 }
 
 function HeroSkeleton() {
-  return <Skeleton className="w-full h-[clamp(360px,58svh,660px)]" />;
+  return <Skeleton className="w-full h-[clamp(440px,62svh,680px)]" />;
 }
 
 function CategoryCardsSkeleton() {
