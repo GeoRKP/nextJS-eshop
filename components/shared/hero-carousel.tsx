@@ -26,7 +26,6 @@ type Props = {
   slides: SlideContent[];
   translations: {
     shopNow: string;
-    viewAllProducts: string;
   };
 };
 
@@ -41,11 +40,6 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
   const [current, setCurrent] = useState(0);
   const [slideKey, setSlideKey] = useState(0);
   const locale = useLocale();
-
-  const priceFormatter = new Intl.NumberFormat(
-    locale === "el" ? "el-GR" : "en-US",
-    { style: "currency", currency: "EUR" }
-  );
 
   const onSelect = useCallback(() => {
     if (!api) return;
@@ -172,35 +166,16 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                         {/* Subtitle */}
                         {slide.subtitle && (
                           <p
-                            className="hidden sm:block text-base md:text-lg text-background/75 max-w-xl mt-4 leading-relaxed opacity-0 animate-fade-up"
+                            className="text-base md:text-lg text-background/75 max-w-xl mt-4 leading-relaxed opacity-0 animate-fade-up"
                             style={ANIMATION_STYLE_200}
                           >
                             {slide.subtitle}
                           </p>
                         )}
 
-                        {/* Featured product spec plate */}
-                        <Link
-                          href={`/product/${product.slug}`}
-                          className="mt-4 md:mt-5 inline-flex max-w-full items-center gap-2.5 md:gap-3 border border-background/25 bg-foreground/60 px-3 py-2 md:px-4 md:py-2.5 backdrop-blur-sm transition-colors hover:border-accent opacity-0 animate-fade-up"
-                          style={ANIMATION_STYLE_200}
-                        >
-                          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-accent shrink-0">
-                            ▲ {product.brand}
-                          </span>
-                          <span className="h-3 w-px bg-background/25 shrink-0" aria-hidden="true" />
-                          <span className="font-heading text-sm font-bold uppercase tracking-[0.04em] text-background truncate">
-                            {productName}
-                          </span>
-                          <span className="h-3 w-px bg-background/25 shrink-0" aria-hidden="true" />
-                          <span className="font-mono text-sm font-medium text-accent tabular-nums shrink-0">
-                            {priceFormatter.format(Number(product.price))}
-                          </span>
-                        </Link>
-
                         {/* CTA cluster */}
                         <div
-                          className="mt-5 md:mt-6 flex flex-wrap items-center gap-4 opacity-0 animate-fade-up"
+                          className="mt-6 md:mt-8 flex flex-wrap items-center gap-4 opacity-0 animate-fade-up"
                           style={ANIMATION_STYLE_300}
                         >
                           <Button
@@ -208,14 +183,8 @@ export default function HeroCarousel({ products, slides, translations }: Props) 
                             asChild
                             className="bg-accent hover:bg-background text-accent-foreground hover:text-foreground font-heading font-bold text-sm md:text-base px-8 py-6 rounded-none uppercase tracking-[0.16em] border-0 btn-stamp"
                           >
-                            <Link href={`/product/${product.slug}`}>{translations.shopNow} →</Link>
+                            <Link href="/search">{translations.shopNow} →</Link>
                           </Button>
-                          <Link
-                            href="/search"
-                            className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-background/80 hover:text-accent transition-colors border-b border-background/40 hover:border-accent pb-1"
-                          >
-                            {translations.viewAllProducts}
-                          </Link>
                         </div>
                       </div>
                     )}

@@ -35,7 +35,6 @@ export default async function HeroSection({
       slides={slides}
       translations={{
         shopNow: t("shopNow"),
-        viewAllProducts: t("viewAllProducts"),
       }}
     />
   );
