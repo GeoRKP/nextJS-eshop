@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback } from "react";
 import { Grid3X3, ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Category } from "@/types";
@@ -141,49 +140,34 @@ export default function CategoryNavClient({
         </div>
       </nav>
 
-      {/* Mega Menus with exit animation */}
-      <AnimatePresence>
-        {activeCategory &&
-          activeCategory !== "__all__" &&
-          activeCategoryData && (
-            <motion.div
-              key="single"
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <MegaMenu
-                mode="single"
-                category={activeCategoryData}
-                translations={translations}
-                onMouseEnter={handleMegaMenuEnter}
-                onMouseLeave={handleMegaMenuLeave}
-                onClose={() => setActiveCategory(null)}
-              />
-            </motion.div>
-          )}
-
-        {activeCategory === "__all__" && (
-          <motion.div
-            key="all"
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          >
+      {/* Mega Menus — CSS enter animation (exit is instant) */}
+      {activeCategory &&
+        activeCategory !== "__all__" &&
+        activeCategoryData && (
+          <div key="single" className="animate-menu-pop">
             <MegaMenu
-              mode="all"
-              categories={categories}
+              mode="single"
+              category={activeCategoryData}
               translations={translations}
               onMouseEnter={handleMegaMenuEnter}
               onMouseLeave={handleMegaMenuLeave}
               onClose={() => setActiveCategory(null)}
             />
-          </motion.div>
+          </div>
         )}
 
-      </AnimatePresence>
+      {activeCategory === "__all__" && (
+        <div key="all" className="animate-menu-pop">
+          <MegaMenu
+            mode="all"
+            categories={categories}
+            translations={translations}
+            onMouseEnter={handleMegaMenuEnter}
+            onMouseLeave={handleMegaMenuLeave}
+            onClose={() => setActiveCategory(null)}
+          />
+        </div>
+      )}
     </div>
   );
 }

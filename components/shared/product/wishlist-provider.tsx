@@ -24,11 +24,22 @@ export function useWishlist() {
   return useContext(WishlistContext);
 }
 
-export function WishlistProvider({ children }: { children: React.ReactNode }) {
+export function WishlistProvider({
+  children,
+  enabled = true,
+}: {
+  children: React.ReactNode;
+  /** Skip the /api/wishlist fetch entirely for anonymous visitors. */
+  enabled?: boolean;
+}) {
   const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set());
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    if (!enabled) {
+      setIsLoaded(true);
+      return;
+    }
     fetch("/api/wishlist")
       .then((res) => res.json())
       .then((data) => {
@@ -36,7 +47,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         setIsLoaded(true);
       })
       .catch(() => setIsLoaded(true));
-  }, []);
+  }, [enabled]);
 
   const toggle = useCallback((productId: string) => {
     setWishlistIds((prev) => {

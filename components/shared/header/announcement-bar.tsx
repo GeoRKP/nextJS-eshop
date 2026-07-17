@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { X, Truck, Sparkles, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { AnimatePresence, motion } from "framer-motion";
 
 const ANNOUNCEMENT_KEYS = [
   "freeShipping",
@@ -42,19 +41,13 @@ export default function AnnouncementBar() {
         ▲ NOTICE
       </span>
 
-      <AnimatePresence mode="wait">
-        <motion.p
-          key={currentIndex}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center flex items-center gap-2 text-background font-mono text-[10px] md:text-[11px] font-medium uppercase tracking-[0.10em] md:tracking-[0.12em] px-10 max-w-full"
-        >
-          <Icon className="h-3 w-3 text-accent shrink-0" />
-          <span className="truncate">{t(ANNOUNCEMENT_KEYS[currentIndex])}</span>
-        </motion.p>
-      </AnimatePresence>
+      <p
+        key={currentIndex}
+        className="animate-page-enter text-center flex items-center gap-2 text-background font-mono text-[10px] md:text-[11px] font-medium uppercase tracking-[0.10em] md:tracking-[0.12em] px-10 max-w-full"
+      >
+        <Icon className="h-3 w-3 text-accent shrink-0" />
+        <span className="truncate">{t(ANNOUNCEMENT_KEYS[currentIndex])}</span>
+      </p>
 
       {/* Dismiss button */}
       <button

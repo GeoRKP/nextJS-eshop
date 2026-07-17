@@ -1,25 +1,8 @@
-"use client";
-
-import { motion } from "framer-motion";
-
+// CSS-only hover lift (server component — no client JS needed).
 export default function AnimatedCard({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <motion.div
-      whileHover={{
-        y: -3,
-        boxShadow: "var(--shadow-card-hover)",
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 400,
-        damping: 25,
-      }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className="card-lift">{children}</div>;
 }

@@ -25,7 +25,7 @@ export type Product = z.infer<typeof insertProductSchema> & {
 export type Cart = z.infer<typeof insertCartSchema>;
 export type CartItem = z.infer<typeof cartItemSchema>;
 export type ShippingAddress = z.infer<typeof shippingAddressSchema>;
-export type Order = z.infer<typeof insertOrderSchema> & {
+export type Order = Omit<z.infer<typeof insertOrderSchema>, "shippingMethod"> & {
   id: string;
   createdAt: Date;
   isPaid: boolean;
@@ -39,6 +39,13 @@ export type Order = z.infer<typeof insertOrderSchema> & {
     email: string;
   };
   statusHistory?: OrderStatusHistory[];
+  // Read side: the DB stores plain text, so widen the insert schema's enum.
+  shippingMethod?: string | null;
+  // Box Now fulfillment (DB columns, not part of the insert schema)
+  boxnowLocker?: unknown;
+  boxnowReferenceNumber?: string | null;
+  boxnowParcelIds?: string[];
+  boxnowStatus?: string | null;
 };
 export type OrderItem = z.infer<typeof insertOrderItemSchema>;
 export type PaymentResult = z.infer<typeof paymentResultSchema>;

@@ -11,11 +11,12 @@ import {
   updateOrderToPaidCOD,
   deliverOrder,
 } from "@/lib/actions/order.actions";
+import { createBoxNowDeliveryRequest } from "@/lib/actions/boxnow.actions";
 import { useToast } from "@/hooks/use-toast";
 import { useTransition } from "react";
 import { useTranslations } from "next-intl";
 import OrderStatusBadge from "@/components/shared/order-status-badge";
-import { CreditCard, MapPin, Package } from "lucide-react";
+import { CreditCard, MapPin, Package, PackageOpen, FileDown } from "lucide-react";
 
 const StripePayment = dynamic(() => import("./stripe-payment"), {
   ssr: false,
@@ -29,6 +30,15 @@ const StripePayment = dynamic(() => import("./stripe-payment"), {
 });
 
 const PayPalPayment = dynamic(() => import("./paypal-payment"), {
+  ssr: false,
+  loading: () => (
+    <div className="space-y-3 animate-pulse">
+      <div className="h-12 bg-muted/50 rounded-lg" />
+    </div>
+  ),
+});
+
+const VivaPayment = dynamic(() => import("./viva-payment"), {
   ssr: false,
   loading: () => (
     <div className="space-y-3 animate-pulse">
@@ -96,6 +106,53 @@ function MarkAsDeliveredButton({ orderId }: { orderId: string }) {
   );
 }
 
+function BoxNowAdminControls({
+  orderId,
+  referenceNumber,
+}: {
+  orderId: string;
+  referenceNumber?: string | null;
+}) {
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
+  const t = useTranslations("Order");
+
+  return (
+    <div className="space-y-2">
+      {referenceNumber ? (
+        <a
+          href={`/api/admin/boxnow/label/${orderId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full h-11 rounded-lg border border-brand-accent/40 text-sm font-medium hover:bg-brand-accent/5 transition-all"
+        >
+          <FileDown className="w-4 h-4" />
+          {t("boxnowDownloadLabel")}
+        </a>
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isPending}
+          className="w-full h-11"
+          onClick={() =>
+            startTransition(async () => {
+              const res = await createBoxNowDeliveryRequest(orderId);
+              toast({
+                variant: res.success ? "default" : "destructive",
+                description: res.success ? res.message : res.error,
+              });
+            })
+          }
+        >
+          <PackageOpen className="w-4 h-4 mr-2" />
+          {t("boxnowCreateVoucher")}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 export default function OrderDetailsTable({
   order,
   paypalClientId,
@@ -110,6 +167,8 @@ export default function OrderDetailsTable({
   const {
     id,
     shippingAddress,
+    shippingMethod,
+    boxnowReferenceNumber,
     orderitems,
     itemsPrice,
     shippingPrice,
@@ -124,6 +183,13 @@ export default function OrderDetailsTable({
     couponCode,
     discountAmount,
   } = order;
+  const isLocker = shippingMethod === "boxnow_locker";
+  const locker = (order.boxnowLocker ?? null) as {
+    name?: string;
+    addressLine1?: string;
+    postalCode?: string;
+    city?: string;
+  } | null;
 
   const t = useTranslations("Order");
   const tCheckout = useTranslations("Checkout");
@@ -166,12 +232,22 @@ export default function OrderDetailsTable({
               <h2 className="font-semibold">{tCheckout("shippingAddress")}</h2>
             </div>
             <div className="text-sm text-muted-foreground space-y-0.5 pl-4">
+              {isLocker && (
+                <Badge className="mb-1 bg-brand-accent/10 text-brand-accent border-brand-accent/20">
+                  <PackageOpen className="w-3 h-3 mr-1" />
+                  {tCheckout("shippingMethodLocker")}
+                </Badge>
+              )}
               <p className="font-medium text-foreground">{shippingAddress.fullName}</p>
+              {isLocker && locker?.name && (
+                <p className="font-medium text-foreground">{locker.name}</p>
+              )}
               <p>{shippingAddress.address}</p>
               <p>
                 {shippingAddress.city}, {shippingAddress.postalCode}
               </p>
               <p>{shippingAddress.country}</p>
+              {shippingAddress.phone && <p>{shippingAddress.phone}</p>}
             </div>
             <div className="pl-4 mt-2">
               {isDelivered ? (
@@ -263,7 +339,8 @@ export default function OrderDetailsTable({
             </div>
 
             {/* Payment actions */}
-            {!isPaid && paymentMethod === "Paypal" && (
+            {/* Historical orders were stored as "PayPal"; the constant said "Paypal". */}
+            {!isPaid && (paymentMethod === "Paypal" || paymentMethod === "PayPal") && (
               <PayPalPayment
                 paypalClientId={paypalClientId}
                 orderId={order.id}
@@ -276,12 +353,21 @@ export default function OrderDetailsTable({
                 clientSecret={stripeClientSecret}
               />
             )}
+            {!isPaid && paymentMethod === "Viva" && (
+              <VivaPayment orderId={id} totalPrice={Number(order.totalPrice)} />
+            )}
             {/* COD */}
             {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
               <MarkAsPaidButton orderId={order.id} />
             )}
             {isAdmin && isPaid && !isDelivered && (
               <MarkAsDeliveredButton orderId={order.id} />
+            )}
+            {isAdmin && isLocker && (
+              <BoxNowAdminControls
+                orderId={order.id}
+                referenceNumber={boxnowReferenceNumber}
+              />
             )}
           </div>
         </div>

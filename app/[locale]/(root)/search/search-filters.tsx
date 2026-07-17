@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { SlidersHorizontal, ChevronDown, Star } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { localizedName } from "@/lib/i18n-helpers";
@@ -85,19 +84,11 @@ function FilterSection({
           }`}
         />
       </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="overflow-hidden"
-          >
-            <div className="pt-3">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className={`collapse-grid ${isOpen ? "is-open" : ""}`}>
+        <div>
+          <div className="pt-3">{children}</div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -223,35 +214,27 @@ function CategoryNode({ cat }: { cat: CategoryItem }) {
         )}
       </div>
       {hasChildren && (
-        <AnimatePresence>
-          {open && (
-            <motion.ul
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="overflow-hidden pl-3 space-y-0.5"
-            >
-              {cat.children!.map((child) => (
-                <li key={child.name}>
-                  <Link
-                    className={`text-xs py-1.5 px-3 flex items-center justify-between rounded-lg transition-all ${
-                      child.isActive
-                        ? "font-bold text-accent-foreground bg-accent"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}
-                    href={child.href}
-                  >
-                    <span>{localizedName(child, locale)}</span>
-                    <span className="text-[10px] tabular-nums bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground">
-                      {child.count}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </motion.ul>
-          )}
-        </AnimatePresence>
+        <div className={`collapse-grid ${open ? "is-open" : ""}`}>
+          <ul className="pl-3 space-y-0.5">
+            {cat.children!.map((child) => (
+              <li key={child.name}>
+                <Link
+                  className={`text-xs py-1.5 px-3 flex items-center justify-between rounded-lg transition-all ${
+                    child.isActive
+                      ? "font-bold text-accent-foreground bg-accent"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  }`}
+                  href={child.href}
+                >
+                  <span>{localizedName(child, locale)}</span>
+                  <span className="text-[10px] tabular-nums bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground">
+                    {child.count}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </li>
   );

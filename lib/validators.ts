@@ -137,6 +137,20 @@ export const insertCartSchema = z.object({
   discountAmount: currency.optional().default("0.00"),
 });
 
+// Snapshot of a selected Box Now APM locker (stored in the address / order JSON).
+export const boxnowLockerSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().optional(),
+  addressLine1: z.string().optional().nullable(),
+  postalCode: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
+  country: z.string().optional().nullable(),
+  lat: z.number().optional().nullable(),
+  lng: z.number().optional().nullable(),
+});
+
+export const SHIPPING_METHODS = ["home", "boxnow_locker"] as const;
+
 export const shippingAddressSchema = z.object({
   fullName: z
     .string()
@@ -153,6 +167,9 @@ export const shippingAddressSchema = z.object({
   country: z
     .string()
     .min(3, { message: "Country must be at least 3 characters long" }),
+  phone: z.string().optional().nullable(),
+  shippingMethod: z.enum(SHIPPING_METHODS).optional().nullable(),
+  boxnowLocker: boxnowLockerSchema.optional().nullable(),
   lat: z.number().optional().nullable(),
   lng: z.number().optional().nullable(),
 });
@@ -178,6 +195,7 @@ export const insertOrderSchema = z.object({
     message: "Invalid payment method",
   }),
   shippingAddress: shippingAddressSchema,
+  shippingMethod: z.enum(SHIPPING_METHODS).optional().nullable(),
   couponId: z.string().uuid().optional().nullable(),
   couponCode: z.string().optional().nullable(),
   discountAmount: currency.optional().default("0.00"),
@@ -345,15 +363,31 @@ export function createSignUpFormSchema(t: T) {
 }
 
 export function createShippingAddressSchema(t: T) {
-  return z.object({
-    fullName: z.string().min(3, { message: t("fullNameMin") }),
-    address: z.string().min(3, { message: t("addressMin") }),
-    city: z.string().min(3, { message: t("cityMin") }),
-    postalCode: z.string().min(3, { message: t("postalCodeMin") }),
-    country: z.string().min(3, { message: t("countryMin") }),
-    lat: z.number().optional().nullable(),
-    lng: z.number().optional().nullable(),
-  });
+  return z
+    .object({
+      fullName: z.string().min(3, { message: t("fullNameMin") }),
+      address: z.string().min(3, { message: t("addressMin") }),
+      city: z.string().min(3, { message: t("cityMin") }),
+      postalCode: z.string().min(3, { message: t("postalCodeMin") }),
+      country: z.string().min(3, { message: t("countryMin") }),
+      phone: z.string().optional().nullable(),
+      shippingMethod: z.enum(SHIPPING_METHODS).optional().nullable(),
+      boxnowLocker: boxnowLockerSchema.optional().nullable(),
+      lat: z.number().optional().nullable(),
+      lng: z.number().optional().nullable(),
+    })
+    // Box Now locker delivery requires a chosen locker and a phone number (for the locker PIN SMS).
+    .refine(
+      (data) =>
+        data.shippingMethod !== "boxnow_locker" || Boolean(data.boxnowLocker?.id),
+      { path: ["boxnowLocker"], message: t("lockerRequired") }
+    )
+    .refine(
+      (data) =>
+        data.shippingMethod !== "boxnow_locker" ||
+        Boolean(data.phone && data.phone.trim().length >= 8),
+      { path: ["phone"], message: t("phoneRequired") }
+    );
 }
 
 export function createPaymentMethodSchema(t: T) {
@@ -379,6 +413,7 @@ export function createInsertOrderSchema(t: T) {
       message: t("invalidPaymentMethod"),
     }),
     shippingAddress: createShippingAddressSchema(t),
+    shippingMethod: z.enum(SHIPPING_METHODS).optional().nullable(),
     couponId: z.string().uuid().optional().nullable(),
     couponCode: z.string().optional().nullable(),
     discountAmount: cur.optional().default("0.00"),

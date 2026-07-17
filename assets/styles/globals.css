@@ -446,6 +446,77 @@
   animation: scan-line 8s linear infinite;
 }
 
+/* Page enter transition (CSS replacement for the framer-motion PageTransition) */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.animate-page-enter {
+  animation: page-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Fade-up used by grids / scroll reveals */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+.animate-fade-up { animation: fade-up 0.4s ease-out both; }
+
+/* Staggered grid entrance: children fade up with a per-index delay */
+.stagger-grid > * { animation: fade-up 0.4s ease-out both; }
+.stagger-grid > *:nth-child(1)  { animation-delay: 0ms; }
+.stagger-grid > *:nth-child(2)  { animation-delay: 60ms; }
+.stagger-grid > *:nth-child(3)  { animation-delay: 120ms; }
+.stagger-grid > *:nth-child(4)  { animation-delay: 180ms; }
+.stagger-grid > *:nth-child(5)  { animation-delay: 240ms; }
+.stagger-grid > *:nth-child(6)  { animation-delay: 300ms; }
+.stagger-grid > *:nth-child(7)  { animation-delay: 360ms; }
+.stagger-grid > *:nth-child(8)  { animation-delay: 420ms; }
+.stagger-grid > *:nth-child(n+9) { animation-delay: 480ms; }
+
+/* Scroll reveal — hidden until .is-visible is added by IntersectionObserver */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+.scroll-reveal.is-visible { opacity: 1; transform: none; }
+
+/* Card hover lift (CSS replacement for the framer-motion AnimatedCard) */
+.card-lift {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Dropdown/mega-menu entrance */
+@keyframes menu-pop {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+.animate-menu-pop {
+  animation: menu-pop 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Tap feedback (framer whileTap replacement) */
+.tap-scale { transition: transform 0.12s ease; }
+.tap-scale:active { transform: scale(0.97); }
+
+/* Animated height collapse (grid-rows trick — element stays mounted) */
+.collapse-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.2s ease, opacity 0.2s ease;
+}
+.collapse-grid.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.collapse-grid > * { overflow: hidden; min-height: 0; }
+
 /* =====================================================================
    REDUCED MOTION
    Respect OS-level preference — WCAG 2.3.3, 2.2.2

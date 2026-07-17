@@ -91,6 +91,8 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 export async function getUserById(id: string) {
   const user = await prisma.user.findFirst({
     where: { id },
+    // Never haul the bcrypt hash around with checkout/profile reads.
+    omit: { password: true },
   });
 
   if (!user) {

@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, SearchIcon, X, Clock, ArrowRight } from "lucide-react";
 import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
@@ -46,12 +45,7 @@ export default function MobileSearch({ onClose }: Props) {
   const showCategories = query && categories.length > 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] bg-background flex flex-col"
-    >
+    <div className="fixed inset-0 z-[60] bg-background flex flex-col animate-in fade-in duration-200">
       {/* Search header — dark themed */}
       <div className="flex items-center gap-2 px-3 py-2 bg-primary text-primary-foreground">
         <Button variant="ghost" size="icon" onClick={onClose} className="text-primary-foreground hover:bg-background/10">
@@ -197,6 +191,6 @@ export default function MobileSearch({ onClose }: Props) {
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

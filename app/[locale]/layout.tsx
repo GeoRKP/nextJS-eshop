@@ -5,12 +5,12 @@ import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from "@/lib/constants";
 
 import { Toaster } from "@/components/ui/toaster";
 import { WishlistProvider } from "@/components/shared/product/wishlist-provider";
-import { MotionProvider } from "@/components/shared/motion-provider";
 import CookieConsent from "@/components/shared/cookie-consent";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { routing, Locale } from "@/i18n/routing";
 import { notFound } from "next/navigation";
+import { getAuthSession } from "@/lib/auth-session";
 
 // Body / UI — Manrope: modern semi-geometric, strong Greek support, industrial undertone
 const manrope = Manrope({
@@ -114,17 +114,50 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
-  const messages = await getMessages();
+  // Ship only the namespaces that client components on the storefront actually
+  // use — the full catalog (incl. Admin*/forms/legal) is ~2× the size and admin
+  // routes provide their own catalog in app/[locale]/admin/layout.tsx.
+  const CLIENT_NAMESPACES = [
+    "AddressBook",
+    "Announcement",
+    "Auth",
+    "Cart",
+    "Checkout",
+    "Common",
+    "CookieConsent",
+    "DeleteDialog",
+    "Footer",
+    "LanguageSwitcher",
+    "MegaMenu",
+    "MobileNav",
+    "NotFound",
+    "Order",
+    "Product",
+    "Search",
+    "UserNav",
+    "UserProfile",
+    "Validation",
+    "Wishlist",
+  ];
+  const [allMessagesRaw, session] = await Promise.all([
+    getMessages(),
+    getAuthSession(),
+  ]);
+  const allMessages = allMessagesRaw as Record<string, unknown>;
+  const messages = Object.fromEntries(
+    CLIENT_NAMESPACES.filter((ns) => ns in allMessages).map((ns) => [
+      ns,
+      allMessages[ns],
+    ])
+  );
 
   return (
     <html lang={locale}>
       <body className={`${manrope.variable} ${oswald.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <NextIntlClientProvider messages={messages}>
-          <MotionProvider>
-            <WishlistProvider>
-              {children}
-            </WishlistProvider>
-          </MotionProvider>
+          <WishlistProvider enabled={Boolean(session?.user)}>
+            {children}
+          </WishlistProvider>
           <CookieConsent />
           <Toaster />
         </NextIntlClientProvider>

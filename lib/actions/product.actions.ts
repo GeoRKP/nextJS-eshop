@@ -12,17 +12,21 @@ import { assertAdmin } from "@/lib/auth-guard";
 import { logAuditEvent } from "@/lib/audit-log";
 import { deleteUploadedImages, diffImages } from "@/lib/file-cleanup";
 
-export async function getLatestProducts(limit?: number) {
-  const data = await prisma.product.findMany({
-    where: { deletedAt: null },
-    take: limit ?? LATEST_PRODUCTS_LIMIT,
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+export const getLatestProducts = unstable_cache(
+  async (limit?: number) => {
+    const data = await prisma.product.findMany({
+      where: { deletedAt: null },
+      take: limit ?? LATEST_PRODUCTS_LIMIT,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-  return toPlainObject(data);
-}
+    return toPlainObject(data);
+  },
+  ["getLatestProducts"],
+  { revalidate: 300, tags: ["products"] }
+);
 
 export const getProductBySlug = unstable_cache(
   async (slug: string) => {
@@ -93,6 +97,20 @@ async function ensureUnaccent(): Promise<boolean> {
   return _unaccentReady;
 }
 
+// Memoized schema probe — the search_vector column either exists or it doesn't;
+// no need to re-probe on every search request.
+let _fullTextReady: boolean | null = null;
+async function ensureFullText(): Promise<boolean> {
+  if (_fullTextReady !== null) return _fullTextReady;
+  try {
+    await prisma.$queryRaw`SELECT search_vector FROM "Product" LIMIT 0`;
+    _fullTextReady = true;
+  } catch {
+    _fullTextReady = false;
+  }
+  return _fullTextReady;
+}
+
 // Get all products
 export async function getAllProducts({
   query,
@@ -122,15 +140,11 @@ export async function getAllProducts({
   // ─── Full-text search path (raw SQL with tsvector, fallback to ILIKE) ───
   if (hasTextQuery) {
     // Check if search_vector column exists (it's created by a custom migration)
-    let useFullText = true;
-    try {
-      await prisma.$queryRaw`SELECT search_vector FROM "Product" LIMIT 0`;
-    } catch {
-      useFullText = false;
-    }
-
     const likeTerm = `%${query}%`;
-    const hasUnaccent = await ensureUnaccent();
+    const [useFullText, hasUnaccent] = await Promise.all([
+      ensureFullText(),
+      ensureUnaccent(),
+    ]);
 
     const searchCondition = useFullText
       ? hasUnaccent

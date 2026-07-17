@@ -1,28 +1,6 @@
-"use client";
+import { cn } from "@/lib/utils";
 
-import { motion } from "framer-motion";
-
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: "easeOut" as const,
-    },
-  },
-};
-
+// CSS-only staggered entrance (server components — no client JS needed).
 export function AnimatedGrid({
   children,
   className,
@@ -30,16 +8,7 @@ export function AnimatedGrid({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <motion.div
-      className={className}
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={cn("stagger-grid", className)}>{children}</div>;
 }
 
 export function AnimatedGridItem({
@@ -47,5 +16,5 @@ export function AnimatedGridItem({
 }: {
   children: React.ReactNode;
 }) {
-  return <motion.div variants={itemVariants}>{children}</motion.div>;
+  return <div>{children}</div>;
 }

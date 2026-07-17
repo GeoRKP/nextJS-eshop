@@ -19,12 +19,16 @@ export default async function PaymentMethodPage() {
   if (!userId) redirect("/sign-in?callbackUrl=/payment-method");
 
   const user = await getUserById(userId);
+  const address = (user?.address ?? {}) as { shippingMethod?: string };
 
   return (
     <div className="wrapper">
       <CheckoutSteps current={2} />
 
-      <PaymentMethodForm preferredPaymentMethod={user?.paymentMethod} />
+      <PaymentMethodForm
+        preferredPaymentMethod={user?.paymentMethod}
+        shippingMethod={address.shippingMethod ?? "home"}
+      />
     </div>
   );
 }

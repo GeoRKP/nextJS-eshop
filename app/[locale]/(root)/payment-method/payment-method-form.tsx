@@ -7,24 +7,26 @@ import { paymentMethodSchema, createPaymentMethodSchema } from "@/lib/validators
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod/v3";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
-import { Loader2, ArrowRight, CreditCard, Wallet, Banknote, Check } from "lucide-react";
+import { Loader2, ArrowRight, CreditCard, Wallet, Banknote, Check, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PAYMENT_METHODS } from "@/lib/constants";
 import { updateUserPaymentMethod } from "@/lib/actions/user.actions";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-const DEFAULT_PAYMENT_METHOD = "card";
-
 const paymentIcons: Record<string, typeof CreditCard> = {
   Stripe: CreditCard,
   PayPal: Wallet,
+  Paypal: Wallet,
+  Viva: ShieldCheck,
   CashOnDelivery: Banknote,
 };
 
 const paymentDescKeys: Record<string, string> = {
   Stripe: "payWithCard",
   PayPal: "payWithPaypal",
+  Paypal: "payWithPaypal",
+  Viva: "payWithViva",
   CashOnDelivery: "payOnDelivery",
 };
 
@@ -32,13 +34,16 @@ const paymentNameKeys: Record<string, string> = {
   Stripe: "paymentStripe",
   Paypal: "paymentPaypal",
   PayPal: "paymentPaypal",
+  Viva: "paymentViva",
   CashOnDelivery: "paymentCashOnDelivery",
 };
 
 export default function PaymentMethodForm({
   preferredPaymentMethod,
+  shippingMethod = "home",
 }: {
   preferredPaymentMethod: string | null;
+  shippingMethod?: string;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -46,10 +51,23 @@ export default function PaymentMethodForm({
   const t = useTranslations("Checkout");
   const tV = useTranslations("Validation");
 
+  // Box Now lockers have no POS and take no cash — COD is only offered for home delivery.
+  const isLocker = shippingMethod === "boxnow_locker";
+  const availableMethods = isLocker
+    ? PAYMENT_METHODS.filter((m) => m !== "CashOnDelivery")
+    : PAYMENT_METHODS;
+
+  // A stale saved preference (e.g. a method no longer offered, or COD on a
+  // locker order) falls back to the first available method.
+  const preferred =
+    preferredPaymentMethod && availableMethods.includes(preferredPaymentMethod)
+      ? preferredPaymentMethod
+      : null;
+
   const form = useForm<z.infer<typeof paymentMethodSchema>>({
     resolver: zodResolver(createPaymentMethodSchema(tV)),
     defaultValues: {
-      type: preferredPaymentMethod || DEFAULT_PAYMENT_METHOD,
+      type: preferred || availableMethods[0],
     },
   });
 
@@ -75,6 +93,11 @@ export default function PaymentMethodForm({
         <p className="text-sm text-muted-foreground mb-6">
           {t("paymentMethodDescription")}
         </p>
+        {isLocker && (
+          <p className="text-sm rounded-lg border border-brand-accent/30 bg-brand-accent/5 p-3 mb-6">
+            {t("codNotAvailableForLocker")}
+          </p>
+        )}
         <Form {...form}>
           <form
             method="post"
@@ -88,7 +111,7 @@ export default function PaymentMethodForm({
                 <FormItem>
                   <FormControl>
                     <div className="grid gap-3">
-                      {PAYMENT_METHODS.map((paymentMethod) => {
+                      {availableMethods.map((paymentMethod) => {
                         const Icon = paymentIcons[paymentMethod] || CreditCard;
                         const isSelected = field.value === paymentMethod;
 

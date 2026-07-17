@@ -81,6 +81,7 @@ model Product {
   @@index([deletedAt, price])
   @@index([deletedAt, rating])
   @@index([deletedAt, category, createdAt])
+  @@index([deletedAt, brand])
 }
 
 // ─── User ──────────────────────────────────────────────────────
@@ -220,6 +221,13 @@ model Order {
   shippingAddressId String?     @db.Uuid
   createdAt         DateTime    @default(now()) @db.Timestamp(6)
 
+  // Shipping method & Box Now (parcel-locker) fulfillment
+  shippingMethod        String?  @default("home") // "home" | "boxnow_locker"
+  boxnowLocker          Json?    @db.Json          // snapshot of the chosen APM locker
+  boxnowReferenceNumber String?                    // delivery-request reference (== order id we send)
+  boxnowParcelIds       String[] @default([])      // Box Now internal parcel ids
+  boxnowStatus          String?                    // latest parcel status from Box Now
+
   user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   orderitems        OrderItem[]
   statusHistory     OrderStatusHistory[]
@@ -233,6 +241,7 @@ model Order {
   @@index([createdAt])
   @@index([createdAt, isPaid])
   @@index([paymentMethod])
+  @@index([shippingMethod])
 }
 
 model OrderItem {

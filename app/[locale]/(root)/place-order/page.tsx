@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import PlaceOrderForm from "./place-order-form";
+import { PAYMENT_METHODS } from "@/lib/constants";
 import { getTranslations } from "next-intl/server";
 import { MapPin, CreditCard, Pencil, Lock, Shield } from "lucide-react";
 
@@ -34,7 +35,9 @@ export default async function PlaceOrderPage() {
   if (!cart || cart.items.length === 0) redirect("/cart");
 
   if (!user.address) redirect("/shipping-address");
-  if (!user.paymentMethod) redirect("/payment-method");
+  // Redirect saved payment methods that are no longer offered (e.g. old PayPal/Stripe).
+  if (!user.paymentMethod || !PAYMENT_METHODS.includes(user.paymentMethod))
+    redirect("/payment-method");
 
   const userAddress = user.address as ShippingAddress;
 

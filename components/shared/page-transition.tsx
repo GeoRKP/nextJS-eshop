@@ -1,8 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { usePathname } from "@/i18n/navigation";
 
+// CSS-only page fade — keyed on pathname so the animation replays per navigation.
 export default function PageTransition({
   children,
 }: {
@@ -11,14 +11,8 @@ export default function PageTransition({
   const pathname = usePathname();
 
   return (
-    <motion.div
-      key={pathname}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-      style={{ willChange: "opacity, transform" }}
-    >
+    <div key={pathname} className="animate-page-enter">
       {children}
-    </motion.div>
+    </div>
   );
 }

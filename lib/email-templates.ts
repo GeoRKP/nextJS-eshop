@@ -171,7 +171,7 @@ export function orderConfirmationEmail(data: OrderEmailData): string {
         <td style="padding:6px 0;font-size:13px;color:${COLORS.foreground};text-align:right;font-weight:600;">${Number(data.shippingPrice) === 0 ? "ΔΩΡΕΑΝ" : data.shippingPrice}</td>
       </tr>
       <tr>
-        <td style="padding:6px 0;font-size:13px;color:${COLORS.muted};">ΦΠΑ</td>
+        <td style="padding:6px 0;font-size:13px;color:${COLORS.muted};">ΦΠΑ 24% (περιλαμβάνεται)</td>
         <td style="padding:6px 0;font-size:13px;color:${COLORS.foreground};text-align:right;font-weight:600;">${data.taxPrice}</td>
       </tr>
       ${discountRow}

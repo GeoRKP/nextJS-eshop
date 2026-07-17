@@ -4,7 +4,8 @@ import { Link } from "@/i18n/navigation";
 import Menu from "@/components/shared/header/menu";
 import MainNav from "./main-nav";
 import AdminSearch from "@/components/admin/admin-search";
-import { getTranslations } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getTranslations } from "next-intl/server";
 
 export default async function AdminLayout({
   children,
@@ -12,8 +13,12 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }>) {
   const t = await getTranslations("AdminNav");
+  // The root layout ships only storefront namespaces to the client — admin
+  // routes re-provide the full catalog (admin traffic is tiny, payload is moot).
+  const messages = await getMessages();
 
   return (
+    <NextIntlClientProvider messages={messages}>
     <div className="min-h-screen flex flex-col border-t-2 border-brand-accent">
       {/* Top bar */}
       <div className="border-b border-border bg-background">
@@ -60,5 +65,6 @@ export default async function AdminLayout({
         </main>
       </div>
     </div>
+    </NextIntlClientProvider>
   );
 }

@@ -1,7 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
+// IntersectionObserver + CSS transition (framer-motion whileInView replacement).
 export default function ScrollFadeIn({
   children,
   className,
@@ -9,15 +11,31 @@ export default function ScrollFadeIn({
   children: React.ReactNode;
   className?: string;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "-50px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+    <div
+      ref={ref}
+      className={cn("scroll-reveal", visible && "is-visible", className)}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

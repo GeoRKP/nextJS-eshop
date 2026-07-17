@@ -17,21 +17,15 @@ const Header = () => {
             className="flex-start group"
             aria-label={`${APP_NAME} — αρχική`}
           >
+            {/* Single responsive logo — no `priority`: the logo isn't the LCP
+                element, so it shouldn't compete with the hero image preload. */}
             <Image
               src="/images/logo.png"
               alt={`${APP_NAME} logo`}
               width={76}
               height={76}
-              priority
-              className="hidden md:block transition-transform group-hover:scale-105"
-            />
-            <Image
-              src="/images/logo.png"
-              alt={`${APP_NAME} logo`}
-              width={40}
-              height={40}
-              priority
-              className="md:hidden"
+              sizes="(max-width: 768px) 40px, 76px"
+              className="w-10 h-10 md:w-[76px] md:h-[76px] transition-transform group-hover:scale-105"
             />
           </Link>
         </div>

@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { CartItem } from "@/types";
 import { formatError, round2, toPlainObject } from "../utils";
@@ -49,7 +50,9 @@ const calcPrice = (
     shippingPrice = round2(
       itemsPrice >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
     ),
-    taxPrice = round2(itemsPrice * VAT_RATE);
+    // Catalog prices are FINAL (VAT-inclusive) — taxPrice is the VAT already
+    // contained in itemsPrice, shown for information; it is NOT added to the total.
+    taxPrice = round2(itemsPrice - itemsPrice / (1 + VAT_RATE));
 
   // Calculate discount
   let discountAmount = 0;
@@ -71,9 +74,7 @@ const calcPrice = (
     }
   }
 
-  const totalPrice = round2(
-    itemsPrice + shippingPrice + taxPrice - discountAmount
-  );
+  const totalPrice = round2(itemsPrice + shippingPrice - discountAmount);
 
   return {
     itemsPrice: itemsPrice.toFixed(2),
@@ -104,6 +105,14 @@ export async function addItemToCart(data: CartItem) {
       where: {
         id: clientItem.productId,
         deletedAt: null,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        images: true,
+        price: true,
+        stock: true,
       },
     });
 
@@ -199,7 +208,9 @@ export async function addItemToCart(data: CartItem) {
   }
 }
 
-export async function getMyCart() {
+// React cache(): the header menu and the page body both call this on most pages —
+// memoize per request so the cart resolves once.
+export const getMyCart = cache(async () => {
   const sessionCartId = (await cookies()).get("sessionCartId")?.value;
 
   if (!sessionCartId) {
@@ -216,13 +227,24 @@ export async function getMyCart() {
     // Logged-in user: look for their cart first
     cart = await prisma.cart.findFirst({ where: { userId } });
 
-    // Check for a guest cart that should be claimed/merged
-    const guestCart = await prisma.cart.findFirst({
-      where: { sessionCartId, userId: null },
-    });
+    // Guest-cart claim/merge only when this browser session isn't linked to the
+    // user cart yet (fresh login, or a different browser). The steady state —
+    // cart.sessionCartId matches the cookie — costs a single SELECT per request.
+    if (!cart || cart.sessionCartId !== sessionCartId) {
+      const guestCart = await prisma.cart.findFirst({
+        where: { sessionCartId, userId: null },
+      });
 
-    if (guestCart) {
-      if (!cart) {
+      if (!guestCart) {
+        // Nothing to merge — link the user cart to this browser session so the
+        // guest lookup is skipped on subsequent requests.
+        if (cart) {
+          cart = await prisma.cart.update({
+            where: { id: cart.id },
+            data: { sessionCartId },
+          });
+        }
+      } else if (!cart) {
         // No user cart exists — claim the guest cart
         cart = await prisma.cart.update({
           where: { id: guestCart.id },
@@ -244,13 +266,28 @@ export async function getMyCart() {
           }
         }
 
+        // Clamp merged quantities to available stock (guest + user carts may
+        // together exceed it) and drop items that are out of stock entirely.
+        const stocks = await prisma.product.findMany({
+          where: { id: { in: userItems.map((i) => i.productId) } },
+          select: { id: true, stock: true },
+        });
+        const stockById = new Map(stocks.map((p) => [p.id, p.stock]));
+        const mergedItems = userItems.filter((item) => {
+          const stock = stockById.get(item.productId) ?? 0;
+          if (stock <= 0) return false;
+          if (item.qty > stock) item.qty = stock;
+          return true;
+        });
+
         const couponData = await getCouponData(cart.couponCode);
 
         cart = await prisma.cart.update({
           where: { id: cart.id },
           data: {
-            items: userItems as Prisma.CartUpdateitemsInput[],
-            ...calcPrice(userItems, couponData),
+            items: mergedItems as Prisma.CartUpdateitemsInput[],
+            sessionCartId,
+            ...calcPrice(mergedItems, couponData),
           },
         });
 
@@ -274,7 +311,7 @@ export async function getMyCart() {
     taxPrice: cart.taxPrice.toString(),
     discountAmount: cart.discountAmount.toString(),
   });
-}
+});
 
 export async function removeItemFromCart(productId: string) {
   try {
@@ -288,6 +325,7 @@ export async function removeItemFromCart(productId: string) {
       where: {
         id: productId,
       },
+      select: { id: true, slug: true, name: true, nameEn: true },
     });
 
     if (!product) throw new Error(t("productNotFound"));

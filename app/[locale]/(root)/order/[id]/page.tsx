@@ -29,8 +29,14 @@ export default async function OrderDetailPage(props: {
 
   let client_secret = null;
 
-  if (order.paymentMethod === "Stripe" && !order.isPaid) {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+  // Stripe is no longer an offered method; guard on the key so viewing a historical
+  // unpaid Stripe order doesn't crash the page if the env var is removed.
+  if (
+    order.paymentMethod === "Stripe" &&
+    !order.isPaid &&
+    process.env.STRIPE_SECRET_KEY
+  ) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     // Reuse existing PaymentIntent if one was already created for this order
     const existingPaymentResult = order.paymentResult as { id?: string } | null;

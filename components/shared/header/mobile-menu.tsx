@@ -25,7 +25,6 @@ import {
   Tag,
   ArrowRight,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { Category } from "@/types";
 import { getCategoryIcon } from "@/lib/category-icons";
@@ -328,15 +327,8 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
                     <ChevronRight className="h-4 w-4" />
                   )}
                 </button>
-                <AnimatePresence>
-                  {brandsExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
+                <div className={`collapse-grid ${brandsExpanded ? "is-open" : ""}`}>
+                  <div>
                       {/* Horizontal scroll for popular brands */}
                       <div className="flex gap-2 px-4 py-2 overflow-x-auto scrollbar-hide">
                         {brands.slice(0, 8).map((b) => (
@@ -365,9 +357,8 @@ export default function MobileMenu({ categories, brands, userName }: Props) {
                           </span>
                         </Link>
                       ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                  </div>
+                </div>
               </div>
             </>
           )}
@@ -488,15 +479,9 @@ function CategoryAccordion({
         )}
       </div>
 
-      <AnimatePresence>
-        {isExpanded && hasChildren && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
+      {hasChildren && (
+        <div className={`collapse-grid ${isExpanded ? "is-open" : ""}`}>
+          <div>
             {/* View All link */}
             <Link
               href={`/search?category=${encodeURIComponent(category.name)}`}
@@ -517,9 +502,9 @@ function CategoryAccordion({
                 level={level + 1}
               />
             ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -190,8 +190,18 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                 )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("estimatedShipping")}</span>
-                  <span className="text-green-600 font-medium">{t("free")}</span>
+                  {Number(cart.shippingPrice) > 0 ? (
+                    <span className="font-medium">{formatCurrency(cart.shippingPrice)}</span>
+                  ) : (
+                    <span className="text-green-600 font-medium">{t("free")}</span>
+                  )}
                 </div>
+                {Number(cart.taxPrice) > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t("cartTax")}</span>
+                    <span className="font-medium">{formatCurrency(cart.taxPrice)}</span>
+                  </div>
+                )}
               </div>
 
               <CouponInput appliedCode={cart.couponCode} />
@@ -200,7 +210,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
 
               <div className="flex justify-between items-baseline">
                 <span className="font-semibold">{t("estimatedTotal")}</span>
-                <span className="text-2xl font-black">{formatCurrency(cart.itemsPrice)}</span>
+                <span className="text-2xl font-black">{formatCurrency(cart.totalPrice)}</span>
               </div>
 
               <Button
@@ -245,7 +255,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                 {t("estimatedTotal")}
               </span>
               <span className="font-heading text-xl font-extrabold tabular-nums truncate">
-                {formatCurrency(cart.itemsPrice)}
+                {formatCurrency(cart.totalPrice)}
               </span>
             </div>
             <Button

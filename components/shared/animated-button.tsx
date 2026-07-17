@@ -1,15 +1,8 @@
-"use client";
-
-import { motion } from "framer-motion";
-
+// CSS-only tap feedback (server component — no client JS needed).
 export default function AnimatedButton({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <motion.div whileTap={{ scale: 0.97 }}>
-      {children}
-    </motion.div>
-  );
+  return <div className="tap-scale">{children}</div>;
 }

@@ -24,7 +24,8 @@ const PERIODS = [
   { value: "all", key: "allTime" },
 ] as const;
 
-const PAYMENT_METHODS = ["Stripe", "Paypal", "CashOnDelivery"] as const;
+// Viva + COD are the live methods; Stripe/Paypal remain for filtering historical orders.
+const PAYMENT_METHODS = ["Viva", "CashOnDelivery", "Stripe", "Paypal"] as const;
 
 export default function DashboardFilters({
   categories,

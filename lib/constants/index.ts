@@ -30,16 +30,19 @@ export const shippingAddressDefaultValues= {
   city: "",
   postalCode: "",
   country: "",
+  phone: "",
+  shippingMethod: "home" as "home" | "boxnow_locker",
+  boxnowLocker: null,
   lat: 0,
   lng: 0,
 };
 
 export const PAYMENT_METHODS = process.env.PAYMENT_METHODS
   ? process.env.PAYMENT_METHODS.split(", ")
-  : ["Paypal", "Stripe", "CashOnDelivery"];
+  : ["Viva", "CashOnDelivery"];
 
 export const DEFAULT_PAYMENT_METHOD =
-  process.env.DEFAULT_PAYMENT_METHOD || "Paypal";
+  process.env.DEFAULT_PAYMENT_METHOD || "Viva";
 
 export const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 12;
 
