@@ -1,7 +1,7 @@
 "use server";
 
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { formatError, toPlainObject, formatCurrency } from "../utils";
+import { formatError, toPlainObject } from "../utils";
 import { getAuthSession } from "@/lib/auth-session";
 import { getMyCart } from "./cart.actions";
 import { getUserById } from "./user.actions";
@@ -16,17 +16,17 @@ import {
   VIVA_STATUS_FINAL,
 } from "../viva";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { createBoxNowDeliveryForOrder } from "./boxnow.actions";
 import { cancelParcel } from "../boxnow";
 import { PAGE_SIZE, PAYMENT_METHODS } from "../constants";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { assertAdmin } from "@/lib/auth-guard";
-import {
-  sendOrderConfirmationEmail,
-  sendOrderStatusEmail,
-} from "@/lib/email";
+import { sendOrderStatusEmail } from "@/lib/email";
 import { logAuditEvent } from "@/lib/audit-log";
+import {
+  updateOrderToPaid,
+  sendOrderConfirmationForOrder,
+} from "../order-fulfillment";
 
 export async function createOrder() {
   try {
@@ -160,6 +160,12 @@ export async function createOrder() {
       await sendOrderConfirmationForOrder(insertedOrderId);
     }
 
+    // The cart was emptied inside the transaction — refresh its cache so the
+    // header count and /cart don't show stale items after checkout.
+    revalidatePath("/cart");
+    revalidatePath("/en/cart");
+    revalidateTag("cart", "max");
+
     return {
       success: true,
       message: t("orderCreatedSuccessfully"),
@@ -276,11 +282,12 @@ export async function approvePaypalOrder(
       throw new Error(t("errorInPaypalPayment"));
     }
 
-    // Verify PayPal capture amount matches order total before marking paid
-    const capturedAmount = Number(
-      captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value
-    );
+    // Verify PayPal capture amount AND currency match the order before marking paid
+    const capture = captureData.purchase_units[0]?.payments?.captures[0];
+    const capturedAmount = Number(capture?.amount?.value);
+    const capturedCurrency = capture?.amount?.currency_code;
     if (
+      capturedCurrency !== "EUR" ||
       Number.isNaN(capturedAmount) ||
       capturedAmount + 0.01 < Number(order.totalPrice)
     ) {
@@ -409,7 +416,9 @@ export async function verifyVivaTransaction({
   const tx = await retrieveVivaTransaction(transactionId);
 
   // 1) Transaction must point back to this order via merchantTrns.
-  if (tx.merchantTrns && tx.merchantTrns !== orderId) {
+  // Fail closed: a missing/empty merchantTrns must NOT bypass the ownership
+  // binding — orderId is derived from the attacker-controllable webhook field.
+  if (!tx.merchantTrns || tx.merchantTrns !== orderId) {
     throw new Error("Viva transaction does not belong to this order");
   }
 
@@ -418,7 +427,15 @@ export async function verifyVivaTransaction({
     throw new Error(`Viva transaction is not final (StatusId=${tx.statusId})`);
   }
 
-  // 3) Amount must match the order total. Viva returns the amount in main currency units (euros).
+  // 3) Currency must be EUR. Viva may report either the ISO numeric code
+  // ("978") or the alpha code ("EUR"); reject only a clearly-foreign currency
+  // so a misconfigured payment source can't settle a non-EUR capture here.
+  const currency = tx.currencyCode?.toString().toUpperCase();
+  if (currency && currency !== "978" && currency !== "EUR") {
+    throw new Error(`Viva currency mismatch: ${currency}`);
+  }
+
+  // 4) Amount must match the order total. Viva returns the amount in main currency units (euros).
   const expected = Number(order.totalPrice);
   const received = Number(tx.amount);
   if (Number.isNaN(received) || received + 0.01 < expected) {
@@ -440,185 +457,6 @@ export async function verifyVivaTransaction({
   return { success: true, message: t("orderHasBeenPaid") };
 }
 
-// Not exported — helper, not a server action.
-async function sendOrderConfirmationForOrder(orderId: string) {
-  try {
-    const fullOrder = await prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        user: { select: { name: true, email: true } },
-        orderitems: true,
-      },
-    });
-
-    if (fullOrder?.user?.email) {
-      const shippingAddr = fullOrder.shippingAddress as ShippingAddress;
-      await sendOrderConfirmationEmail(fullOrder.user.email, {
-        orderId: fullOrder.id,
-        orderIdFormatted: fullOrder.id.slice(0, 8).toUpperCase(),
-        customerName: fullOrder.user.name || shippingAddr.fullName,
-        items: fullOrder.orderitems.map((item) => ({
-          name: item.name,
-          qty: item.qty,
-          price: formatCurrency(Number(item.price)),
-        })),
-        itemsPrice: formatCurrency(Number(fullOrder.itemsPrice)),
-        shippingPrice: formatCurrency(Number(fullOrder.shippingPrice)),
-        taxPrice: formatCurrency(Number(fullOrder.taxPrice)),
-        totalPrice: formatCurrency(Number(fullOrder.totalPrice)),
-        discountAmount: formatCurrency(Number(fullOrder.discountAmount)),
-        couponCode: fullOrder.couponCode,
-        shippingAddress: {
-          fullName: shippingAddr.fullName,
-          address: shippingAddr.address,
-          city: shippingAddr.city,
-          postalCode: shippingAddr.postalCode,
-          country: shippingAddr.country,
-        },
-        paymentMethod: fullOrder.paymentMethod,
-      });
-    }
-  } catch (emailError) {
-    console.error("Order confirmation email failed:", emailError);
-  }
-}
-
-export async function updateOrderToPaid({
-  orderId,
-  paymentResult,
-}: {
-  orderId: string;
-  paymentResult?: PaymentResult;
-}) {
-  const t = await getTranslations("Actions");
-  const order = await prisma.order.findFirst({
-    where: { id: orderId },
-    include: {
-      orderitems: true,
-    },
-  });
-
-  if (!order) throw new Error(t("orderNotFound"));
-
-  if (order.isPaid) throw new Error(t("orderAlreadyPaid"));
-
-  const oversoldItems: string[] = [];
-  const claimed = await prisma.$transaction(async (tx) => {
-    // Atomic claim: exactly one concurrent caller (Viva webhook vs return URL)
-    // flips isPaid; the losers see count 0 and skip stock/coupons/emails.
-    const claim = await tx.order.updateMany({
-      where: { id: orderId, isPaid: false },
-      data: {
-        isPaid: true,
-        paidAt: new Date(),
-        status: "confirmed",
-        paymentResult,
-      },
-    });
-    if (claim.count === 0) return false;
-
-    // ATOMIC stock decrement — only succeeds if stock is sufficient.
-    // Prevents overselling when 2 users simultaneously buy the last item.
-    for (const item of order.orderitems) {
-      const result = await tx.product.updateMany({
-        where: { id: item.productId, stock: { gte: item.qty } },
-        data: { stock: { decrement: item.qty } },
-      });
-      if (result.count === 0) {
-        // Without a captured payment (admin/COD marking) it's safe to refuse.
-        if (!paymentResult) throw new Error(t("notEnoughStock"));
-        // Money already captured — stranding a charged customer is worse than
-        // overselling. Let stock go negative and flag the order for review.
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stock: { decrement: item.qty } },
-        });
-        oversoldItems.push(item.name);
-      }
-    }
-
-    // Record status change
-    await tx.orderStatusHistory.create({
-      data: {
-        orderId,
-        status: "confirmed",
-        note: t("orderHasBeenPaid"),
-      },
-    });
-
-    if (oversoldItems.length > 0) {
-      await tx.orderStatusHistory.create({
-        data: {
-          orderId,
-          status: "confirmed",
-          note: `${t("paidWithInsufficientStock")}: ${oversoldItems.join(", ")}`,
-        },
-      });
-    }
-
-    // Record coupon usage atomically with order payment.
-    // Prevents users from re-using single-use coupons across multiple orders.
-    if (order.couponCode && order.userId) {
-      const coupon = await tx.coupon.findUnique({
-        where: { code: order.couponCode },
-      });
-      if (coupon) {
-        await tx.couponUsage.create({
-          data: {
-            couponId: coupon.id,
-            userId: order.userId,
-            orderId: order.id,
-          },
-        });
-        await tx.coupon.update({
-          where: { id: coupon.id },
-          data: { usedCount: { increment: 1 } },
-        });
-      }
-    }
-    return true;
-  });
-
-  // A concurrent caller completed the payment first — everything below already ran.
-  if (!claimed) return;
-
-  // Send order confirmation email (best-effort — won't break order flow).
-  // COD orders already got theirs when the order was placed.
-  if (order.paymentMethod !== "CashOnDelivery") {
-    await sendOrderConfirmationForOrder(orderId);
-  }
-
-  // Best-effort: create the Box Now voucher for locker orders once paid. No-op for
-  // home delivery or if already created / credentials missing.
-  try {
-    await createBoxNowDeliveryForOrder(orderId);
-  } catch (boxnowError) {
-    console.error("Box Now delivery request failed:", boxnowError);
-    // Surface the failure to the admin (order history + boxnowStatus) instead of
-    // leaving a paid locker order with a silently missing voucher.
-    try {
-      const msg =
-        boxnowError instanceof Error ? boxnowError.message : String(boxnowError);
-      await prisma.order.update({
-        where: { id: orderId },
-        data: { boxnowStatus: "failed" },
-      });
-      await prisma.orderStatusHistory.create({
-        data: {
-          orderId,
-          status: "confirmed",
-          note: `${t("boxnowVoucherFailed")}: ${msg.slice(0, 300)}`,
-        },
-      });
-    } catch (persistError) {
-      console.error("Failed to record Box Now failure:", persistError);
-    }
-  }
-
-  revalidatePath(`/order/${orderId}`);
-  revalidatePath(`/en/order/${orderId}`);
-  revalidateTag("orders", "max");
-}
 
 // Get the users orders
 

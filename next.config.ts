@@ -37,8 +37,19 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
           },
-          // HSTS only safe once HTTPS is in place — uncomment after SSL cert deployed
-          // { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+          // HTTPS is live (Caddy + Let's Encrypt on demo.avl.gr).
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          // Conservative CSP: only directives that can't break normal rendering
+          // (no script-src/style-src, which Next.js needs 'unsafe-inline' for).
+          // Blocks plugin/object embeds, restricts <base>, and forbids framing.
+          {
+            key: "Content-Security-Policy",
+            value:
+              "base-uri 'self'; object-src 'none'; frame-ancestors 'none'",
+          },
         ],
       },
       {

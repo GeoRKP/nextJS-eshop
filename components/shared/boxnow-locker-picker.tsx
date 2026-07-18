@@ -86,6 +86,7 @@ export default function BoxNowLockerPicker({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("searchLockerPlaceholder")}
+              aria-label={t("searchLockerPlaceholder")}
               className="pl-9"
             />
           </div>

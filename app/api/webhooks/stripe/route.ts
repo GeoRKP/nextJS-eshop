@@ -1,14 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { updateOrderToPaid } from "@/lib/actions/order.actions";
+import { updateOrderToPaid } from "@/lib/order-fulfillment";
 import { prisma } from "@/db/prisma";
 
 export async function POST(req: NextRequest) {
-  const event = await Stripe.webhooks.constructEventAsync(
-    await req.text(),
-    req.headers.get("stripe-signature") as string,
-    process.env.STRIPE_WEBHOOK_SECRET!
-  );
+  // Gate on config + verify the signature explicitly, returning 400 on a bad
+  // signature instead of throwing a 500 (which triggers noisy Stripe retries).
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    return NextResponse.json(
+      { error: "webhook not configured" },
+      { status: 503 }
+    );
+  }
+
+  let event: Stripe.Event;
+  try {
+    event = await Stripe.webhooks.constructEventAsync(
+      await req.text(),
+      req.headers.get("stripe-signature") as string,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch {
+    return NextResponse.json({ error: "invalid signature" }, { status: 400 });
+  }
 
   if (event.type === "charge.succeeded") {
     const { object } = event.data;
@@ -59,7 +73,7 @@ export async function POST(req: NextRequest) {
         id: object.id,
         status: "COMPLETED",
         email_address: object.billing_details.email!,
-        pricePaid: (object.amount / 100).toFixed(),
+        pricePaid: (object.amount / 100).toFixed(2),
       },
     });
 

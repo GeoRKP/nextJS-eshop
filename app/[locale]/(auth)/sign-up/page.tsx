@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import SignUpForm from "./sign-up-form";
 import { getTranslations } from "next-intl/server";
+import { safeCallbackUrl } from "@/lib/safe-redirect";
 
 export async function generateMetadata() {
   const t = await getTranslations("Metadata");
@@ -21,7 +22,7 @@ export default async function SignUpPage(props: {
   const t = await getTranslations("Auth");
 
   if (session) {
-    return redirect(callbackUrl || "/");
+    return redirect(safeCallbackUrl(callbackUrl));
   }
 
   return (

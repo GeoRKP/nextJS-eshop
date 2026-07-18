@@ -14,7 +14,8 @@ export const paypal = {
       },
       body: JSON.stringify({
         intent: "CAPTURE",
-        purchase_units: [{ amount: { currency_code: "USD", value: price } }],
+        // Store is EUR — the amount must be billed in EUR, not USD.
+        purchase_units: [{ amount: { currency_code: "EUR", value: price } }],
       }),
     });
 

@@ -81,6 +81,7 @@ export default function AddToCart({
           type="button"
           variant="ghost"
           size="icon"
+          disabled={isPending}
           className="rounded-none h-13 w-13 hover:bg-accent hover:text-accent-foreground btn-stamp"
           onClick={handleRemoveFromCart}
         >
@@ -97,6 +98,7 @@ export default function AddToCart({
           type="button"
           variant="ghost"
           size="icon"
+          disabled={isPending}
           className="rounded-none h-13 w-13 hover:bg-accent hover:text-accent-foreground btn-stamp"
           onClick={handleAddToCart}
         >
@@ -120,6 +122,7 @@ export default function AddToCart({
     <Button
       className="w-full h-14 rounded-none bg-accent hover:bg-foreground text-accent-foreground hover:text-background font-heading font-extrabold text-base uppercase tracking-[0.16em] btn-stamp transition-colors border-2 border-accent hover:border-foreground"
       type="button"
+      disabled={isPending}
       onClick={handleAddToCart}
     >
       {isPending ? (

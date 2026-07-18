@@ -196,6 +196,9 @@ model Cart {
 
   @@index([sessionCartId])
   @@index([userId])
+  // NOTE: a PARTIAL unique index on (sessionCartId) WHERE "userId" IS NULL is
+  // enforced at the DB level (migration 20260718000000_add_cart_guest_unique).
+  // Prisma can't express partial indexes, so it lives only in SQL.
 }
 
 // ─── Order ─────────────────────────────────────────────────────

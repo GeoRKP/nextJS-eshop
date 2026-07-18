@@ -6,12 +6,18 @@ import MainNav from "./main-nav";
 import AdminSearch from "@/components/admin/admin-search";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
+import { requireAdmin } from "@/lib/auth-guard";
 
 export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Request-layer auth is not enforced in proxy.ts, so gate the whole admin
+  // subtree here — this covers every /admin page (incl. users/[id], products)
+  // in one place, not just the ones with their own requireAdmin() call.
+  await requireAdmin();
+
   const t = await getTranslations("AdminNav");
   // The root layout ships only storefront namespaces to the client — admin
   // routes re-provide the full catalog (admin traffic is tiny, payload is moot).

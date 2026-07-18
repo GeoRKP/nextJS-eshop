@@ -18,6 +18,8 @@ import { z } from "zod/v3";
 import { PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
+import { rateLimit } from "@/lib/rate-limit";
 import { assertAdmin } from "@/lib/auth-guard";
 
 export async function signInWithCredentials(
@@ -31,6 +33,19 @@ export async function signInWithCredentials(
       email: formData.get("email"),
       password: formData.get("password"),
     });
+
+    // Throttle brute-force / password-spraying: cap attempts per IP+email.
+    const ip =
+      (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      "unknown";
+    const rl = rateLimit({
+      key: `login:${ip}:${user.email.toLowerCase()}`,
+      limit: 10,
+      windowMs: 15 * 60_000,
+    });
+    if (!rl.success) {
+      return { success: false, message: t("tooManyLoginAttempts") };
+    }
 
     await signIn("credentials", user);
 
@@ -222,6 +237,7 @@ export async function getAllUsers({
     where: {
       name: {
         contains: query,
+        mode: "insensitive",
       },
     },
   });
@@ -237,6 +253,15 @@ export async function deleteUser(id: string) {
   try {
     await assertAdmin();
     const t = await getTranslations("Actions");
+
+    // Refuse to hard-delete a user who has orders: Order.userId cascades, so a
+    // delete would permanently destroy their orders/invoices — a breach of
+    // Greek tax record-retention. Only accounts with no orders can be removed.
+    const orderCount = await prisma.order.count({ where: { userId: id } });
+    if (orderCount > 0) {
+      return { success: false, message: t("cannotDeleteUserWithOrders") };
+    }
+
     await prisma.user.delete({
       where: { id },
     });
@@ -254,11 +279,14 @@ export async function updateUser(user: z.infer<typeof updateUserSchema>) {
   try {
     await assertAdmin();
     const t = await getTranslations("Actions");
+    // Validate server-side: never trust the typed input verbatim. This also
+    // constrains `role` to the allowed set (see updateUserSchema).
+    const parsed = updateUserSchema.parse(user);
     await prisma.user.update({
-      where: { id: user.id },
+      where: { id: parsed.id },
       data: {
-        name: user.name,
-        role: user.role,
+        name: parsed.name,
+        role: parsed.role,
       },
     });
 

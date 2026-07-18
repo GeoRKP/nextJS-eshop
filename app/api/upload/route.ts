@@ -6,12 +6,13 @@ import crypto from "crypto";
 
 const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 
+// SVG deliberately excluded: it can carry inline <script> and, served
+// same-origin, would run as stored XSS. Only raster formats are accepted.
 const ALLOWED_TYPES = [
   "image/jpeg",
   "image/png",
   "image/gif",
   "image/webp",
-  "image/svg+xml",
 ];
 
 const MAX_SIZE = 4 * 1024 * 1024; // 4MB

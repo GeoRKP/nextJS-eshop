@@ -34,7 +34,7 @@ export function formatError(error: any) {
     const field = error.meta?.target ? error.meta.target[0] : "Field";
     return `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`;
   } else {
-    return error.message === "string"
+    return typeof error.message === "string"
       ? error.message
       : JSON.stringify(error.message);
   }
@@ -57,8 +57,9 @@ const CURRENCY_FORMAT = new Intl.NumberFormat("el-GR", {
 });
 
 export function formatCurrency(amount: number | string | null) {
-  if (amount === null) return "NaN";
+  if (amount === null) return "—";
   if (typeof amount === "string") amount = Number(amount);
+  if (Number.isNaN(amount)) return "—";
   return CURRENCY_FORMAT.format(amount);
 
 }
@@ -69,9 +70,10 @@ export function formatNumber(number: number) {
   return NUMBER_FORMATTER.format(number);
 }
 
-// Shorten UUID
+// Shorten UUID. Uses the first 8 chars uppercased so the on-site order number
+// matches the reference shown in confirmation emails and the Viva descriptor.
 export function formatId(id: string) {
-  return `..${id.substring(id.length - 6)}`
+  return id.slice(0, 8).toUpperCase();
 }
 
 // Format date and time

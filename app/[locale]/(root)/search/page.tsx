@@ -97,19 +97,28 @@ export default async function SearchPage(props: {
     p,
     r,
     pg,
+    qv,
   }: {
     c?: string;
     s?: string;
     p?: string;
     r?: string;
     pg?: string;
+    qv?: string;
   }) => {
     const params = { q, category, price, rating, sort, page };
+    if (qv !== undefined) params.q = qv;
     if (c) params.category = c;
     if (s) params.sort = s;
     if (p) params.price = p;
     if (r) params.rating = r;
-    if (pg) params.page = pg;
+    if (pg) {
+      params.page = pg;
+    } else if (c || s || p || r || qv !== undefined) {
+      // Any filter/sort/query change resets to page 1 — the current page may
+      // not exist in the narrowed result set (otherwise: empty grid).
+      params.page = "1";
+    }
 
     return `/search?${new URLSearchParams(params).toString()}`;
   };
@@ -154,12 +163,9 @@ export default async function SearchPage(props: {
   if (q !== "all" && q !== "") {
     activeFilters.push({
       label: `${t("query")} ${q}`,
-      clearUrl: getFilterUrl({
-        c: category,
-        p: price,
-        r: rating,
-        s: sort,
-      }).replace(`q=${encodeURIComponent(q)}`, "q=all"),
+      // Reset the query directly — string-replacing the encoded value broke for
+      // multi-word/special-char queries (URLSearchParams "+" vs "%20" mismatch).
+      clearUrl: getFilterUrl({ qv: "all" }),
     });
   }
   if (category !== "all" && category !== "") {

@@ -22,8 +22,9 @@ export async function GET(
   const { path: segments } = await params;
   const filePath = path.join(UPLOAD_DIR, ...segments);
 
-  // Prevent path traversal
-  if (!filePath.startsWith(UPLOAD_DIR)) {
+  // Prevent path traversal — require the separator so a sibling dir like
+  // "<cwd>/uploads-x" can't satisfy a bare startsWith(UPLOAD_DIR) prefix check.
+  if (filePath !== UPLOAD_DIR && !filePath.startsWith(UPLOAD_DIR + path.sep)) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
@@ -31,11 +32,20 @@ export async function GET(
     const file = await readFile(filePath);
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || "application/octet-stream";
+    const isSvg = ext === ".svg";
 
     return new NextResponse(file, {
       headers: {
         "Content-Type": contentType,
         "Cache-Control": "public, max-age=31536000, immutable",
+        // Neutralise any legacy SVG uploaded before svg was disallowed:
+        // force download + a locked-down CSP so it can never execute inline JS.
+        ...(isSvg
+          ? {
+              "Content-Disposition": "attachment",
+              "Content-Security-Policy": "default-src 'none'; sandbox",
+            }
+          : {}),
       },
     });
   } catch {

@@ -27,10 +27,17 @@ export default async function proxy(req: NextRequest) {
   // Run intl middleware (auth is handled by NextAuth's authorized callback in auth.config.ts)
   const response = intlMiddleware(req);
 
-  // Set sessionCartId cookie if not present
+  // Set sessionCartId cookie if not present. Only read server-side (never by
+  // client JS), so lock it down: httpOnly + sameSite + secure in production.
   if (!req.cookies.get("sessionCartId")) {
     const sessionCartId = crypto.randomUUID();
-    response.cookies.set("sessionCartId", sessionCartId);
+    response.cookies.set("sessionCartId", sessionCartId, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    });
   }
 
   // Expose pathname to layouts/server components via header so they can

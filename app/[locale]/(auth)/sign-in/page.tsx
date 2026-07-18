@@ -5,6 +5,7 @@ import CredentialsSignInForm from "./credentials-signin-form";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getTranslations } from "next-intl/server";
+import { safeCallbackUrl } from "@/lib/safe-redirect";
 
 export async function generateMetadata() {
   const t = await getTranslations("Metadata");
@@ -21,7 +22,7 @@ export default async function SignInPage(props: {
   const t = await getTranslations("Auth");
 
   if (session) {
-    return redirect(callbackUrl || "/");
+    return redirect(safeCallbackUrl(callbackUrl));
   }
 
   return (

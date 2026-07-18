@@ -50,6 +50,7 @@ export async function getProductById(productId: string) {
   const data = await prisma.product.findFirst({
     where: {
       id: productId,
+      deletedAt: null,
     },
   });
 

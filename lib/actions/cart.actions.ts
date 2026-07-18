@@ -127,6 +127,11 @@ export async function addItemToCart(data: CartItem) {
     };
 
     if (!cart) {
+      // Never let the first add exceed available stock (client qty is untrusted).
+      if (product.stock < clientItem.qty) {
+        throw new Error(t("notEnoughStock"));
+      }
+
       const newCart = insertCartSchema.parse({
         userId: userId,
         items: [item],
@@ -166,7 +171,7 @@ export async function addItemToCart(data: CartItem) {
           (x) => x.productId === item.productId
         )!.qty = existItem.qty + 1;
       } else {
-        if (product.stock < 1) {
+        if (product.stock < clientItem.qty) {
           throw new Error(t("notEnoughStock"));
         }
 

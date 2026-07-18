@@ -1,6 +1,6 @@
 import { z } from "zod/v3";
 import { formatNumberWithDecimal } from "./utils";
-import { PAYMENT_METHODS } from "./constants";
+import { PAYMENT_METHODS, USER_ROLES } from "./constants";
 
 // Translation function type — compatible with both useTranslations and getTranslations
  
@@ -120,7 +120,7 @@ export const cartItemSchema = z.object({
   qty: z
     .number()
     .int()
-    .nonnegative({ message: "Quantity must be a positive number" }),
+    .positive({ message: "Quantity must be a positive number" }),
   image: z.string().min(1, { message: "Image is required" }),
   price: currency,
 });
@@ -230,7 +230,13 @@ export const updateUserProfileSchema = z.object({
 
 export const updateUserSchema = updateUserProfileSchema.extend({
   id: z.string().min(1, { message: "Id is required" }),
-  role: z.string().min(1, { message: "Role is required" }),
+  // Constrain to known roles so an arbitrary role value can't be written.
+  // Kept as `string` (not z.enum) so the inferred form type stays compatible
+  // with the DB user; the refine still rejects out-of-set values at parse time.
+  role: z
+    .string()
+    .min(1, { message: "Role is required" })
+    .refine((v) => USER_ROLES.includes(v), { message: "Invalid role" }),
 });
 
 // Schema for inserting a review

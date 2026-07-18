@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/db/prisma";
+import crypto from "crypto";
+
+// Constant-time secret comparison to avoid leaking the secret via timing.
+function secretsMatch(a: string, b: string): boolean {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return crypto.timingSafeEqual(ab, bb);
+}
 
 /**
  * Box Now parcel status webhook.
@@ -54,7 +63,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "webhook not configured" }, { status: 503 });
   }
   const provided = req.headers.get("x-boxnow-secret") || payload.secret || "";
-  if (provided !== secret) {
+  if (!secretsMatch(provided, secret)) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
