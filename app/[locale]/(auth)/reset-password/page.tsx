@@ -1,7 +1,6 @@
 import { Link } from "@/i18n/navigation";
-import Image from "next/image";
-import { APP_NAME } from "@/lib/constants";
 import ResetPasswordForm from "./reset-password-form";
+import AuthCard from "../auth-card";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getTranslations } from "next-intl/server";
@@ -23,36 +22,27 @@ export default async function ResetPasswordPage(props: {
   if (!token) {
     return (
       <div className="w-full">
-        <h1 className="h2-bold">{t("resetPassword")}</h1>
-        <p className="text-destructive mt-4">{t("invalidResetLink")}</p>
-        <Link
-          href="/forgot-password"
-          className="text-accent hover:underline mt-4 inline-block"
-        >
-          {t("requestNewResetLink")}
-        </Link>
+        <AuthCard title={t("resetPassword")}>
+          <p className="text-destructive text-sm">{t("invalidResetLink")}</p>
+          <Link
+            href="/forgot-password"
+            className="text-accent font-semibold hover:underline mt-4 inline-block text-sm"
+          >
+            {t("requestNewResetLink")}
+          </Link>
+        </AuthCard>
       </div>
     );
   }
 
   return (
     <div className="w-full">
-      <div className="mb-8">
-        <Link href="/" className="inline-block lg:hidden mb-6">
-          <Image
-            src="/images/logo.png"
-            width={64}
-            height={64}
-            alt={`${APP_NAME} logo`}
-            priority
-          />
-        </Link>
-        <h1 className="h2-bold">{t("resetPasswordTitle")}</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {t("resetPasswordDescription")}
-        </p>
-      </div>
-      <ResetPasswordForm token={token} />
+      <AuthCard
+        title={t("resetPasswordTitle")}
+        description={t("resetPasswordDescription")}
+      >
+        <ResetPasswordForm token={token} />
+      </AuthCard>
     </div>
   );
 }

@@ -158,7 +158,14 @@ export default function SignUpForm() {
           )}
           <div className="text-sm text-center text-muted-foreground mt-2">
             {t("hasAccount")}{" "}
-            <Link href="/sign-in" className="text-accent font-semibold hover:underline inline-block px-1 py-1">
+            <Link
+              href={
+                callbackUrl !== "/"
+                  ? `/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  : "/sign-in"
+              }
+              className="text-accent font-semibold hover:underline inline-block px-1 py-1"
+            >
               {t("signIn")}
             </Link>
           </div>

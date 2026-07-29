@@ -117,7 +117,10 @@
     "passwordMinHint": "Τουλάχιστον 8 χαρακτήρες",
     "redirectingToSignIn": "Ανακατεύθυνση στη σύνδεση...",
     "requestNewResetLink": "Ζητήστε νέο σύνδεσμο επαναφοράς",
-    "invalidResetLink": "Ο σύνδεσμος είναι άκυρος ή έχει λήξει."
+    "invalidResetLink": "Ο σύνδεσμος είναι άκυρος ή έχει λήξει.",
+    "brandEyebrow": "Ανταλλακτικά φορτηγών",
+    "brandHeadline": "Το σωστό ανταλλακτικό, στην ώρα του.",
+    "continueCheckoutNotice": "Συνδεθείτε για να συνεχίσετε την ολοκλήρωση της παραγγελίας σας."
   },
   "Product": {
     "featuredProducts": "Προτεινόμενα Προϊόντα",
@@ -555,7 +558,6 @@
     "couponUpdatedSuccessfully": "Το κουπόνι ενημερώθηκε επιτυχώς",
     "couponDeletedSuccessfully": "Το κουπόνι διαγράφηκε επιτυχώς",
     "addressCreatedSuccessfully": "Η διεύθυνση δημιουργήθηκε επιτυχώς",
-    "addressUpdatedSuccessfully": "Η διεύθυνση ενημερώθηκε επιτυχώς",
     "addressDeletedSuccessfully": "Η διεύθυνση διαγράφηκε επιτυχώς",
     "addressNotFound": "Η διεύθυνση δεν βρέθηκε",
     "defaultAddressUpdatedSuccessfully": "Η προεπιλεγμένη διεύθυνση ενημερώθηκε επιτυχώς",

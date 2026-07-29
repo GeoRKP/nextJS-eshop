@@ -117,7 +117,10 @@
     "passwordMinHint": "At least 8 characters",
     "redirectingToSignIn": "Redirecting to sign in...",
     "requestNewResetLink": "Request a new reset link",
-    "invalidResetLink": "This link is invalid or has expired."
+    "invalidResetLink": "This link is invalid or has expired.",
+    "brandEyebrow": "Truck parts",
+    "brandHeadline": "The right part, right on time.",
+    "continueCheckoutNotice": "Sign in to continue checking out."
   },
   "Product": {
     "featuredProducts": "Featured Products",
@@ -555,7 +558,6 @@
     "couponUpdatedSuccessfully": "Coupon updated successfully",
     "couponDeletedSuccessfully": "Coupon deleted successfully",
     "addressCreatedSuccessfully": "Address created successfully",
-    "addressUpdatedSuccessfully": "Address updated successfully",
     "addressDeletedSuccessfully": "Address deleted successfully",
     "addressNotFound": "Address not found",
     "defaultAddressUpdatedSuccessfully": "Default address updated successfully",

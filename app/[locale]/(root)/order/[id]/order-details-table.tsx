@@ -356,8 +356,8 @@ export default function OrderDetailsTable({
             {!isPaid && paymentMethod === "Viva" && (
               <VivaPayment orderId={id} totalPrice={Number(order.totalPrice)} />
             )}
-            {/* COD */}
-            {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
+            {/* Manual payment reconciliation (COD, bank transfer, offline card) */}
+            {isAdmin && !isPaid && (
               <MarkAsPaidButton orderId={order.id} />
             )}
             {isAdmin && isPaid && !isDelivered && (

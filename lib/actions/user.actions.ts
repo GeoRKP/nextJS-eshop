@@ -21,6 +21,7 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { rateLimit } from "@/lib/rate-limit";
 import { assertAdmin } from "@/lib/auth-guard";
+import { safeCallbackUrl } from "@/lib/safe-redirect";
 
 export async function signInWithCredentials(
   prevState: unknown,
@@ -47,7 +48,12 @@ export async function signInWithCredentials(
       return { success: false, message: t("tooManyLoginAttempts") };
     }
 
-    await signIn("credentials", user);
+    // Send the user back to where they came from (e.g. a checkout step) —
+    // without redirectTo, NextAuth falls back to the home page.
+    await signIn("credentials", {
+      ...user,
+      redirectTo: safeCallbackUrl(formData.get("callbackUrl") as string | null),
+    });
 
     return { success: true, message: t("signedInSuccessfully") };
   } catch (error) {
@@ -90,6 +96,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
     await signIn("credentials", {
       email: user.email,
       password: plainPassword,
+      redirectTo: safeCallbackUrl(formData.get("callbackUrl") as string | null),
     });
 
     return { success: true, message: t("userRegisteredSuccessfully") };

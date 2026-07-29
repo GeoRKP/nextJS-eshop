@@ -124,7 +124,14 @@ export default function CredentialsSignInForm() {
           )}
           <div className="text-sm text-center text-muted-foreground mt-2">
             {t("noAccount")}{" "}
-            <Link href="/sign-up" className="text-accent font-semibold hover:underline inline-block px-1 py-1">
+            <Link
+              href={
+                callbackUrl !== "/"
+                  ? `/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  : "/sign-up"
+              }
+              className="text-accent font-semibold hover:underline inline-block px-1 py-1"
+            >
               {t("signUp")}
             </Link>
           </div>
