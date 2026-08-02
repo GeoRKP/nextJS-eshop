@@ -3,6 +3,7 @@ import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compareSync } from "bcrypt-ts";
 import { authConfig } from "./auth.config";
+import { verifyGuestToken } from "./lib/guest-token";
 
 // Refresh ban/suspension status from DB at most once per this interval
 const BAN_SYNC_INTERVAL_MS = 60 * 1000; // 60 seconds
@@ -54,10 +55,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               email: user.email,
               name,
               role: user.role,
+              isGuest: user.isGuest,
             };
           }
         }
         return null;
+      },
+    }),
+    // Guest checkout: sessions for shadow accounts are minted exclusively via a
+    // short-lived HMAC token issued server-side by `continueAsGuest` — guests
+    // have no password, so the normal credentials flow can never sign them in.
+    CredentialsProvider({
+      id: "guest",
+      name: "Guest",
+      credentials: {
+        token: { type: "text" },
+      },
+      async authorize(credentials) {
+        const userId = verifyGuestToken(credentials?.token as string | undefined);
+        if (!userId) return null;
+
+        const user = await prisma.user.findFirst({
+          where: { id: userId, isGuest: true, deletedAt: null },
+        });
+        if (!user) return null;
+        if (user.isBanned) return null;
+        if (user.suspendedUntil && user.suspendedUntil > new Date()) return null;
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          isGuest: true,
+        };
       },
     }),
   ],
@@ -79,6 +110,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.id = token.sub as string;
       session.user.role = token.role as string;
       session.user.name = token.name as string;
+      session.user.isGuest = Boolean(token.isGuest);
       session.user.isBanned = Boolean(token.isBanned);
       session.user.suspendedUntil = (token.suspendedUntil as string | null) ?? null;
       if (trigger === "update") {
@@ -89,6 +121,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user, session, trigger }: any) {
       if (user) {
         token.role = user.role;
+        token.isGuest = Boolean((user as { isGuest?: boolean }).isGuest);
         token.isBanned = false;
         token.suspendedUntil = null;
         token.banSyncedAt = Date.now();
@@ -102,7 +135,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.sub as string },
-            select: { isBanned: true, suspendedUntil: true, role: true },
+            select: { isBanned: true, suspendedUntil: true, role: true, isGuest: true },
           });
           if (dbUser) {
             token.isBanned = dbUser.isBanned;
@@ -110,6 +143,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               ? dbUser.suspendedUntil.toISOString()
               : null;
             token.role = dbUser.role;
+            token.isGuest = dbUser.isGuest;
             token.banSyncedAt = Date.now();
           }
         } catch {

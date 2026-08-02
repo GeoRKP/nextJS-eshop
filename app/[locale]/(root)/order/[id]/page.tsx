@@ -8,6 +8,9 @@ import { prisma } from "@/db/prisma";
 import { getTranslations } from "next-intl/server";
 import OrderStatusTimeline from "@/components/shared/order-status-timeline";
 import OrderStatusUpdate from "@/components/shared/order-status-update";
+import { Link } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { UserPlus } from "lucide-react";
 
 export async function generateMetadata() {
   const t = await getTranslations("Metadata");
@@ -78,6 +81,9 @@ export default async function OrderDetailPage(props: {
   }
 
   const isAdmin = session?.user?.role === "admin" || false;
+  const isGuestOwner =
+    Boolean(session?.user?.isGuest) && session?.user?.id === order.userId;
+  const tAuth = isGuestOwner ? await getTranslations("Auth") : null;
 
   return (
     <div className="wrapper">
@@ -90,6 +96,22 @@ export default async function OrderDetailPage(props: {
         paypalClientId={process.env.PAYPAL_CLIENT_ID ?? ""}
         isAdmin={isAdmin}
       />
+      {isGuestOwner && tAuth && (
+        <div className="mt-6 card-premium p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex-1">
+            <p className="font-semibold">{tAuth("claimAccountTitle")}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {tAuth("claimAccountText")}
+            </p>
+          </div>
+          <Button asChild variant="accent" className="shrink-0">
+            <Link href="/forgot-password">
+              <UserPlus className="w-4 h-4 mr-2" aria-hidden="true" />
+              {tAuth("claimAccountCta")}
+            </Link>
+          </Button>
+        </div>
+      )}
       <div className="mt-6 grid md:grid-cols-3 md:gap-5">
         <div className="col-span-2">
           {order.statusHistory && order.statusHistory.length > 0 && (

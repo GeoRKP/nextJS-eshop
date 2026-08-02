@@ -4,6 +4,7 @@ declare module "next-auth" {
   export interface Session extends DefaultSession {
     user: {
       role: string;
+      isGuest?: boolean;
       isBanned?: boolean;
       suspendedUntil?: string | null;
     } & DefaultSession["user"];
@@ -13,6 +14,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     role?: string;
+    isGuest?: boolean;
     isBanned?: boolean;
     suspendedUntil?: string | null;
     banSyncedAt?: number;

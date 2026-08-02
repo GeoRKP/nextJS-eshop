@@ -22,6 +22,8 @@ import { headers } from "next/headers";
 import { rateLimit } from "@/lib/rate-limit";
 import { assertAdmin } from "@/lib/auth-guard";
 import { safeCallbackUrl } from "@/lib/safe-redirect";
+import { createGuestToken } from "@/lib/guest-token";
+import { Prisma } from "@prisma/client";
 
 export async function signInWithCredentials(
   prevState: unknown,
@@ -68,6 +70,84 @@ export async function signInWithCredentials(
 
 export async function signOutUser() {
   await signOut();
+}
+
+/**
+ * Guest checkout: create (or reuse) a passwordless shadow account for the given
+ * email and mint a session for it via the "guest" provider, then continue to
+ * the checkout step in callbackUrl.
+ */
+export async function continueAsGuest(prevState: unknown, formData: FormData) {
+  try {
+    const t = await getTranslations("Actions");
+    const tV = await getTranslations("Validation");
+
+    const email = z
+      .string()
+      .email({ message: tV("invalidEmail") })
+      .parse(
+        String(formData.get("email") ?? "")
+          .trim()
+          .toLowerCase()
+      );
+
+    // Same throttle profile as login: guests can enumerate emails otherwise.
+    const ip =
+      (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      "unknown";
+    const rl = rateLimit({
+      key: `guest:${ip}`,
+      limit: 10,
+      windowMs: 15 * 60_000,
+    });
+    if (!rl.success) {
+      return { success: false, message: t("tooManyLoginAttempts") };
+    }
+
+    const existing = await prisma.user.findFirst({
+      where: { email, deletedAt: null },
+    });
+
+    if (existing && !existing.isGuest) {
+      return { success: false, message: t("guestEmailHasAccount") };
+    }
+
+    let user;
+    if (existing) {
+      // Returning guest email: wipe the previously stored personal data so
+      // whoever types this email cannot see the earlier session's address.
+      user = await prisma.user.update({
+        where: { id: existing.id },
+        data: { address: Prisma.DbNull, paymentMethod: null },
+      });
+    } else {
+      user = await prisma.user.create({
+        data: {
+          email,
+          name: email.split("@")[0],
+          isGuest: true,
+          // No password on purpose: guests can never sign in via the normal
+          // form; they can claim the account later through password reset.
+          password: null,
+        },
+      });
+    }
+
+    await signIn("guest", {
+      token: createGuestToken(user.id),
+      redirectTo: safeCallbackUrl(
+        formData.get("callbackUrl") as string | null,
+        "/shipping-address"
+      ),
+    });
+
+    return { success: true, message: t("signedInSuccessfully") };
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+    return { success: false, message: formatError(error) };
+  }
 }
 
 export async function signUpUser(prevState: unknown, formData: FormData) {

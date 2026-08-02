@@ -1,11 +1,18 @@
 import MainNav from "./main-nav";
 import { getTranslations } from "next-intl/server";
+import { getAuthSession } from "@/lib/auth-session";
+import { redirect } from "next/navigation";
 
 export default async function UserLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Guest-checkout sessions are checkout-only: the account area would expose
+  // whatever a previous visitor with the same email left behind.
+  const session = await getAuthSession();
+  if (session?.user?.isGuest) redirect("/");
+
   const t = await getTranslations("UserNav");
 
   return (

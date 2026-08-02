@@ -120,7 +120,15 @@
     "invalidResetLink": "This link is invalid or has expired.",
     "brandEyebrow": "Truck parts",
     "brandHeadline": "The right part, right on time.",
-    "continueCheckoutNotice": "Sign in to continue checking out."
+    "continueCheckoutNotice": "Sign in to continue checking out.",
+    "checkoutOptionsTitle": "How would you like to continue?",
+    "checkoutOptionsDescription": "Sign in, create an account, or continue as a guest.",
+    "orGuest": "or without an account",
+    "guestDescription": "We only need your email for the order confirmation.",
+    "guestContinue": "Continue as guest",
+    "claimAccountTitle": "Keep your order in an account",
+    "claimAccountText": "Set a password to track your orders — your email is already on file.",
+    "claimAccountCta": "Set password"
   },
   "Product": {
     "featuredProducts": "Featured Products",
@@ -561,7 +569,8 @@
     "addressDeletedSuccessfully": "Address deleted successfully",
     "addressNotFound": "Address not found",
     "defaultAddressUpdatedSuccessfully": "Default address updated successfully",
-    "orderStatusUpdatedSuccessfully": "Order status updated successfully"
+    "orderStatusUpdatedSuccessfully": "Order status updated successfully",
+    "guestEmailHasAccount": "An account with this email already exists. Please sign in to continue."
   },
   "Validation": {
     "nameMin": "Name must be at least 3 characters long",
@@ -616,7 +625,8 @@
     "unauthorizedAccess": "Unauthorized Access",
     "unauthorizedDescription": "You are not authorized to access this page",
     "searchProducts": "Search products",
-    "seoKeywords": "e-commerce,truck parts,shop,products"
+    "seoKeywords": "e-commerce,truck parts,shop,products",
+    "checkoutOptions": "Checkout"
   },
   "LanguageSwitcher": {
     "label": "Language",

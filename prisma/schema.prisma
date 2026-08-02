@@ -107,6 +107,8 @@ model User {
   suspendedReason String?
   // GDPR consent tracking
   marketingConsent Boolean  @default(false)
+  // Guest checkout: shadow account created via "continue as guest" (no password)
+  isGuest          Boolean  @default(false)
 
   Account       Account[]
   Session       Session[]

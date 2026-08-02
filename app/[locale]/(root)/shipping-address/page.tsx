@@ -25,7 +25,9 @@ export default async function ShippingAddressPage() {
 
   const userId = session?.user?.id;
 
-  if (!userId) redirect("/sign-in?callbackUrl=/shipping-address");
+  // First checkout step: unauthenticated users choose sign-in / sign-up /
+  // guest checkout instead of being dropped straight on the login form.
+  if (!userId) redirect("/checkout-options?callbackUrl=/shipping-address");
 
   const user = await getUserById(userId);
 
