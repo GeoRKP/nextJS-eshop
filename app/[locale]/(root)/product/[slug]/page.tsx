@@ -32,9 +32,11 @@ export async function generateMetadata(props: {
   const { slug } = await props.params;
   const product = await getProductBySlug(slug);
   if (!product) {
-    // Real 404 status: notFound() here runs before streaming starts, so the
-    // response is a proper 404 instead of a soft-404 (200 + not-found body).
-    notFound();
+    // Just the title — the page component calls notFound() for the real thing.
+    // Throwing notFound() from generateMetadata bypasses the segment's
+    // not-found boundary and renders Next's unstyled default page instead of
+    // app/[locale]/not-found.tsx.
+    return {};
   }
 
   const locale = await getLocale();
