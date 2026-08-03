@@ -6,7 +6,13 @@ import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-function ProductImages({ images }: { images: string[] }) {
+function ProductImages({
+  images,
+  productName,
+}: {
+  images: string[];
+  productName: string;
+}) {
   const t = useTranslations("Common");
   const [current, setCurrent] = useState(0);
 
@@ -22,7 +28,7 @@ function ProductImages({ images }: { images: string[] }) {
       <div className="group/image relative overflow-hidden bg-card cursor-zoom-in aspect-square">
         <Image
           src={images[current]}
-          alt={t("productImage")}
+          alt={productName}
           fill
           className="object-contain p-4 transition-transform duration-700 ease-out group-hover/image:scale-125"
           sizes="(max-width: 768px) 100vw, 50vw"
@@ -73,7 +79,7 @@ function ProductImages({ images }: { images: string[] }) {
             >
               <Image
                 src={image}
-                alt={t("thumbnailAlt", { index: index + 1 })}
+                alt={`${productName} (${index + 1})`}
                 width={72}
                 height={72}
                 className="object-cover w-full h-full"

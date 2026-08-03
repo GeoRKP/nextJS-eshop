@@ -33,6 +33,33 @@ export function vivaCheckoutBase(): string {
 }
 
 /**
+ * Normalize a free-text country (from the shipping-address form) to the ISO
+ * 3166-1 alpha-2 code Viva expects in `customer.countryCode`. Anything we can't
+ * confidently map returns undefined — sending an invalid value makes Viva's
+ * create-order call fail with a 500 "Update order ... failed".
+ */
+const COUNTRY_NAME_TO_ISO: Record<string, string> = {
+  "ελλαδα": "GR",
+  "ελλασ": "GR",
+  greece: "GR",
+  "κυπροσ": "CY",
+  cyprus: "CY",
+};
+
+export function toVivaCountryCode(country?: string): string | undefined {
+  const raw = country?.trim();
+  if (!raw) return undefined;
+  if (/^[A-Za-z]{2}$/.test(raw)) return raw.toUpperCase();
+  // Fold Greek accents/final-sigma so "Ελλάδα"/"ελλάς" etc. match.
+  const folded = raw
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/ς/g, "σ");
+  return COUNTRY_NAME_TO_ISO[folded];
+}
+
+/**
  * Build the Smart Checkout redirect URL for a given orderCode.
  * orderCode is treated as a string to preserve precision (it can exceed JS MAX_SAFE_INTEGER).
  */

@@ -58,24 +58,13 @@ export const productDefaultValues = {
   descriptionEn: "",
   price: '0',
   stock: 0,
-  rating: '0',
-  numReviews: '0',
+  lowStockThreshold: 20,
+  allowBackorder: false,
   isFeatured: false,
   banner: null,
 }
 
 export const USER_ROLES = process.env.USER_ROLES ? process.env.USER_ROLES.split(", ") : ["user", "admin"];
-
-// Protected route patterns (shared between middleware.ts and auth.config.ts)
-export const PROTECTED_PATHS = [
-  /^(?:\/en)?\/shipping-address/,
-  /^(?:\/en)?\/payment-method/,
-  /^(?:\/en)?\/place-order/,
-  /^(?:\/en)?\/profile/,
-  /^(?:\/en)?\/user\/(.*)/,
-  /^(?:\/en)?\/order\/(.*)/,
-  /^(?:\/en)?\/admin/,
-];
 
 export const reviewFormDefaultValues = {
   title: "",

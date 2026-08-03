@@ -24,7 +24,6 @@ async function main() {
   await prisma.order.deleteMany()
 
   await prisma.cart.deleteMany()
-  await prisma.review.deleteMany()
   await prisma.address.deleteMany()
 
   await prisma.product.deleteMany()
@@ -121,8 +120,6 @@ async function main() {
         images: product.images,
         price: product.price,
         brand: product.brand,
-        rating: product.rating,
-        numReviews: product.numReviews,
         stock: product.stock,
         isFeatured: product.isFeatured,
         banner: product.banner,
@@ -189,41 +186,7 @@ async function main() {
 
   console.log(`  ${sampleData.coupons.length} coupons created.`)
 
-  // ── 6. Seed reviews ───────────────────────────────────────────
-  console.log('Seeding reviews...')
-
-  let reviewCount = 0
-
-  for (const review of sampleData.reviews) {
-    const userId = userMap.get(review.userEmail)
-    const product = productMap.get(review.productSlug)
-
-    if (!userId) {
-      console.warn(`  Warning: User "${review.userEmail}" not found, skipping review.`)
-      continue
-    }
-    if (!product) {
-      console.warn(`  Warning: Product "${review.productSlug}" not found, skipping review.`)
-      continue
-    }
-
-    await prisma.review.create({
-      data: {
-        userId,
-        productId: product.id,
-        rating: review.rating,
-        title: review.title,
-        description: review.description,
-        isVerifiedPurchase: review.isVerifiedPurchase,
-      },
-    })
-
-    reviewCount++
-  }
-
-  console.log(`  ${reviewCount} reviews created.`)
-
-  // ── 7. Seed orders with order items ───────────────────────────
+  // ── 6. Seed orders with order items ───────────────────────────
   console.log('Seeding orders...')
 
   let orderCount = 0
@@ -301,7 +264,6 @@ async function main() {
   console.log(`  Products:   ${productCount}`)
   console.log(`  Users:      ${sampleData.users.length}`)
   console.log(`  Coupons:    ${sampleData.coupons.length}`)
-  console.log(`  Reviews:    ${reviewCount}`)
   console.log(`  Orders:     ${orderCount} (${orderItemCount} items)`)
 }
 

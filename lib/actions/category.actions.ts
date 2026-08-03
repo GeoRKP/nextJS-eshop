@@ -8,6 +8,8 @@ import { createInsertCategorySchema, createUpdateCategorySchema } from "../valid
 import { z } from "zod/v3";
 import { insertCategorySchema, updateCategorySchema } from "../validators";
 import { getTranslations } from "next-intl/server";
+import { assertAdmin } from "@/lib/auth-guard";
+import { logAuditEvent } from "@/lib/audit-log";
 
 // Get all categories as a flat list
 export async function getAllCategoriesFlat() {
@@ -112,11 +114,12 @@ export async function getAdminCategories({
 // Create category
 export async function createCategory(data: z.infer<typeof insertCategorySchema>) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     const tV = await getTranslations("Validation");
     const category = createInsertCategorySchema(tV).parse(data);
 
-    await prisma.category.create({
+    const created = await prisma.category.create({
       data: {
         name: category.name,
         nameEn: category.nameEn ?? null,
@@ -135,6 +138,13 @@ export async function createCategory(data: z.infer<typeof insertCategorySchema>)
     revalidatePath("/en");
     revalidateTag("categories", "max");
 
+    await logAuditEvent({
+      action: "category.create",
+      entity: "Category",
+      entityId: created.id,
+      details: { name: created.name, slug: created.slug },
+    });
+
     return { success: true, message: t("categoryCreatedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
@@ -144,6 +154,7 @@ export async function createCategory(data: z.infer<typeof insertCategorySchema>)
 // Update category
 export async function updateCategory(data: z.infer<typeof updateCategorySchema>) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
     const tV = await getTranslations("Validation");
     const category = createUpdateCategorySchema(tV).parse(data);
@@ -174,6 +185,13 @@ export async function updateCategory(data: z.infer<typeof updateCategorySchema>)
     revalidatePath("/en");
     revalidateTag("categories", "max");
 
+    await logAuditEvent({
+      action: "category.update",
+      entity: "Category",
+      entityId: category.id,
+      details: { name: category.name, slug: category.slug },
+    });
+
     return { success: true, message: t("categoryUpdatedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
@@ -183,6 +201,7 @@ export async function updateCategory(data: z.infer<typeof updateCategorySchema>)
 // Delete category
 export async function deleteCategory(id: string) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
 
     // Check if category has children
@@ -194,12 +213,19 @@ export async function deleteCategory(id: string) {
       throw new Error(t("categoryHasChildren"));
     }
 
-    await prisma.category.delete({ where: { id } });
+    const deleted = await prisma.category.delete({ where: { id } });
 
     revalidatePath("/admin/categories");
     revalidatePath("/");
     revalidatePath("/en");
     revalidateTag("categories", "max");
+
+    await logAuditEvent({
+      action: "category.delete",
+      entity: "Category",
+      entityId: id,
+      details: { name: deleted.name, slug: deleted.slug },
+    });
 
     return { success: true, message: t("categoryDeletedSuccessfully") };
   } catch (error) {
@@ -212,6 +238,7 @@ export async function updateCategorySortOrder(
   items: { id: string; sortOrder: number }[]
 ) {
   try {
+    await assertAdmin();
     const t = await getTranslations("Actions");
 
     await prisma.$transaction(

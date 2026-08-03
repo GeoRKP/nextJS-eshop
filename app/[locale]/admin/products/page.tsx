@@ -14,6 +14,7 @@ import Pagination from "@/components/shared/pagination";
 import DeleteDialog from "@/components/shared/delete-dialog";
 import { getTranslations } from "next-intl/server";
 import { Package } from "lucide-react";
+import { requireAdmin } from "@/lib/auth-guard";
 
 export default async function AdminProductsPage(props: {
   searchParams: Promise<{
@@ -22,6 +23,11 @@ export default async function AdminProductsPage(props: {
     category: string;
   }>;
 }) {
+  // The layout guard alone is not enough: layout and page render in parallel,
+  // so this page's data can reach the RSC stream before the layout redirect
+  // lands. Every admin page has to gate itself before it queries anything.
+  await requireAdmin();
+
   const searchParams = await props.searchParams;
 
   const page = Number(searchParams.page) || 1;
@@ -74,7 +80,6 @@ export default async function AdminProductsPage(props: {
                   <TableHead className="text-right">{t("price")}</TableHead>
                   <TableHead>{t("category")}</TableHead>
                   <TableHead>{t("stock")}</TableHead>
-                  <TableHead>{t("rating")}</TableHead>
                   <TableHead className="w-[100px]">{t("actions")}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -88,7 +93,6 @@ export default async function AdminProductsPage(props: {
                     </TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell>{product.stock}</TableCell>
-                    <TableCell>{product.rating}</TableCell>
                     <TableCell className="flex gap-1">
                       <Button variant="outline" size="sm" asChild>
                         <Link href={`/admin/products/${product.id}`}>

@@ -100,7 +100,11 @@ export interface OrderEmailData {
   shippingPrice: string;
   taxPrice: string;
   totalPrice: string;
+  /** Formatted for display, e.g. "5,00 €". */
   discountAmount?: string;
+  /** Raw numeric value. Kept separate because Number("5,00 €") is NaN, which
+   *  is what silently hid the discount row from every order email. */
+  discountValue?: number;
   couponCode?: string | null;
   shippingAddress: {
     fullName: string;
@@ -131,9 +135,9 @@ export function orderConfirmationEmail(data: OrderEmailData): string {
     .join("");
 
   const discountRow =
-    data.discountAmount && Number(data.discountAmount) > 0
+    (data.discountValue ?? 0) > 0 && data.discountAmount
       ? `<tr>
-          <td style="padding:6px 0;font-size:13px;color:${COLORS.success};">Discount${data.couponCode ? ` (${data.couponCode})` : ""}</td>
+          <td style="padding:6px 0;font-size:13px;color:${COLORS.success};">Έκπτωση${data.couponCode ? ` (${data.couponCode})` : ""}</td>
           <td style="padding:6px 0;font-size:13px;color:${COLORS.success};text-align:right;font-weight:600;">-${data.discountAmount}</td>
         </tr>`
       : "";
@@ -293,6 +297,41 @@ export function orderStatusEmail(data: {
     ${data.note ? `<p style="margin:0 0 24px;font-size:13px;color:${COLORS.muted};line-height:1.6;font-style:italic;">"${data.note}"</p>` : ""}
 
     ${primaryButton("Προβολή Παραγγελίας", `${SERVER_URL}/order/${data.orderId}`)}
+  `;
+
+  return baseLayout(content);
+}
+
+// ─── Low-stock alert (admin notification) ───────────────────────
+
+export function lowStockAlertEmail(data: {
+  orderIdFormatted: string;
+  items: { name: string; stock: number; threshold: number }[];
+}): string {
+  const rows = data.items
+    .map(
+      (item) => `<tr>
+        <td style="padding:10px 12px;border-bottom:1px solid ${COLORS.border};font-size:14px;color:${COLORS.foreground};">${item.name}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid ${COLORS.border};font-size:14px;font-weight:700;color:${item.stock <= 0 ? COLORS.destructive : COLORS.accentDark};text-align:right;">${item.stock}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid ${COLORS.border};font-size:14px;color:${COLORS.muted};text-align:right;">${item.threshold}</td>
+      </tr>`
+    )
+    .join("");
+
+  const content = `
+    <h2 style="margin:0 0 8px;font-size:20px;font-weight:800;color:${COLORS.foreground};text-transform:uppercase;letter-spacing:1px;">⚠ Χαμηλό Απόθεμα</h2>
+    <p style="margin:0 0 20px;font-size:14px;color:${COLORS.muted};line-height:1.6;">
+      Μετά την πληρωμή της παραγγελίας <strong>${data.orderIdFormatted}</strong>, τα παρακάτω προϊόντα έπεσαν στο ή κάτω από το όριο χαμηλού αποθέματος:
+    </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${COLORS.border};">
+      <tr style="background-color:${COLORS.footerBg};">
+        <th style="padding:10px 12px;font-size:12px;color:${COLORS.muted};text-align:left;text-transform:uppercase;letter-spacing:1px;">Προϊόν</th>
+        <th style="padding:10px 12px;font-size:12px;color:${COLORS.muted};text-align:right;text-transform:uppercase;letter-spacing:1px;">Απόθεμα</th>
+        <th style="padding:10px 12px;font-size:12px;color:${COLORS.muted};text-align:right;text-transform:uppercase;letter-spacing:1px;">Όριο</th>
+      </tr>
+      ${rows}
+    </table>
+    ${primaryButton("Διαχείριση Προϊόντων", `${SERVER_URL}/admin/products`)}
   `;
 
   return baseLayout(content);

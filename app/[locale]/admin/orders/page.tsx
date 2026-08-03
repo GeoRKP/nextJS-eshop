@@ -18,16 +18,7 @@ import OrderStatusBadge from "@/components/shared/order-status-badge";
 import { ORDER_STATUSES } from "@/lib/validators";
 import { ShoppingCart } from "lucide-react";
 
-const statusTranslationKey: Record<string, string> = {
-  pending: "statusPending",
-  confirmed: "statusConfirmed",
-  processing: "statusProcessing",
-  shipped: "statusShipped",
-  delivered: "statusDelivered",
-  cancelled: "statusCancelled",
-  refund_requested: "statusRefundRequested",
-  refunded: "statusRefunded",
-};
+import { ORDER_STATUS_TRANSLATION_KEY as statusTranslationKey } from "@/lib/order-status";
 
 export async function generateMetadata() {
   const t = await getTranslations("Metadata");

@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -12,14 +13,26 @@ import {
 import { Globe } from "lucide-react";
 import { routing } from "@/i18n/routing";
 
+/**
+ * Switching language must not throw away the query string — doing so dropped
+ * the visitor's active filters, sort order and page on /search.
+ */
+function useLocalizedHref() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const query = searchParams.toString();
+
+  return query ? `${pathname}?${query}` : pathname;
+}
+
 export default function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
-  const pathname = usePathname();
+  const href = useLocalizedHref();
   const t = useTranslations("LanguageSwitcher");
 
   const handleChange = (newLocale: string) => {
-    router.replace(pathname, { locale: newLocale });
+    router.replace(href, { locale: newLocale });
   };
 
   return (
@@ -43,7 +56,7 @@ export default function LanguageSwitcher() {
 export function LanguageToggle({ className }: { className?: string }) {
   const locale = useLocale();
   const router = useRouter();
-  const pathname = usePathname();
+  const href = useLocalizedHref();
   const tCommon = useTranslations("Common");
 
   const nextLocale = locale === "el" ? "en" : "el";
@@ -51,7 +64,7 @@ export function LanguageToggle({ className }: { className?: string }) {
 
   return (
     <button
-      onClick={() => router.replace(pathname, { locale: nextLocale })}
+      onClick={() => router.replace(href, { locale: nextLocale })}
       className={className ?? "h-9 w-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-background/60 transition-all"}
       aria-label={tCommon("switchTo", { locale: nextLocale })}
     >

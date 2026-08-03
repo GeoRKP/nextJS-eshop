@@ -1,9 +1,10 @@
 import { getTranslations } from "next-intl/server";
+import { localeAlternates } from "@/lib/seo";
 import { APP_NAME } from "@/lib/constants";
 
 export async function generateMetadata() {
   const t = await getTranslations("Legal.privacy");
-  return { title: t("title") };
+  return { title: t("title"), alternates: localeAlternates("/privacy") };
 }
 
 export default async function PrivacyPage() {

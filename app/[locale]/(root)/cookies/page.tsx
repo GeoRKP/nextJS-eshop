@@ -1,8 +1,9 @@
 import { getTranslations } from "next-intl/server";
+import { localeAlternates } from "@/lib/seo";
 
 export async function generateMetadata() {
   const t = await getTranslations("Legal.cookies");
-  return { title: t("title") };
+  return { title: t("title"), alternates: localeAlternates("/cookies") };
 }
 
 export default async function CookiesPage() {

@@ -3,11 +3,11 @@ import { getTranslations } from "next-intl/server";
 import ValuePropositions from "@/components/shared/value-propositions";
 import CategoryCards from "@/components/shared/category-cards";
 import PromoBanner from "@/components/shared/promo-banner";
-import TestimonialStrip from "@/components/shared/testimonial-strip";
 import ScrollFadeIn from "@/components/shared/scroll-fade-in";
 import ProductCardSkeleton from "@/components/shared/product/product-card-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
-import { APP_NAME, APP_DESCRIPTION } from "@/lib/constants";
+import { APP_DESCRIPTION } from "@/lib/constants";
+import { localeAlternates } from "@/lib/seo";
 import {
   HeroWithData,
   TrendingProducts,
@@ -16,10 +16,13 @@ import {
 } from "./homepage-sections";
 
 export async function generateMetadata() {
-  const t = await getTranslations("HomePage");
+  const t = await getTranslations("Metadata");
   return {
-    title: `${APP_NAME} — ${t("latestProducts")}`,
+    // The root layout appends "| AVL Truck Parts" via the title template, so
+    // including the brand here produced "AVL Truck Parts — … | AVL Truck Parts".
+    title: t("homeTitle"),
     description: APP_DESCRIPTION,
+    alternates: localeAlternates("/"),
   };
 }
 
@@ -93,10 +96,6 @@ const HomePage = async () => {
         <BrandShowcaseWithData />
       </Suspense>
 
-      {/* 8. Testimonials — the footer's newsletter band closes the page */}
-      <ScrollFadeIn>
-        <TestimonialStrip />
-      </ScrollFadeIn>
     </>
   );
 };

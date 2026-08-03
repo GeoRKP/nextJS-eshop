@@ -16,6 +16,7 @@ import Pagination from "@/components/shared/pagination";
 import { Badge } from "@/components/ui/badge";
 import { getTranslations } from "next-intl/server";
 import { Users } from "lucide-react";
+import { requireAdmin } from "@/lib/auth-guard";
 
 export async function generateMetadata() {
   const t = await getTranslations("Metadata");
@@ -30,6 +31,8 @@ export default async function AdminUserPage(props: {
     query: string;
   }>;
 }) {
+  await requireAdmin();
+
   const { page = "1", query = "" } = await props.searchParams;
 
   const users = await getAllUsers({

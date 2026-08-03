@@ -5,10 +5,6 @@ import ProductImages from "@/components/shared/product/product-images";
 import AddToCart from "@/components/shared/product/add-to-cart";
 import { getMyCart } from "@/lib/actions/cart.actions";
 import { Cart } from "@/types";
-import ReviewList from "./review-list";
-import { getReviews } from "@/lib/actions/review-actions";
-import { getAuthSession } from "@/lib/auth-session";
-import Rating from "@/components/shared/product/rating";
 import { getLocale, getTranslations } from "next-intl/server";
 import { localizedName, localizedDescription } from "@/lib/i18n-helpers";
 import Breadcrumb from "@/components/shared/breadcrumb";
@@ -19,6 +15,8 @@ import ProductDetailTabs from "@/components/shared/product/product-detail-tabs";
 import SkuChip from "@/components/shared/product/sku-chip";
 import StickyAddToCartBar from "@/components/shared/product/sticky-add-to-cart-bar";
 import { Truck, Shield, RotateCcw } from "lucide-react";
+import { localeAlternates } from "@/lib/seo";
+import { SERVER_URL } from "@/lib/constants";
 
 // Synthetic SKU display from product UUID
 function formatSku(id: string): string {
@@ -34,8 +32,9 @@ export async function generateMetadata(props: {
   const { slug } = await props.params;
   const product = await getProductBySlug(slug);
   if (!product) {
-    const t = await getTranslations("NotFound");
-    return { title: t("title") };
+    // Real 404 status: notFound() here runs before streaming starts, so the
+    // response is a proper 404 instead of a soft-404 (200 + not-found body).
+    notFound();
   }
 
   const locale = await getLocale();
@@ -45,9 +44,11 @@ export async function generateMetadata(props: {
   return {
     title,
     description,
+    alternates: localeAlternates(`/product/${slug}`),
     openGraph: {
       title,
       description,
+      url: `${SERVER_URL}${locale === "en" ? "/en" : ""}/product/${slug}`,
       images: product.images[0] ? [{ url: product.images[0] }] : [],
     },
   };
@@ -62,18 +63,15 @@ export default async function ProductDetailsPage(props: {
     notFound();
   }
 
-  const [session, cart, reviewsData] = await Promise.all([
-    getAuthSession(),
-    getMyCart(),
-    getReviews({ productId: product.id, page: 1, limit: 10 }),
-  ]);
-  const userId = session?.user?.id;
+  const cart = await getMyCart();
 
   const t = await getTranslations("Product");
   const tv = await getTranslations("ValueProps");
   const locale = await getLocale();
   const displayName = localizedName(product, locale);
   const displayDescription = localizedDescription(product, locale);
+  // Per-product threshold from the admin form, not a hardcoded 5.
+  const lowStockThreshold = product.lowStockThreshold ?? 5;
   // Resolve the localized category label by joining through the categoryRef
   // when available. The denormalized `product.category` string is canonical
   // Greek; we keep it for the link target so /search?category=… still works.
@@ -101,7 +99,7 @@ export default async function ProductDetailsPage(props: {
               <div className="absolute bottom-2 left-2 h-4 w-4 border-b-2 border-l-2 border-accent z-10" aria-hidden="true" />
               <div className="absolute bottom-2 right-2 h-4 w-4 border-b-2 border-r-2 border-accent z-10" aria-hidden="true" />
               <div className="p-5">
-                <ProductImages images={product.images} />
+                <ProductImages images={product.images} productName={displayName} />
               </div>
             </div>
 
@@ -129,17 +127,6 @@ export default async function ProductDetailsPage(props: {
                 </div>
               </div>
 
-              {/* Rating + reviews */}
-              <div className="flex items-center gap-3 flex-wrap">
-                <Rating value={Number(product.rating)} />
-                <a href="#reviews" className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground hover:text-accent transition-colors">
-                  {t("numReviews", { count: product.numReviews })}
-                </a>
-                <span className="text-border hidden sm:inline">|</span>
-                <a href="#reviews" className="font-mono text-[11px] uppercase tracking-[0.12em] text-accent hover:text-accent/70 transition-colors">
-                  {t("writeReview")} →
-                </a>
-              </div>
 
               {/* Price/stock — workshop spec plate */}
               <div className="bg-card border border-border">
@@ -158,7 +145,7 @@ export default async function ProductDetailsPage(props: {
 
                 {/* Stock status */}
                 <div className="flex items-center gap-2.5 px-4 py-3">
-                  {product.stock > 5 ? (
+                  {product.stock > lowStockThreshold ? (
                     <>
                       <span className="relative flex h-2.5 w-2.5">
                         <span className="animate-ping absolute inline-flex h-full w-full bg-success opacity-75" />
@@ -171,6 +158,11 @@ export default async function ProductDetailsPage(props: {
                       <span className="inline-flex h-2.5 w-2.5 bg-warning" />
                       <span className="font-mono text-[11px] uppercase tracking-[0.16em] font-bold text-warning">▲ {t("lowStock", { count: product.stock })}</span>
                     </>
+                  ) : product.allowBackorder ? (
+                    <>
+                      <span className="inline-flex h-2.5 w-2.5 bg-info" />
+                      <span className="font-mono text-[11px] uppercase tracking-[0.16em] font-bold text-info">{t("backorder")}</span>
+                    </>
                   ) : (
                     <>
                       <span className="inline-flex h-2.5 w-2.5 bg-destructive" />
@@ -178,10 +170,15 @@ export default async function ProductDetailsPage(props: {
                     </>
                   )}
                 </div>
+                {product.stock <= 0 && product.allowBackorder && (
+                  <div className="px-4 pb-3 -mt-1 text-sm text-muted-foreground">
+                    {t("backorderNotice")}
+                  </div>
+                )}
               </div>
 
               {/* Add to Cart */}
-              {product.stock > 0 && (
+              {(product.stock > 0 || product.allowBackorder) && (
                 <AddToCart
                   cart={cart as Cart}
                   item={{
@@ -227,20 +224,6 @@ export default async function ProductDetailsPage(props: {
         </section>
       </ScrollFadeIn>
 
-      {/* Reviews Section */}
-      <ScrollFadeIn>
-        <section id="reviews" className="mt-20 scroll-mt-24 pt-10 border-t border-border">
-          <div className="text-stamp text-accent mb-2 hazard-mark">{t("reviews")}</div>
-          <h2 className="h2-bold mb-6">{t("reviews")}</h2>
-          <ReviewList
-            userId={userId || ""}
-            productId={product.id}
-            productSlug={product.slug}
-            initialReviews={reviewsData.data}
-            initialTotalPages={reviewsData.totalPages}
-          />
-        </section>
-      </ScrollFadeIn>
 
       {/* Related Products */}
       <div className="-mx-5 md:-mx-10">

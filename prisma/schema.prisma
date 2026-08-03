@@ -50,12 +50,12 @@ model Product {
   descriptionEn    String?
   stock            Int
   price            Decimal   @default(0) @db.Decimal(12, 2)
-  rating           Decimal   @default(0) @db.Decimal(10, 2)
-  numReviews       Int       @default(0)
   isFeatured       Boolean   @default(false)
   banner           String?
   specs            Json?     @db.Json
-  lowStockThreshold Int      @default(5)
+  lowStockThreshold Int      @default(20)
+  // Sold on backorder: purchasable at zero stock, delivery time by arrangement.
+  allowBackorder   Boolean   @default(false)
   deletedAt        DateTime? @db.Timestamp(6)
   createdAt        DateTime  @default(now()) @db.Timestamp(6)
   // Full-text search column (managed via custom migration / trigger)
@@ -63,7 +63,6 @@ model Product {
 
   categoryRef     Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   orderitems      OrderItem[]
-  Review          Review[]
   wishlistItems   WishlistItem[]
   couponProducts  CouponProduct[]
   priceHistory    PriceHistory[]
@@ -74,12 +73,10 @@ model Product {
   @@index([createdAt])
   @@index([price])
   @@index([stock])
-  @@index([rating])
   @@index([deletedAt, createdAt])
   @@index([deletedAt, isFeatured])
   @@index([deletedAt, category])
   @@index([deletedAt, price])
-  @@index([deletedAt, rating])
   @@index([deletedAt, category, createdAt])
   @@index([deletedAt, brand])
 }
@@ -114,7 +111,6 @@ model User {
   Session       Session[]
   Cart          Cart[]
   Order         Order[]
-  Review        Review[]
   Wishlist      Wishlist?
   addresses     Address[]
   couponUsages  CouponUsage[]
@@ -226,6 +222,17 @@ model Order {
   shippingAddressId String?     @db.Uuid
   createdAt         DateTime    @default(now()) @db.Timestamp(6)
 
+  // Guest checkout: shadow users are keyed by email, so the same User row is
+  // reused by whoever types that email next. This pins the order to the browser
+  // session that placed it, keeping the previous visitor's PII out of reach.
+  guestSessionId String? @db.Uuid
+
+  // True once this order has taken its items out of stock. Set at placement so
+  // COD orders reserve too; read by payment/cancellation so stock is never
+  // decremented or returned twice. False on orders created before reservation
+  // existed — those still decrement at payment time.
+  stockReserved Boolean @default(false)
+
   // Shipping method & Box Now (parcel-locker) fulfillment
   shippingMethod        String?  @default("home") // "home" | "boxnow_locker"
   boxnowLocker          Json?    @db.Json          // snapshot of the chosen APM locker
@@ -255,6 +262,9 @@ model OrderItem {
   qty       Int
   price     Decimal @db.Decimal(12, 2)
   name      String
+  // English snapshot taken with `name`, so the order keeps reading in the
+  // customer's language after the catalog changes.
+  nameEn    String?
   slug      String
   image     String
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -279,45 +289,6 @@ model OrderStatusHistory {
 
   @@index([orderId])
   @@index([orderId, createdAt])
-}
-
-// ─── Review ────────────────────────────────────────────────────
-
-model Review {
-  id                 String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId             String         @db.Uuid
-  productId          String         @db.Uuid
-  rating             Int
-  title              String
-  description        String?
-  isVerifiedPurchase Boolean        @default(true)
-  isHidden           Boolean        @default(false)
-  createdAt          DateTime       @default(now()) @db.Timestamp(6)
-  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product            Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
-  reports            ReviewReport[]
-
-  @@unique([userId, productId])
-  @@index([productId])
-  @@index([userId])
-  @@index([productId, createdAt])
-}
-
-// ─── Review Report (moderation queue) ─────────────────────────
-model ReviewReport {
-  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  reviewId      String   @db.Uuid
-  reason        String
-  description   String?
-  reporterEmail String
-  status        String   @default("pending") // pending | resolved | dismissed
-  createdAt     DateTime @default(now()) @db.Timestamp(6)
-
-  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-
-  @@index([reviewId])
-  @@index([status])
-  @@index([status, createdAt])
 }
 
 // ─── Audit Log (admin action tracking) ─────────────────────────
@@ -521,5 +492,20 @@ model Notification {
 
   @@index([userId])
   @@index([userId, isRead])
+  @@index([createdAt])
+}
+
+// ─── Newsletter ────────────────────────────────────────────────
+
+model NewsletterSubscriber {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email          String    @unique
+  locale         String    @default("el")
+  source         String? // which form/page the signup came from
+  isActive       Boolean   @default(true)
+  unsubscribedAt DateTime? @db.Timestamp(6)
+  createdAt      DateTime  @default(now()) @db.Timestamp(6)
+
+  @@index([isActive])
   @@index([createdAt])
 }

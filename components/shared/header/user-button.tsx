@@ -29,6 +29,7 @@ export default async function UserButton() {
   }
 
   const firstInitial = session.user?.name?.charAt(0).toUpperCase() ?? "U";
+  const isGuest = Boolean(session.user?.isGuest);
 
   return (
     <div className="flex items-center">
@@ -50,32 +51,51 @@ export default async function UserButton() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="p-0">
-            <Link href="/user/profile" className="w-full flex items-center gap-2 px-2 py-2.5">
-              <UserIcon className="w-4 h-4" />
-              {t("userProfile")}
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="p-0">
-            <Link href="/user/orders" className="w-full flex items-center gap-2 px-2 py-2.5">
-              <Package className="w-4 h-4" />
-              {t("orderHistory")}
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="p-0">
-            <Link href="/user/wishlist" className="w-full flex items-center gap-2 px-2 py-2.5">
-              <Heart className="w-4 h-4" />
-              {t("wishlist")}
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="p-0">
-            <Link href="/user/addresses" className="w-full flex items-center gap-2 px-2 py-2.5">
-              <MapPin className="w-4 h-4" />
-              {t("addresses")}
-            </Link>
-          </DropdownMenuItem>
 
-          {session?.user?.role === "admin" && (
+          {/* Guests are redirected out of every /user/* page, so showing them
+              the full account menu just produced four links that silently
+              bounce back to the home page. Offer the way out instead: claiming
+              the account via the password-reset flow. */}
+          {isGuest ? (
+            <DropdownMenuItem className="p-0">
+              <Link
+                href="/forgot-password"
+                className="w-full flex items-center gap-2 px-2 py-2.5 text-brand-accent font-medium"
+              >
+                <UserIcon className="w-4 h-4" />
+                {t("completeRegistration")}
+              </Link>
+            </DropdownMenuItem>
+          ) : (
+            <>
+              <DropdownMenuItem className="p-0">
+                <Link href="/user/profile" className="w-full flex items-center gap-2 px-2 py-2.5">
+                  <UserIcon className="w-4 h-4" />
+                  {t("userProfile")}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="p-0">
+                <Link href="/user/orders" className="w-full flex items-center gap-2 px-2 py-2.5">
+                  <Package className="w-4 h-4" />
+                  {t("orderHistory")}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="p-0">
+                <Link href="/user/wishlist" className="w-full flex items-center gap-2 px-2 py-2.5">
+                  <Heart className="w-4 h-4" />
+                  {t("wishlist")}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="p-0">
+                <Link href="/user/addresses" className="w-full flex items-center gap-2 px-2 py-2.5">
+                  <MapPin className="w-4 h-4" />
+                  {t("addresses")}
+                </Link>
+              </DropdownMenuItem>
+            </>
+          )}
+
+          {!isGuest && session?.user?.role === "admin" && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="p-0">

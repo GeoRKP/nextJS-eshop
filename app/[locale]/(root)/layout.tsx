@@ -5,8 +5,6 @@ import Header from "@/components/shared/header";
 import Footer from "@/components/footer";
 import PageTransition from "@/components/shared/page-transition";
 import StickyHeaderWrapper from "@/components/shared/header/sticky-header-wrapper";
-// import AnnouncementBar from "@/components/shared/header/announcement-bar";
-// import UtilityBar from "@/components/shared/header/utility-bar";
 import MobileBottomNav from "@/components/shared/header/mobile-bottom-nav";
 import MobileCategoryChips from "@/components/shared/header/mobile-category-chips";
 import MobileMenuWrapper from "@/components/shared/header/mobile-menu-wrapper";
@@ -41,11 +39,7 @@ export default async function RootLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <StickyHeaderWrapper
-        // utilityBar={<UtilityBar />}
-        // announcementBar={<AnnouncementBar />}
-        announcementBar={null}
-      >
+      <StickyHeaderWrapper announcementBar={null}>
         <Suspense fallback={<div className="h-16 bg-background" />}>
           <Header />
         </Suspense>

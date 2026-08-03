@@ -8,6 +8,7 @@ import {
   rangeSpanDays,
   type DateRange,
 } from "@/lib/dashboard-utils";
+import { assertAdmin } from "@/lib/auth-guard";
 
 // ── Types ──
 
@@ -55,19 +56,13 @@ export type DashboardData = {
   categories: string[];
 };
 
-// ── Derive order status from isPaid/isDelivered ──
-
-function deriveOrderStatus(isPaid: boolean, isDelivered: boolean): string {
-  if (isDelivered) return "Delivered";
-  if (isPaid) return "Paid";
-  return "Pending";
-}
-
 // ── Main function ──
 
 export async function getDashboardData(
   filters: DashboardFilters
 ): Promise<DashboardData> {
+  await assertAdmin();
+
   const range = resolveDateRange(filters);
   const prevRange = range ? previousDateRange(range) : null;
 
@@ -98,15 +93,23 @@ export async function getDashboardData(
         ? { isPaid: false }
         : {};
 
+  // The category filter never reached the order queries, so picking a category
+  // changed the charts but left the KPI cards untouched.
+  const categoryFilter: Prisma.OrderWhereInput = category
+    ? { orderitems: { some: { product: { category } } } }
+    : {};
+
   const orderWhere: Prisma.OrderWhereInput = {
     ...(dateFilter && { createdAt: dateFilter }),
     ...(paymentMethod && { paymentMethod }),
+    ...categoryFilter,
     ...paidFilter,
   };
 
   const prevOrderWhere: Prisma.OrderWhereInput = {
     ...(prevDateFilter && { createdAt: prevDateFilter }),
     ...(paymentMethod && { paymentMethod }),
+    ...categoryFilter,
     ...paidFilter,
   };
 
@@ -125,25 +128,37 @@ export async function getDashboardData(
     latestOrders,
     categoriesRaw,
   ] = await Promise.all([
-    // 1. Current period revenue + count
+    // 1. Current period revenue + count.
+    // No hardcoded isPaid here: it pinned the KPIs to paid orders regardless of
+    // the paidStatus filter, so ?paidStatus=unpaid returned identical numbers.
+    // When no filter is chosen, default to paid so revenue stays revenue.
     prisma.order.aggregate({
-      where: { ...orderWhere, isPaid: true },
+      where: paidStatus ? orderWhere : { ...orderWhere, isPaid: true },
       _sum: { totalPrice: true },
       _count: true,
     }),
     // 2. Previous period revenue + count
     prisma.order.aggregate({
-      where: { ...prevOrderWhere, isPaid: true },
+      where: paidStatus ? prevOrderWhere : { ...prevOrderWhere, isPaid: true },
       _sum: { totalPrice: true },
       _count: true,
     }),
-    // 3. New customers in current period
+    // 3. New customers in current period. Guest shadow accounts are checkout
+    // artifacts, not customers signing up, and soft-deleted rows are gone.
     prisma.user.count({
-      where: dateFilter ? { createdAt: dateFilter } : undefined,
+      where: {
+        isGuest: false,
+        deletedAt: null,
+        ...(dateFilter && { createdAt: dateFilter }),
+      },
     }),
     // 4. New customers in previous period
     prisma.user.count({
-      where: prevDateFilter ? { createdAt: prevDateFilter } : undefined,
+      where: {
+        isGuest: false,
+        deletedAt: null,
+        ...(prevDateFilter && { createdAt: prevDateFilter }),
+      },
     }),
     // 5. Total products (exclude soft-deleted)
     prisma.product.count({ where: { deletedAt: null } }),
@@ -201,7 +216,9 @@ export async function getDashboardData(
       userName: o.user?.name ?? "Deleted User",
       createdAt: o.createdAt,
       totalPrice: o.totalPrice,
-      status: deriveOrderStatus(o.isPaid, o.isDelivered),
+      // The real column, so this table agrees with /admin/orders instead of
+      // showing a cancelled-but-paid order as "Paid".
+      status: o.status,
       paymentMethod: o.paymentMethod,
     })),
     productsCount,
@@ -234,10 +251,13 @@ async function getSalesTimeSeries(
     conditions.push(`o."paymentMethod" = $${paramIdx++}`);
     params.push(paymentMethod);
   }
-  if (paidStatus === "paid") {
-    conditions.push(`o."isPaid" = true`);
-  } else if (paidStatus === "unpaid") {
+  // Unfiltered used to mean "all orders" here while the KPI card counted only
+  // paid ones, so the chart total and the revenue card never agreed. Same
+  // default as the KPI: paid unless the admin asks otherwise.
+  if (paidStatus === "unpaid") {
     conditions.push(`o."isPaid" = false`);
+  } else {
+    conditions.push(`o."isPaid" = true`);
   }
 
   let joinClause = "";
@@ -292,19 +312,16 @@ async function getOrdersByStatus(
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
+  // Read the real `status` column. Deriving Pending/Paid/Delivered from the
+  // isPaid/isDelivered booleans invented a taxonomy nothing else in the admin
+  // uses, and filed cancelled-but-paid orders under "Paid".
   const raw = await prisma.$queryRawUnsafe<
     Array<{ status: string; count: number }>
   >(
-    `SELECT
-       CASE
-         WHEN "isDelivered" = true THEN 'Delivered'
-         WHEN "isPaid" = true THEN 'Paid'
-         ELSE 'Pending'
-       END as "status",
-       COUNT(*)::int as "count"
+    `SELECT "status", COUNT(*)::int as "count"
      FROM "Order"
      ${whereClause}
-     GROUP BY 1
+     GROUP BY "status"
      ORDER BY "count" DESC`,
     ...params
   );
@@ -364,10 +381,11 @@ async function getTopProducts(
     conditions.push(`o."paymentMethod" = $${paramIdx++}`);
     params.push(paymentMethod);
   }
-  if (paidStatus === "paid") {
-    conditions.push(`o."isPaid" = true`);
-  } else if (paidStatus === "unpaid") {
+  // Match the KPI default (paid) so chart totals reconcile with the cards.
+  if (paidStatus === "unpaid") {
     conditions.push(`o."isPaid" = false`);
+  } else {
+    conditions.push(`o."isPaid" = true`);
   }
 
   let joinProduct = "";
@@ -425,10 +443,11 @@ async function getSalesByCategory(
     conditions.push(`o."paymentMethod" = $${paramIdx++}`);
     params.push(paymentMethod);
   }
-  if (paidStatus === "paid") {
-    conditions.push(`o."isPaid" = true`);
-  } else if (paidStatus === "unpaid") {
+  // Match the KPI default (paid) so chart totals reconcile with the cards.
+  if (paidStatus === "unpaid") {
     conditions.push(`o."isPaid" = false`);
+  } else {
+    conditions.push(`o."isPaid" = true`);
   }
 
   const whereClause =

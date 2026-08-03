@@ -21,18 +21,23 @@ export default function WishlistActions({
   productId,
   product,
   displayName,
+  onRemoved,
 }: {
   productId: string;
   product: WishlistProduct;
   displayName?: string;
+  onRemoved?: (removed: boolean) => void;
 }) {
   const { toast } = useToast();
   const t = useTranslations("Wishlist");
   const [isPending, startTransition] = useTransition();
 
   const handleRemove = () => {
+    // Optimistic: hide the tile now, restore it if the server refuses.
+    onRemoved?.(true);
     startTransition(async () => {
       const res = await toggleWishlist(productId);
+      if (!res.success) onRemoved?.(false);
       toast({
         description: res.message,
         variant: res.success ? "default" : "destructive",

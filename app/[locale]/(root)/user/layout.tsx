@@ -2,16 +2,25 @@ import MainNav from "./main-nav";
 import { getTranslations } from "next-intl/server";
 import { getAuthSession } from "@/lib/auth-session";
 import { redirect } from "next/navigation";
+import { localePath } from "@/lib/locale-path";
 
 export default async function UserLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getAuthSession();
+
+  // /user/* has no request-layer guard (PROTECTED_PATHS was never wired up), so
+  // this is the only thing standing between a signed-out visitor and a blank
+  // page full of "user not authenticated" errors.
+  if (!session?.user?.id) {
+    redirect(await localePath("/sign-in", { callbackUrl: "/user/orders" }));
+  }
+
   // Guest-checkout sessions are checkout-only: the account area would expose
   // whatever a previous visitor with the same email left behind.
-  const session = await getAuthSession();
-  if (session?.user?.isGuest) redirect("/");
+  if (session.user.isGuest) redirect(await localePath("/"));
 
   const t = await getTranslations("UserNav");
 

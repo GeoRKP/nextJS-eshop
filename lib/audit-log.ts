@@ -1,5 +1,7 @@
-"use server";
-
+// Plain server-only module (NOT "use server"). Every export of a "use server"
+// module is registered as a callable endpoint, which made logAuditEvent a public
+// action: any signed-in user could forge audit entries under their own name.
+// It is a helper, not an action — imported only by server code.
 import { prisma } from "@/db/prisma";
 import { auth } from "@/auth";
 

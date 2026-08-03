@@ -70,12 +70,9 @@ export async function generateMetadata({
       },
     },
     manifest: "/manifest.json",
-    alternates: {
-      languages: {
-        el: `${SERVER_URL}`,
-        en: `${SERVER_URL}/en`,
-      },
-    },
+    // No `alternates` here on purpose: layout metadata is inherited, so a static
+    // hreflang pair pointed EVERY page at the home page. Pages declare their own
+    // canonical + languages via localeAlternates() in lib/seo.ts.
     openGraph: {
       type: "website",
       url: SERVER_URL,

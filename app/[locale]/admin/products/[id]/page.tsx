@@ -3,6 +3,7 @@ import { getProductById } from "@/lib/actions/product.actions";
 import { getAllCategoriesFlat } from "@/lib/actions/category.actions";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { requireAdmin } from "@/lib/auth-guard";
 
 export async function generateMetadata() {
   const t = await getTranslations("Metadata");
@@ -14,6 +15,8 @@ export async function generateMetadata() {
 export default async function AdminProductUpdatePage(props: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAdmin();
+
   const { id } = await props.params;
 
   const product = await getProductById(id);

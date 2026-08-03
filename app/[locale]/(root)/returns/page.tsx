@@ -1,9 +1,10 @@
 import { getTranslations } from "next-intl/server";
+import { localeAlternates } from "@/lib/seo";
 import { RotateCcw, ShieldCheck, Mail } from "lucide-react";
 
 export async function generateMetadata() {
   const t = await getTranslations("Info.returns");
-  return { title: t("title") };
+  return { title: t("title"), alternates: localeAlternates("/returns") };
 }
 
 export default async function ReturnsPage() {

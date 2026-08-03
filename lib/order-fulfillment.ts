@@ -10,8 +10,8 @@
 import { prisma } from "@/db/prisma";
 import { PaymentResult, ShippingAddress } from "@/types";
 import { formatCurrency } from "./utils";
-import { sendOrderConfirmationEmail } from "@/lib/email";
-import { createBoxNowDeliveryForOrder } from "./actions/boxnow.actions";
+import { sendOrderConfirmationEmail, sendLowStockAlertEmail } from "@/lib/email";
+import { createBoxNowDeliveryForOrder } from "./boxnow-fulfillment";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getTranslations } from "next-intl/server";
 
@@ -27,7 +27,7 @@ export async function sendOrderConfirmationForOrder(orderId: string) {
 
     if (fullOrder?.user?.email) {
       const shippingAddr = fullOrder.shippingAddress as ShippingAddress;
-      await sendOrderConfirmationEmail(fullOrder.user.email, {
+      const sent = await sendOrderConfirmationEmail(fullOrder.user.email, {
         orderId: fullOrder.id,
         orderIdFormatted: fullOrder.id.slice(0, 8).toUpperCase(),
         customerName: fullOrder.user.name || shippingAddr.fullName,
@@ -41,6 +41,7 @@ export async function sendOrderConfirmationForOrder(orderId: string) {
         taxPrice: formatCurrency(Number(fullOrder.taxPrice)),
         totalPrice: formatCurrency(Number(fullOrder.totalPrice)),
         discountAmount: formatCurrency(Number(fullOrder.discountAmount)),
+        discountValue: Number(fullOrder.discountAmount),
         couponCode: fullOrder.couponCode,
         shippingAddress: {
           fullName: shippingAddr.fullName,
@@ -51,6 +52,19 @@ export async function sendOrderConfirmationForOrder(orderId: string) {
         },
         paymentMethod: fullOrder.paymentMethod,
       });
+
+      // Put the failure where an admin will see it, same as the Box Now voucher
+      // errors — otherwise a bounced confirmation lives only in the container log.
+      if (!sent) {
+        const t = await getTranslations("Actions");
+        await prisma.orderStatusHistory.create({
+          data: {
+            orderId,
+            status: fullOrder.status,
+            note: `${t("confirmationEmailFailed")}: ${fullOrder.user.email}`,
+          },
+        });
+      }
     }
   } catch (emailError) {
     console.error("Order confirmation email failed:", emailError);
@@ -60,9 +74,13 @@ export async function sendOrderConfirmationForOrder(orderId: string) {
 export async function updateOrderToPaid({
   orderId,
   paymentResult,
+  changedBy,
 }: {
   orderId: string;
   paymentResult?: PaymentResult;
+  /** Admin who triggered this, when it wasn't a payment webhook. Leaving it
+   *  null on gateway callbacks is correct — those are system events. */
+  changedBy?: string;
 }) {
   const t = await getTranslations("Actions");
   const order = await prisma.order.findFirst({
@@ -77,6 +95,8 @@ export async function updateOrderToPaid({
   if (order.isPaid) throw new Error(t("orderAlreadyPaid"));
 
   const oversoldItems: string[] = [];
+  const lowStockItems: { name: string; stock: number; threshold: number }[] =
+    [];
   const claimed = await prisma.$transaction(async (tx) => {
     // Atomic claim: exactly one concurrent caller (Viva webhook vs return URL)
     // flips isPaid; the losers see count 0 and skip stock/coupons/emails.
@@ -91,23 +111,68 @@ export async function updateOrderToPaid({
     });
     if (claim.count === 0) return false;
 
+    // Product flags/thresholds for backorder handling + low-stock alerting.
+    const products = await tx.product.findMany({
+      where: { id: { in: order.orderitems.map((i) => i.productId) } },
+      select: {
+        id: true,
+        stock: true,
+        allowBackorder: true,
+        lowStockThreshold: true,
+      },
+    });
+    const productById = new Map(products.map((p) => [p.id, p]));
+
     // ATOMIC stock decrement — only succeeds if stock is sufficient.
     // Prevents overselling when 2 users simultaneously buy the last item.
-    for (const item of order.orderitems) {
-      const result = await tx.product.updateMany({
-        where: { id: item.productId, stock: { gte: item.qty } },
-        data: { stock: { decrement: item.qty } },
-      });
-      if (result.count === 0) {
-        // Without a captured payment (admin/COD marking) it's safe to refuse.
-        if (!paymentResult) throw new Error(t("notEnoughStock"));
-        // Money already captured — stranding a charged customer is worse than
-        // overselling. Let stock go negative and flag the order for review.
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stock: { decrement: item.qty } },
-        });
-        oversoldItems.push(item.name);
+    // Backorder products decrement unconditionally (negative stock = pending
+    // procurement, delivery arranged individually) and are never "oversold".
+    //
+    // Only for orders that did NOT reserve at placement. Reserved orders already
+    // took their items out of stock (and already raised any low-stock alert);
+    // running this again would double-count. Orders created before reservation
+    // existed have stockReserved = false and still come through here.
+    if (!order.stockReserved) {
+      for (const item of order.orderitems) {
+        const flags = productById.get(item.productId);
+        const isBackorder = flags?.allowBackorder === true;
+
+        if (isBackorder) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { decrement: item.qty } },
+          });
+        } else {
+          const result = await tx.product.updateMany({
+            where: { id: item.productId, stock: { gte: item.qty } },
+            data: { stock: { decrement: item.qty } },
+          });
+          if (result.count === 0) {
+            // Without a captured payment (admin/COD marking) it's safe to refuse.
+            if (!paymentResult) throw new Error(t("notEnoughStock"));
+            // Money already captured — stranding a charged customer is worse than
+            // overselling. Let stock go negative and flag the order for review.
+            await tx.product.update({
+              where: { id: item.productId },
+              data: { stock: { decrement: item.qty } },
+            });
+            oversoldItems.push(item.name);
+          }
+        }
+
+        // Low-stock alert only when THIS order crosses the threshold, so the
+        // admin gets one email per crossing instead of one per subsequent sale.
+        if (flags && flags.lowStockThreshold > 0) {
+          const prevStock = flags.stock;
+          const newStock = prevStock - item.qty;
+          if (prevStock > flags.lowStockThreshold && newStock <= flags.lowStockThreshold) {
+            lowStockItems.push({
+              name: item.name,
+              stock: newStock,
+              threshold: flags.lowStockThreshold,
+            });
+          }
+        }
       }
     }
 
@@ -117,6 +182,7 @@ export async function updateOrderToPaid({
         orderId,
         status: "confirmed",
         note: t("orderHasBeenPaid"),
+        changedBy: changedBy ?? null,
       },
     });
 
@@ -200,6 +266,15 @@ export async function updateOrderToPaid({
   // COD orders already got theirs when the order was placed.
   if (order.paymentMethod !== "CashOnDelivery") {
     await sendOrderConfirmationForOrder(orderId);
+  }
+
+  // Notify the admin about products this order pushed to/below their
+  // low-stock threshold (best-effort, errors swallowed inside).
+  if (lowStockItems.length > 0) {
+    await sendLowStockAlertEmail({
+      orderIdFormatted: orderId.slice(0, 8).toUpperCase(),
+      items: lowStockItems,
+    });
   }
 
   // Best-effort: create the Box Now voucher for locker orders once paid. No-op for

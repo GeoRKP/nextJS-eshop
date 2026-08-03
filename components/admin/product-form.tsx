@@ -301,6 +301,49 @@ export default function ProductForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="lowStockThreshold"
+            render={({
+              field,
+            }: {
+              field: ControllerRenderProps<
+                z.infer<typeof insertProductSchema>,
+                "lowStockThreshold"
+              >;
+            }) => (
+              <FormItem className="w-full">
+                <FormLabel>{t("lowStockThreshold")}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("enterLowStockThreshold")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="upload-field">
+          {t("availability")}
+          <div className="card-premium p-4 space-y-2 mt-2">
+            <FormField
+              control={form.control}
+              name="allowBackorder"
+              render={({ field }) => (
+                <FormItem className="space-x-2 items-center">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel>{t("allowBackorder")}</FormLabel>
+                </FormItem>
+              )}
+            />
+            <p className="text-sm text-muted-foreground">
+              {t("allowBackorderHint")}
+            </p>
+          </div>
         </div>
         <div className="upload-field flex flex-col md:flex-row gap-3 md:gap-5">
           <FormField

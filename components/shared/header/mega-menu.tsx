@@ -17,9 +17,6 @@ type Translations = {
   newArrivals: string;
   popularBrands: string;
   allBrands: string;
-  viewAllIn: string;
-  products: string;
-  subcategories: string;
 };
 
 type SingleCategoryProps = {

@@ -57,7 +57,7 @@ All server actions live in `lib/actions/` and follow this pattern:
 - Call `revalidatePath()` and `revalidateTag(tag, "max")` for cache invalidation
 - Errors wrapped with `formatError()` from `lib/utils`
 
-Files: `cart.actions.ts`, `product.actions.ts`, `order.actions.ts`, `user.actions.ts`, `review-actions.ts`
+Files: `cart.actions.ts`, `product.actions.ts`, `order.actions.ts`, `user.actions.ts`
 
 ### Client Component Pattern
 
@@ -80,7 +80,7 @@ Zod schemas are defined as factory functions that accept a translation function 
 - UUIDs for primary keys (`gen_random_uuid()`)
 - Prices use `Decimal(12, 2)` — Prisma result extensions convert Decimals to strings for JSON serialization
 - Prisma client singleton in `db/prisma.ts` with custom result transformers
-- Key models: User, Product, Cart, Order, OrderItem, Review
+- Key models: User, Product, Cart, Order, OrderItem
 
 ### Proxy (proxy.ts)
 

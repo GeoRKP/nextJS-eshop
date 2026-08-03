@@ -6,16 +6,22 @@ import { assertAdmin } from "@/lib/auth-guard";
 import { formatError } from "@/lib/utils";
 import { logAuditEvent } from "@/lib/audit-log";
 
+// Reads are admin-only too: settings hold company details (VAT number, ΓΕΜΗ,
+// contact data) and the writes were already guarded, so leaving the getters open
+// just handed the same data out through the back door.
 export async function getSettings(group?: string) {
+  await assertAdmin();
   const where = group ? { group } : {};
   return prisma.systemSetting.findMany({ where, orderBy: { key: "asc" } });
 }
 
 export async function getSetting(key: string) {
+  await assertAdmin();
   return prisma.systemSetting.findUnique({ where: { key } });
 }
 
 export async function getSettingValue(key: string, defaultValue = "") {
+  await assertAdmin();
   const setting = await prisma.systemSetting.findUnique({ where: { key } });
   return setting?.value ?? defaultValue;
 }
@@ -90,7 +96,7 @@ export async function seedDefaultSettings() {
   const defaults = [
     { key: "site.name", value: "AVL", type: "string", label: "Site Name", group: "general" },
     { key: "site.email", value: "info@avl.gr", type: "string", label: "Contact Email", group: "general" },
-    { key: "site.phone", value: "+30 210 1234567", type: "string", label: "Phone Number", group: "general" },
+    { key: "site.phone", value: "+30 210 3457405", type: "string", label: "Phone Number", group: "general" },
     { key: "shipping.freeThreshold", value: "100", type: "number", label: "Free Shipping Threshold (€)", group: "shipping" },
     { key: "shipping.standardRate", value: "10", type: "number", label: "Standard Shipping Rate (€)", group: "shipping" },
     { key: "tax.rate", value: "24", type: "number", label: "VAT Rate (%)", group: "tax" },

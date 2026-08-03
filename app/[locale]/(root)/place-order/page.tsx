@@ -2,6 +2,7 @@ import { getMyCart } from "@/lib/actions/cart.actions";
 import { getAuthSession } from "@/lib/auth-session";
 import { getUserById } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
+import { localePath } from "@/lib/locale-path";
 import { ShippingAddress } from "@/types";
 import CheckoutSteps from "@/components/shared/checkout-steps";
 import { Link } from "@/i18n/navigation";
@@ -9,7 +10,8 @@ import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
 import PlaceOrderForm from "./place-order-form";
 import { PAYMENT_METHODS } from "@/lib/constants";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { localizedName } from "@/lib/i18n-helpers";
 import { MapPin, CreditCard, Pencil, Lock, Shield } from "lucide-react";
 
 export async function generateMetadata() {
@@ -24,20 +26,21 @@ export default async function PlaceOrderPage() {
   const tOrder = await getTranslations("Order");
   const tCommon = await getTranslations("Common");
   const tCart = await getTranslations("Cart");
+  const locale = await getLocale();
 
   const [cart, session] = await Promise.all([getMyCart(), getAuthSession()]);
   const userid = session?.user?.id;
 
-  if (!userid) redirect("/sign-in?callbackUrl=/place-order");
+  if (!userid) redirect(await localePath("/sign-in", { callbackUrl: "/place-order" }));
 
   const user = await getUserById(userid);
 
-  if (!cart || cart.items.length === 0) redirect("/cart");
+  if (!cart || cart.items.length === 0) redirect(await localePath("/cart"));
 
-  if (!user.address) redirect("/shipping-address");
+  if (!user.address) redirect(await localePath("/shipping-address"));
   // Redirect saved payment methods that are no longer offered (e.g. old PayPal/Stripe).
   if (!user.paymentMethod || !PAYMENT_METHODS.includes(user.paymentMethod))
-    redirect("/payment-method");
+    redirect(await localePath("/payment-method"));
 
   const userAddress = user.address as ShippingAddress;
 
@@ -99,7 +102,7 @@ export default async function PlaceOrderPage() {
                     <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden bg-muted/30">
                       <Image
                         src={item.image}
-                        alt={item.name}
+                        alt={localizedName(item, locale)}
                         width={96}
                         height={96}
                         className="object-cover w-full h-full"
@@ -108,7 +111,7 @@ export default async function PlaceOrderPage() {
                   </Link>
                   <div className="flex-1 min-w-0">
                     <Link href={`/product/${item.slug}`}>
-                      <p className="text-sm font-medium line-clamp-1 hover:text-brand-accent transition-colors">{item.name}</p>
+                      <p className="text-sm font-medium line-clamp-1 hover:text-brand-accent transition-colors">{localizedName(item, locale)}</p>
                     </Link>
                     <p className="text-xs text-muted-foreground">
                       {tOrder("quantity")}: {item.qty} &times; {formatCurrency(item.price)}

@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { redirect } from "next/navigation";
+import { localePath } from "@/lib/locale-path";
 import { auth } from "@/auth";
 import { getTranslations } from "next-intl/server";
 import { safeCallbackUrl } from "@/lib/safe-redirect";
@@ -25,7 +26,7 @@ export default async function CheckoutOptionsPage(props: {
   const target = safeCallbackUrl(callbackUrl, "/shipping-address");
 
   if (session) {
-    return redirect(target);
+    redirect(await localePath(target));
   }
 
   const qs = `?callbackUrl=${encodeURIComponent(target)}`;

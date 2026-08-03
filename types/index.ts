@@ -13,12 +13,9 @@ import {
 import { z } from "zod/v3";
 
 export type Product = z.infer<typeof insertProductSchema> & {
-  rating: string;
   id: string;
   createdAt: Date;
-  numReviews: number;
   deletedAt?: Date | null;
-  lowStockThreshold?: number;
   categoryId?: string | null;
 };
 
@@ -49,20 +46,6 @@ export type Order = Omit<z.infer<typeof insertOrderSchema>, "shippingMethod"> & 
 };
 export type OrderItem = z.infer<typeof insertOrderItemSchema>;
 export type PaymentResult = z.infer<typeof paymentResultSchema>;
-
-export type Review = {
-  userId: string;
-  productId: string;
-  title: string;
-  description: string | null;
-  rating: number;
-  id: string;
-  createdAt: Date;
-  isVerifiedPurchase?: boolean;
-  user?: {
-    name: string;
-  };
-};
 
 // ── Category types ──
 

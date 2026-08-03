@@ -26,8 +26,6 @@ export async function getMyWishlist() {
               price: true,
               images: true,
               stock: true,
-              rating: true,
-              numReviews: true,
               brand: true,
               category: true,
               isFeatured: true,
@@ -100,7 +98,9 @@ export async function toggleWishlist(productId: string) {
     const session = await getAuthSession();
 
     if (!session?.user?.id) {
-      throw new Error(t("userNotAuthenticated"));
+      // A visitor tapping the heart gets this in a toast, so speak to them
+      // rather than reporting an auth state ("user is not authenticated").
+      throw new Error(t("signInToSaveWishlist"));
     }
 
     // Upsert wishlist and check item in single flow

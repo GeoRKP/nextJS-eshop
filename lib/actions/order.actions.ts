@@ -5,23 +5,26 @@ import { formatError, toPlainObject } from "../utils";
 import { getAuthSession } from "@/lib/auth-session";
 import { getMyCart } from "./cart.actions";
 import { getUserById } from "./user.actions";
-import { createInsertOrderSchema } from "../validators";
+import { createInsertOrderSchema, updateOrderStatusSchema } from "../validators";
 import { prisma } from "@/db/prisma";
 import { CartItem, PaymentResult, ShippingAddress } from "@/types";
 import { paypal } from "../paypal";
 import {
   createPaymentOrder as createVivaApiOrder,
   retrieveTransaction as retrieveVivaTransaction,
+  toVivaCountryCode,
   vivaCheckoutUrl,
   VIVA_STATUS_FINAL,
 } from "../viva";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { cookies } from "next/headers";
+import { calcPrice, getCouponData } from "../pricing";
 import { cancelParcel } from "../boxnow";
 import { PAGE_SIZE, PAYMENT_METHODS } from "../constants";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { assertAdmin } from "@/lib/auth-guard";
-import { sendOrderStatusEmail } from "@/lib/email";
+import { sendOrderStatusEmail, sendLowStockAlertEmail } from "@/lib/email";
 import { logAuditEvent } from "@/lib/audit-log";
 import {
   updateOrderToPaid,
@@ -87,17 +90,26 @@ export async function createOrder() {
         redirectTo: "/payment-method",
       };
     }
+    // Recompute totals for the chosen shipping method (Box Now vs carrier have
+    // different rates) — the cart totals may predate the method selection.
+    const couponData = await getCouponData(cart.couponCode);
+    const prices = calcPrice(
+      cart.items as CartItem[],
+      couponData,
+      (addr.shippingMethod as string) ?? "home"
+    );
+
     const order = createInsertOrderSchema(tV).parse({
       userId: userId,
       shippingAddress: user.address,
       shippingMethod: addr.shippingMethod ?? "home",
       paymentMethod: user.paymentMethod,
-      itemsPrice: cart.itemsPrice,
-      shippingPrice: cart.shippingPrice,
-      taxPrice: cart.taxPrice,
-      totalPrice: cart.totalPrice,
+      itemsPrice: prices.itemsPrice,
+      shippingPrice: prices.shippingPrice,
+      taxPrice: prices.taxPrice,
+      totalPrice: prices.totalPrice,
       couponCode: cart.couponCode,
-      discountAmount: cart.discountAmount,
+      discountAmount: prices.discountAmount,
     });
 
     // Create a transaction to create order and order items
@@ -107,11 +119,22 @@ export async function createOrder() {
     const boxnowLocker = (
       order.shippingMethod === "boxnow_locker" ? (addr.boxnowLocker ?? null) : null
     ) as Prisma.InputJsonValue | null;
+    // Guest sessions are keyed by email, so the same shadow User is handed to
+    // whoever types that email next. Stamp the browser's cart session on the
+    // order so only the visitor who placed it can open it later.
+    const guestSessionId = session.user.isGuest
+      ? ((await cookies()).get("sessionCartId")?.value ?? null)
+      : null;
+
+    const lowStockItems: { name: string; stock: number; threshold: number }[] = [];
+
     const insertedOrderId = await prisma.$transaction(async (tx) => {
       const insertedOrder = await tx.order.create({
         data: {
           ...order,
           status: "pending",
+          guestSessionId,
+          stockReserved: true,
           // Json column: only set when present (avoids Prisma JsonNull handling).
           ...(boxnowLocker ? { boxnowLocker } : {}),
         },
@@ -124,6 +147,58 @@ export async function createOrder() {
           orderId: insertedOrder.id,
         })),
       });
+
+      // Reserve stock at placement, not at payment. COD orders are only marked
+      // paid by an admin hours or days later; until this reservation existed
+      // nothing held the item, so two COD buyers could both take the last unit
+      // and the second order became impossible to mark paid.
+      const flags = await tx.product.findMany({
+        where: { id: { in: (cart.items as CartItem[]).map((i) => i.productId) } },
+        select: {
+          id: true,
+          stock: true,
+          allowBackorder: true,
+          lowStockThreshold: true,
+        },
+      });
+      const flagsById = new Map(flags.map((p) => [p.id, p]));
+
+      for (const item of cart.items as CartItem[]) {
+        const productFlags = flagsById.get(item.productId);
+
+        if (productFlags?.allowBackorder) {
+          // Backorder items go negative on purpose: delivery is arranged individually.
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { decrement: item.qty } },
+          });
+        } else {
+          const reserved = await tx.product.updateMany({
+            where: { id: item.productId, stock: { gte: item.qty } },
+            data: { stock: { decrement: item.qty } },
+          });
+          if (reserved.count === 0) {
+            // Rolls the whole transaction back — no order, no partial reservation.
+            throw new Error(t("notEnoughStock"));
+          }
+        }
+
+        // Stock now drops here rather than at payment, so the threshold crossing
+        // is detected here too — one alert per crossing, as before.
+        if (productFlags && productFlags.lowStockThreshold > 0) {
+          const newStock = productFlags.stock - item.qty;
+          if (
+            productFlags.stock > productFlags.lowStockThreshold &&
+            newStock <= productFlags.lowStockThreshold
+          ) {
+            lowStockItems.push({
+              name: item.name,
+              stock: newStock,
+              threshold: productFlags.lowStockThreshold,
+            });
+          }
+        }
+      }
 
       // Create initial status history entry
       await tx.orderStatusHistory.create({
@@ -153,6 +228,15 @@ export async function createOrder() {
     });
 
     if (!insertedOrderId) throw new Error(t("orderNotCreated"));
+
+    // Best-effort, outside the transaction: an email hiccup must not undo a
+    // placed order.
+    if (lowStockItems.length > 0) {
+      await sendLowStockAlertEmail({
+        orderIdFormatted: insertedOrderId.slice(0, 8).toUpperCase(),
+        items: lowStockItems,
+      });
+    }
 
     // COD orders never hit updateOrderToPaid at checkout, so their confirmation
     // email goes out at placement time (best-effort).
@@ -201,6 +285,17 @@ export async function getOrderById(orderId: string) {
       },
     },
   });
+
+  // A guest session proves only "someone typed this email", and shadow accounts
+  // are reused across visitors — so for guests, ownership of the User row is not
+  // ownership of the order. Require the placing browser's cart session too.
+  // Claiming the account (password reset) clears isGuest and lifts this.
+  if (data && session.user.role !== "admin" && session.user.isGuest) {
+    const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+    if (!data.guestSessionId || data.guestSessionId !== sessionCartId) {
+      return null;
+    }
+  }
 
   return toPlainObject(data);
 }
@@ -364,7 +459,9 @@ export async function createVivaPaymentOrder(orderId: string) {
       customer: {
         email: order.user?.email,
         fullName: order.user?.name,
-        countryCode: (order.shippingAddress as ShippingAddress)?.country,
+        countryCode: toVivaCountryCode(
+          (order.shippingAddress as ShippingAddress)?.country
+        ),
         requestLang: process.env.VIVA_REQUEST_LANG || "el-GR",
       },
       tags: [order.id],
@@ -610,7 +707,27 @@ export async function deleteOrder(id: string) {
   try {
     await assertAdmin();
     const t = await getTranslations("Actions");
-    await prisma.order.delete({ where: { id } });
+
+    const order = await prisma.order.findFirst({
+      where: { id },
+      include: { orderitems: true },
+    });
+    if (!order) throw new Error(t("orderNotFound"));
+
+    await prisma.$transaction(async (tx) => {
+      // Deleting an order that still holds a reservation would lose that stock
+      // for good — put it back unless it was already returned by a cancellation.
+      if (order.stockReserved && order.status !== "cancelled") {
+        for (const item of order.orderitems) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.qty } },
+          });
+        }
+      }
+
+      await tx.order.delete({ where: { id } });
+    });
 
     await logAuditEvent({
       action: "order.delete",
@@ -631,9 +748,15 @@ export async function deleteOrder(id: string) {
 
 export async function updateOrderToPaidCOD(orderId: string) {
   try {
-    await assertAdmin();
+    const session = await assertAdmin();
     const t = await getTranslations("Actions");
-    await updateOrderToPaid({ orderId });
+    await updateOrderToPaid({ orderId, changedBy: session?.user?.id });
+
+    await logAuditEvent({
+      action: "order.markPaid",
+      entity: "Order",
+      entityId: orderId,
+    });
 
     revalidatePath(`/order/${orderId}`);
     revalidatePath(`/en/order/${orderId}`);
@@ -650,7 +773,7 @@ export async function updateOrderToPaidCOD(orderId: string) {
 
 export async function deliverOrder(orderId: string) {
   try {
-    await assertAdmin();
+    const session = await assertAdmin();
     const t = await getTranslations("Actions");
     const order = await prisma.order.findFirst({
       where: { id: orderId },
@@ -677,8 +800,15 @@ export async function deliverOrder(orderId: string) {
           orderId,
           status: "delivered",
           note: t("orderMarkedAsDelivered"),
+          changedBy: session?.user?.id,
         },
       });
+    });
+
+    await logAuditEvent({
+      action: "order.deliver",
+      entity: "Order",
+      entityId: orderId,
     });
 
     revalidatePath(`/order/${orderId}`);
@@ -706,27 +836,37 @@ export async function updateOrderStatus({
     const session = await assertAdmin();
     const t = await getTranslations("Actions");
 
+    // The schema existed but was never called, so any string went straight into
+    // the column — an order with a bogus status vanishes from every admin filter
+    // and renders t(undefined) in the customer's order list.
+    const parsed = updateOrderStatusSchema.parse({ orderId, status, note });
+
     const order = await prisma.order.findFirst({
-      where: { id: orderId },
+      where: { id: parsed.orderId },
       include: { orderitems: true },
     });
 
     if (!order) throw new Error(t("orderNotFound"));
 
-    const cancelling = status === "cancelled" && order.status !== "cancelled";
+    const cancelling =
+      parsed.status === "cancelled" && order.status !== "cancelled";
 
     await prisma.$transaction(async (tx) => {
       // Sync booleans with status. NOTE: moving to "confirmed" no longer implies
       // "paid" — payment marking goes through updateOrderToPaid (stock + coupons).
-      const updateData: Record<string, unknown> = { status };
+      const updateData: Record<string, unknown> = { status: parsed.status };
 
-      if (status === "delivered") {
+      if (parsed.status === "delivered") {
         updateData.isDelivered = true;
         updateData.deliveredAt = new Date();
       }
 
-      // Cancelling a paid order returns its stock (it was decremented on payment).
-      if (cancelling && order.isPaid) {
+      // Return stock on cancellation — reserved at placement for new orders,
+      // decremented at payment for orders predating the reservation.
+      // "refunded" deliberately does NOT return stock: the goods come back
+      // physically and the admin re-stocks them, which may never happen (damaged
+      // returns), so an automatic increment would invent inventory.
+      if (cancelling && (order.stockReserved || order.isPaid)) {
         for (const item of order.orderitems) {
           await tx.product.update({
             where: { id: item.productId },
@@ -736,15 +876,15 @@ export async function updateOrderStatus({
       }
 
       await tx.order.update({
-        where: { id: orderId },
+        where: { id: parsed.orderId },
         data: updateData,
       });
 
       await tx.orderStatusHistory.create({
         data: {
-          orderId,
-          status,
-          note,
+          orderId: parsed.orderId,
+          status: parsed.status,
+          note: parsed.note,
           changedBy: session?.user?.id,
         },
       });

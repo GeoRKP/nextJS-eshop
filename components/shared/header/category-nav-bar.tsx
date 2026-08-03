@@ -24,9 +24,6 @@ export default async function CategoryNavBar() {
         featured: t("featured"),
         popularBrands: t("popularBrands"),
         allBrands: t("allBrands"),
-        viewAllIn: t("viewAllIn"),
-        products: t("products"),
-        subcategories: t("subcategories"),
       }}
     />
   );

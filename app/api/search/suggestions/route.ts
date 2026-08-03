@@ -42,9 +42,9 @@ export async function GET(request: NextRequest) {
             LEFT JOIN "Category" c ON c.id = p."categoryId"
             WHERE p."deletedAt" IS NULL
               AND (
-                unaccent(p.name) ILIKE unaccent(${likeTerm})
-                OR unaccent(COALESCE(p."nameEn", '')) ILIKE unaccent(${likeTerm})
-                OR unaccent(p.brand) ILIKE unaccent(${likeTerm})
+                translate(lower(unaccent(p.name)),'ς','σ') LIKE translate(lower(unaccent(${likeTerm})),'ς','σ')
+                OR translate(lower(unaccent(COALESCE(p."nameEn", ''))),'ς','σ') LIKE translate(lower(unaccent(${likeTerm})),'ς','σ')
+                OR translate(lower(unaccent(p.brand)),'ς','σ') LIKE translate(lower(unaccent(${likeTerm})),'ς','σ')
               )
             ORDER BY GREATEST(
               similarity(unaccent(p.name), unaccent(${q})),
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
             FROM "Product" p
             LEFT JOIN "Category" c ON c.id = p."categoryId"
             WHERE p."deletedAt" IS NULL
-              AND (p.name ILIKE ${likeTerm} OR COALESCE(p."nameEn",'') ILIKE ${likeTerm} OR p.brand ILIKE ${likeTerm})
+              AND (translate(lower(p.name),'ς','σ') LIKE translate(lower(${likeTerm}),'ς','σ') OR translate(lower(COALESCE(p."nameEn",'')),'ς','σ') LIKE translate(lower(${likeTerm}),'ς','σ') OR translate(lower(p.brand),'ς','σ') LIKE translate(lower(${likeTerm}),'ς','σ'))
             ORDER BY GREATEST(similarity(p.name, ${q}), similarity(COALESCE(p."nameEn",''), ${q})) DESC
             LIMIT 5
           `;
@@ -76,9 +76,9 @@ export async function GET(request: NextRequest) {
             LEFT JOIN "Category" c ON c.id = p."categoryId"
             WHERE p."deletedAt" IS NULL
               AND (
-                unaccent(p.name) ILIKE unaccent(${likeTerm})
-                OR unaccent(COALESCE(p."nameEn", '')) ILIKE unaccent(${likeTerm})
-                OR unaccent(p.brand) ILIKE unaccent(${likeTerm})
+                translate(lower(unaccent(p.name)),'ς','σ') LIKE translate(lower(unaccent(${likeTerm})),'ς','σ')
+                OR translate(lower(unaccent(COALESCE(p."nameEn", ''))),'ς','σ') LIKE translate(lower(unaccent(${likeTerm})),'ς','σ')
+                OR translate(lower(unaccent(p.brand)),'ς','σ') LIKE translate(lower(unaccent(${likeTerm})),'ς','σ')
               )
             ORDER BY p.name ASC
             LIMIT 5
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
             FROM "Product" p
             LEFT JOIN "Category" c ON c.id = p."categoryId"
             WHERE p."deletedAt" IS NULL
-              AND (p.name ILIKE ${likeTerm} OR COALESCE(p."nameEn",'') ILIKE ${likeTerm} OR p.brand ILIKE ${likeTerm})
+              AND (translate(lower(p.name),'ς','σ') LIKE translate(lower(${likeTerm}),'ς','σ') OR translate(lower(COALESCE(p."nameEn",'')),'ς','σ') LIKE translate(lower(${likeTerm}),'ς','σ') OR translate(lower(p.brand),'ς','σ') LIKE translate(lower(${likeTerm}),'ς','σ'))
             ORDER BY p.name ASC
             LIMIT 5
           `;
@@ -107,8 +107,8 @@ export async function GET(request: NextRequest) {
           LEFT JOIN "Category" c ON c.id = p."categoryId"
           WHERE p."deletedAt" IS NULL
             AND (
-              unaccent(p.category) ILIKE unaccent(${likeTerm})
-              OR unaccent(COALESCE(c."nameEn", '')) ILIKE unaccent(${likeTerm})
+              translate(lower(unaccent(p.category)),'ς','σ') LIKE translate(lower(unaccent(${likeTerm})),'ς','σ')
+              OR translate(lower(unaccent(COALESCE(c."nameEn", ''))),'ς','σ') LIKE translate(lower(unaccent(${likeTerm})),'ς','σ')
             )
           GROUP BY p.category
           ORDER BY count DESC
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
           FROM "Product" p
           LEFT JOIN "Category" c ON c.id = p."categoryId"
           WHERE p."deletedAt" IS NULL
-            AND (p.category ILIKE ${likeTerm} OR COALESCE(c."nameEn",'') ILIKE ${likeTerm})
+            AND (translate(lower(p.category),'ς','σ') LIKE translate(lower(${likeTerm}),'ς','σ') OR translate(lower(COALESCE(c."nameEn",'')),'ς','σ') LIKE translate(lower(${likeTerm}),'ς','σ'))
           GROUP BY p.category
           ORDER BY count DESC
           LIMIT 3

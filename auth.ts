@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { compareSync } from "bcrypt-ts";
 import { authConfig } from "./auth.config";
 import { verifyGuestToken } from "./lib/guest-token";
+import { clientIp, rateLimit } from "./lib/rate-limit";
 
 // Refresh ban/suspension status from DB at most once per this interval
 const BAN_SYNC_INTERVAL_MS = 60 * 1000; // 60 seconds
@@ -21,6 +22,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (credentials == null) {
           return null;
         }
+
+        // Throttle here rather than only in the signInWithCredentials action:
+        // POST /api/auth/callback/credentials reaches authorize() directly, so
+        // an action-level limit leaves the real login endpoint wide open.
+        const email = String(credentials.email ?? "").toLowerCase();
+        const rl = rateLimit({
+          key: `login:${await clientIp()}:${email}`,
+          limit: 10,
+          windowMs: 15 * 60_000,
+        });
+        if (!rl.success) return null;
+
         const user = await prisma.user.findFirst({
           where: { email: credentials.email as string, deletedAt: null },
         });
@@ -135,9 +148,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.sub as string },
-            select: { isBanned: true, suspendedUntil: true, role: true, isGuest: true },
+            select: {
+              isBanned: true,
+              suspendedUntil: true,
+              role: true,
+              isGuest: true,
+              deletedAt: true,
+            },
           });
-          if (dbUser) {
+          if (!dbUser || dbUser.deletedAt) {
+            // Account deleted (GDPR erasure or admin action) while a JWT was
+            // still live. Without this branch the session kept working until
+            // the token expired — ban applied, delete did not.
+            token.isBanned = true;
+            token.role = "user";
+            token.banSyncedAt = Date.now();
+          } else {
             token.isBanned = dbUser.isBanned;
             token.suspendedUntil = dbUser.suspendedUntil
               ? dbUser.suspendedUntil.toISOString()

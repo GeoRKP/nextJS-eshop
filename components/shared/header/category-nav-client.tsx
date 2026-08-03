@@ -18,9 +18,6 @@ type Props = {
     featured: string;
     popularBrands: string;
     allBrands: string;
-    viewAllIn: string;
-    products: string;
-    subcategories: string;
   };
 };
 

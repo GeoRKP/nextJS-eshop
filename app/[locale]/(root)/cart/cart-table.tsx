@@ -9,8 +9,9 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import CouponInput from "@/components/shared/coupon-input";
+import { localizedName } from "@/lib/i18n-helpers";
 
 function QuantityControls({
   item,
@@ -64,6 +65,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
   const router = useRouter();
   const t = useTranslations("Cart");
   const tc = useTranslations("Common");
+  const locale = useLocale();
 
   const handleRemove = (productId: string) => {
     startTransition(async () => {
@@ -127,7 +129,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden bg-muted/30">
                     <Image
                       src={item.image}
-                      alt={item.name}
+                      alt={localizedName(item, locale)}
                       width={96}
                       height={96}
                       className="object-cover w-full h-full"
@@ -140,7 +142,7 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                     <div>
                       <Link href={`/product/${item.slug}`}>
                         <h3 className="font-semibold text-sm md:text-base line-clamp-2 hover:text-brand-accent transition-colors">
-                          {item.name}
+                          {localizedName(item, locale)}
                         </h3>
                       </Link>
                       <p className="text-sm text-muted-foreground mt-0.5">
@@ -204,7 +206,10 @@ export default function CartTable({ cart }: { cart?: Cart }) {
                 )}
               </div>
 
-              <CouponInput appliedCode={cart.couponCode} />
+              <CouponInput
+                appliedCode={cart.couponCode}
+                discountAmount={cart.discountAmount}
+              />
 
               <div className="divider-gradient" />
 

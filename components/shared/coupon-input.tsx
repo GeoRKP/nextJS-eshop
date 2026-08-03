@@ -10,8 +10,10 @@ import { Tag, X } from "lucide-react";
 
 export default function CouponInput({
   appliedCode,
+  discountAmount,
 }: {
   appliedCode?: string | null;
+  discountAmount?: string | number | null;
 }) {
   const { toast } = useToast();
   const t = useTranslations("Cart");
@@ -47,21 +49,34 @@ export default function CouponInput({
   };
 
   if (appliedCode) {
+    // The coupon stays attached when the cart drops below its minimum, and the
+    // discount just goes to zero. Say so — a lone chip reads as "you saved money".
+    const isInactive = Number(discountAmount ?? 0) === 0;
+
     return (
-      <div className="flex items-center gap-2 text-sm">
-        <div className="flex items-center gap-1.5 bg-brand-accent/10 text-brand-accent rounded-full px-3 py-1">
-          <Tag className="w-3.5 h-3.5" />
-          <span className="font-mono font-medium">
-            {appliedCode}
-          </span>
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-2 text-sm">
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1 ${
+              isInactive
+                ? "bg-muted text-muted-foreground"
+                : "bg-brand-accent/10 text-brand-accent"
+            }`}
+          >
+            <Tag className="w-3.5 h-3.5" />
+            <span className="font-mono font-medium">{appliedCode}</span>
+          </div>
+          <button
+            onClick={handleRemove}
+            disabled={isPending}
+            className="text-muted-foreground hover:text-destructive transition-colors p-1"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
-        <button
-          onClick={handleRemove}
-          disabled={isPending}
-          className="text-muted-foreground hover:text-destructive transition-colors p-1"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
+        {isInactive && (
+          <p className="text-xs text-muted-foreground">{t("couponNotApplied")}</p>
+        )}
       </div>
     );
   }

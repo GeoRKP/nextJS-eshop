@@ -16,6 +16,8 @@ const SKIP_BAN_REDIRECT = [
   /^(?:\/en)?\/reset-password/,
 ];
 
+const ADMIN_PATH = /^(?:\/en)?\/admin(?:\/|$)/;
+
 function buildBlockedUrl(req: NextRequest) {
   const url = req.nextUrl.clone();
   url.pathname = req.nextUrl.pathname.startsWith("/en") ? "/en/blocked" : "/blocked";
@@ -23,8 +25,19 @@ function buildBlockedUrl(req: NextRequest) {
   return url;
 }
 
+function buildUnauthorizedUrl(req: NextRequest) {
+  const url = req.nextUrl.clone();
+  url.pathname = req.nextUrl.pathname.startsWith("/en")
+    ? "/en/unauthorized"
+    : "/unauthorized";
+  url.search = "";
+  return url;
+}
+
 export default async function proxy(req: NextRequest) {
-  // Run intl middleware (auth is handled by NextAuth's authorized callback in auth.config.ts)
+  // Run intl middleware. This is NOT wrapped in NextAuth's middleware, so no
+  // `authorized` callback runs here — the only auth this layer does is the
+  // ban redirect below. Route protection is enforced per page/action.
   const response = intlMiddleware(req);
 
   // Set sessionCartId cookie if not present. Only read server-side (never by
@@ -60,6 +73,16 @@ export default async function proxy(req: NextRequest) {
         if (token.isBanned || isSuspended) {
           return NextResponse.redirect(buildBlockedUrl(req));
         }
+      }
+
+      // Cheap first line for the admin subtree, so an unauthorized request is
+      // turned away before any page code runs. NOT the authoritative check:
+      // this reads the role off the JWT cookie, which only refreshes on the
+      // jwt callback's schedule, and middleware is the wrong place to be the
+      // last word on authorization. requireAdmin() in each page/layout and
+      // assertAdmin() in each action remain the enforcing layer.
+      if (ADMIN_PATH.test(pathname) && token?.role !== "admin") {
+        return NextResponse.redirect(buildUnauthorizedUrl(req));
       }
     } catch {
       // Fail open — token decode errors must not lock everyone out.

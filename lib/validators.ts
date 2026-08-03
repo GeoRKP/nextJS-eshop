@@ -71,6 +71,11 @@ export const insertProductSchema = z.object({
     .min(3, { message: "Description must be at least 3 characters long" }),
   descriptionEn: z.string().optional().nullable(),
   stock: z.coerce.number().min(0, { message: "Stock must be at least 0" }),
+  lowStockThreshold: z.coerce
+    .number()
+    .int()
+    .min(0, { message: "Low-stock threshold must be at least 0" }),
+  allowBackorder: z.boolean(),
   images: z
     .array(z.string())
     .min(1, { message: "At least one image is required" }),
@@ -116,6 +121,9 @@ export const signUpFormSchema = z
 export const cartItemSchema = z.object({
   productId: z.string().min(1, { message: "Product is required" }),
   name: z.string().min(1, { message: "Name is required" }),
+  // Snapshotted alongside `name` so an English visitor sees English product
+  // names all the way through cart → checkout → order, not just in the toast.
+  nameEn: z.string().nullable().optional(),
   slug: z.string().min(1, { message: "Slug is required" }),
   qty: z
     .number()
@@ -124,6 +132,24 @@ export const cartItemSchema = z.object({
   image: z.string().min(1, { message: "Image is required" }),
   price: currency,
 });
+
+/**
+ * Localized cart-item schema. The bare `cartItemSchema` above still backs the
+ * CartItem type, but its English messages leaked to Greek shoppers as
+ * "Quantity must be a positive number" / "Expected integer, received float".
+ */
+export function createCartItemSchema(t: T) {
+  return cartItemSchema.extend({
+    productId: z.string().min(1, { message: t("productRequired") }),
+    name: z.string().min(1, { message: t("nameRequired") }),
+    slug: z.string().min(1, { message: t("slugRequired") }),
+    qty: z
+      .number({ invalid_type_error: t("quantityInvalid") })
+      .int({ message: t("quantityInvalid") })
+      .positive({ message: t("quantityPositive") }),
+    image: z.string().min(1, { message: t("imageRequired") }),
+  });
+}
 
 export const insertCartSchema = z.object({
   items: z.array(cartItemSchema),
@@ -142,6 +168,9 @@ export const boxnowLockerSchema = z.object({
   id: z.string().min(1),
   name: z.string().optional(),
   addressLine1: z.string().optional().nullable(),
+  // Zod strips unknown keys, so without this the town Box Now puts in
+  // addressLine2 never made it into the order snapshot.
+  addressLine2: z.string().optional().nullable(),
   postalCode: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
   country: z.string().optional().nullable(),
@@ -239,16 +268,6 @@ export const updateUserSchema = updateUserProfileSchema.extend({
     .refine((v) => USER_ROLES.includes(v), { message: "Invalid role" }),
 });
 
-// Schema for inserting a review
-
-export const insertReviewSchema = z.object({
-  title: z.string().min(3, { message: "Title must be at least 3 characters long" }),
-  description: z.string().min(3, { message: "Description must be at least 3 characters long" }),
-  productId: z.string().min(1, { message: "Product is required" }),
-  userId: z.string().min(1, { message: "User is required" }),
-  rating: z.coerce.number().int().min(1, { message: "Rating must be at least 1" }).max(5, { message: "Rating must be at most 5" }),
-});
-
 // ── Category schemas ──
 
 export const insertCategorySchema = z.object({
@@ -334,6 +353,8 @@ export function createInsertProductSchema(t: T) {
     description: z.string().min(3, { message: t("descriptionMin") }),
     descriptionEn: z.string().optional().nullable(),
     stock: z.coerce.number().min(0, { message: t("stockMin") }),
+    lowStockThreshold: z.coerce.number().int().min(0, { message: t("stockMin") }),
+    allowBackorder: z.boolean(),
     images: z.array(z.string()).min(1, { message: t("imagesMin") }),
     isFeatured: z.boolean(),
     banner: z.string().nullable(),
@@ -437,16 +458,6 @@ export function createUpdateUserSchema(t: T) {
   return createUpdateUserProfileSchema(t).extend({
     id: z.string().min(1, { message: t("idRequired") }),
     role: z.string().min(1, { message: t("roleRequired") }),
-  });
-}
-
-export function createInsertReviewSchema(t: T) {
-  return z.object({
-    title: z.string().min(3, { message: t("titleMin") }),
-    description: z.string().min(3, { message: t("descriptionMin") }),
-    productId: z.string().min(1, { message: t("productRequired") }),
-    userId: z.string().min(1, { message: t("userRequired") }),
-    rating: z.coerce.number().int().min(1, { message: t("ratingMin") }).max(5, { message: t("ratingMax") }),
   });
 }
 

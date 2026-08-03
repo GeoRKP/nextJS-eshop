@@ -33,8 +33,10 @@ export async function requestPasswordReset(
       return { success: true, message: t("passwordResetSent") };
     }
 
+    // Guests are created with password: null on purpose — this flow is also how
+    // they claim their account, so passwordless users must not be filtered out.
     const user = await prisma.user.findFirst({
-      where: { email, deletedAt: null, password: { not: null } },
+      where: { email, deletedAt: null },
     });
 
     // Always return same message to prevent email enumeration
@@ -112,9 +114,13 @@ export async function resetPassword(prevState: unknown, formData: FormData) {
 
     const hashedPassword = hashSync(password, 12);
 
+    // Clearing isGuest is what turns a shadow account into a real one. It must
+    // happen in the same write as the password: while isGuest stays true,
+    // continueAsGuest would still hand out a session for this email with no
+    // password at all.
     await prisma.user.update({
       where: { id: user.id },
-      data: { password: hashedPassword },
+      data: { password: hashedPassword, isGuest: false },
     });
 
     // Single-use token: delete after successful reset

@@ -1,10 +1,6 @@
 import { APP_NAME } from "@/lib/constants";
 import { getTranslations } from "next-intl/server";
 import {
-  Facebook,
-  Instagram,
-  Twitter,
-  Youtube,
   Phone,
   Mail,
   MapPin,
@@ -19,13 +15,6 @@ const Footer = async () => {
   const buildDate = new Date().toISOString().slice(0, 10);
   const t = await getTranslations("Footer");
   const tc = await getTranslations("Common");
-
-  const socialLinks = [
-    { icon: Facebook, label: "Facebook" },
-    { icon: Instagram, label: "Instagram" },
-    { icon: Twitter, label: "Twitter" },
-    { icon: Youtube, label: "Youtube" },
-  ];
 
   return (
     <footer className="bg-foreground text-background relative">
@@ -68,19 +57,6 @@ const Footer = async () => {
             <p className="text-sm text-background/80 leading-relaxed max-w-sm">
               {t("description")}
             </p>
-            {/* Square bordered social tiles */}
-            <div className="flex gap-2 pt-2">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href="#"
-                  className="h-10 w-10 border border-background/20 flex items-center justify-center text-background/85 hover:bg-accent hover:text-accent-foreground hover:border-accent transition-all duration-200"
-                  aria-label={social.label}
-                >
-                  <social.icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Categories column */}
@@ -177,7 +153,7 @@ const Footer = async () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-[13px] text-background/85">
                 <Phone className="h-4 w-4 text-accent shrink-0 mt-0.5 stroke-[1.75]" />
-                <span className="font-mono">+30 210 1234567</span>
+                <span className="font-mono">+30 210 3457405</span>
               </li>
               <li className="flex items-start gap-2 text-[13px] text-background/85">
                 <Mail className="h-4 w-4 text-accent shrink-0 mt-0.5 stroke-[1.75]" />
@@ -226,10 +202,6 @@ const Footer = async () => {
         <div className="wrapper py-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center">
           <span className="font-mono text-[10px] text-background/55 tracking-[0.14em] uppercase">
             <span className="text-accent">▲</span> BUILD {buildDate.replace(/-/g, ".")}
-          </span>
-          <span className="text-background/15">·</span>
-          <span className="font-mono text-[10px] text-background/55 tracking-[0.14em] uppercase">
-            Γ.Ε.ΜΗ. 123456701000
           </span>
           <span className="text-background/15">·</span>
           <span className="font-mono text-[10px] text-background/55 tracking-[0.14em] uppercase">

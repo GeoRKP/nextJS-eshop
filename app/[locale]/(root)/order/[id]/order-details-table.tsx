@@ -14,7 +14,8 @@ import {
 import { createBoxNowDeliveryRequest } from "@/lib/actions/boxnow.actions";
 import { useToast } from "@/hooks/use-toast";
 import { useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { localizedName } from "@/lib/i18n-helpers";
 import OrderStatusBadge from "@/components/shared/order-status-badge";
 import { CreditCard, MapPin, Package, PackageOpen, FileDown } from "lucide-react";
 
@@ -193,6 +194,7 @@ export default function OrderDetailsTable({
 
   const t = useTranslations("Order");
   const tCheckout = useTranslations("Checkout");
+  const locale = useLocale();
 
   return (
     <>
@@ -273,7 +275,7 @@ export default function OrderDetailsTable({
                     <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden bg-muted/30">
                       <Image
                         src={item.image}
-                        alt={item.name}
+                        alt={localizedName(item, locale)}
                         width={80}
                         height={80}
                         className="object-cover w-full h-full"
@@ -284,7 +286,7 @@ export default function OrderDetailsTable({
                   <div className="flex-1 min-w-0">
                     <Link href={`/product/${item.slug}`}>
                       <p className="text-sm font-medium line-clamp-1 hover:text-brand-accent transition-colors">
-                        {item.name}
+                        {localizedName(item, locale)}
                       </p>
                     </Link>
                     <p className="text-xs text-muted-foreground">

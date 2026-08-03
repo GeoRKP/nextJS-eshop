@@ -1,6 +1,7 @@
 import { getAuthSession } from "@/lib/auth-session";
 import { getMyCart } from "@/lib/actions/cart.actions";
 import { redirect } from "next/navigation";
+import { localePath } from "@/lib/locale-path";
 import { ShippingAddress } from "@/types";
 import { getUserById } from "@/lib/actions/user.actions";
 import ShippingAddressForm from "./shipping-address-form";
@@ -18,7 +19,7 @@ export default async function ShippingAddressPage() {
   const cart = await getMyCart();
 
   if (!cart || cart.items.length === 0) {
-    redirect("/cart");
+    redirect(await localePath("/cart"));
   }
 
   const session = await getAuthSession();
@@ -27,7 +28,7 @@ export default async function ShippingAddressPage() {
 
   // First checkout step: unauthenticated users choose sign-in / sign-up /
   // guest checkout instead of being dropped straight on the login form.
-  if (!userId) redirect("/checkout-options?callbackUrl=/shipping-address");
+  if (!userId) redirect(await localePath("/checkout-options", { callbackUrl: "/shipping-address" }));
 
   const user = await getUserById(userId);
 

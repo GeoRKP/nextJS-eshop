@@ -10,7 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
-import { SlidersHorizontal, ChevronDown, Star } from "lucide-react";
+import { SlidersHorizontal, ChevronDown } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { localizedName } from "@/lib/i18n-helpers";
@@ -26,16 +26,13 @@ type CategoryItem = {
 
 type FilterData = {
   categories: CategoryItem[];
-  ratings: { value: number; label: string; href: string; isActive: boolean }[];
   priceRange: { min: number; max: number; currentMin: number; currentMax: number };
-  anyHref: { category: string; price: string; rating: string };
+  anyHref: { category: string; price: string };
   activeCategory: string;
   activePrice: string;
-  activeRating: string;
   translations: {
     department: string;
     price: string;
-    rating: string;
     any: string;
     filters: string;
     clearFilters: string;
@@ -90,23 +87,6 @@ function FilterSection({
         </div>
       </div>
     </div>
-  );
-}
-
-function StarRating({ count }: { count: number }) {
-  return (
-    <span className="inline-flex items-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={`h-3.5 w-3.5 ${
-            i < count
-              ? "fill-brand-accent text-brand-accent"
-              : "fill-none text-muted-foreground/40"
-          }`}
-        />
-      ))}
-    </span>
   );
 }
 
@@ -241,12 +221,11 @@ function CategoryNode({ cat }: { cat: CategoryItem }) {
 }
 
 function FilterContent({ filterData }: { filterData: FilterData }) {
-  const { categories, ratings, priceRange, anyHref, translations, clearAllHref, searchParams } =
+  const { categories, priceRange, anyHref, translations, clearAllHref, searchParams } =
     filterData;
 
   const activeCatCount = filterData.activeCategory !== "all" && filterData.activeCategory !== "" ? 1 : 0;
   const activePriceCount = filterData.activePrice !== "all" ? 1 : 0;
-  const activeRatingCount = filterData.activeRating !== "all" ? 1 : 0;
 
   return (
     <div>
@@ -295,38 +274,6 @@ function FilterContent({ filterData }: { filterData: FilterData }) {
         />
       </FilterSection>
 
-      {/* Rating filter */}
-      <FilterSection title={translations.rating} count={activeRatingCount}>
-        <ul className="space-y-0.5">
-          <li>
-            <Link
-              className={`text-sm py-2 px-3 block rounded-lg transition-all ${
-                filterData.activeRating === "all"
-                  ? "font-bold text-accent-foreground bg-accent"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}
-              href={anyHref.rating}
-            >
-              {translations.any}
-            </Link>
-          </li>
-          {ratings.map((r) => (
-            <li key={r.value}>
-              <Link
-                className={`text-sm py-2 px-3 flex items-center gap-2 rounded-lg transition-all ${
-                  r.isActive
-                    ? "font-bold text-accent-foreground bg-accent"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                }`}
-                href={r.href}
-              >
-                <StarRating count={r.value} />
-                <span className="text-xs">{r.label.replace(/^\d+\s*/, '')}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </FilterSection>
     </div>
   );
 }

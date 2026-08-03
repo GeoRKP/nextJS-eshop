@@ -22,18 +22,13 @@ function createPrismaClient() {
   return new PrismaClient();
 }
 
-// Extends the PrismaClient with a custom result transformer to convert the price and rating fields to strings.
+// Extends the PrismaClient with a custom result transformer to convert the price fields to strings.
 export const prisma = createPrismaClient().$extends({
   result: {
     product: {
       price: {
         compute(product) {
           return product.price.toString();
-        },
-      },
-      rating: {
-        compute(product) {
-          return product.rating.toString();
         },
       },
     },

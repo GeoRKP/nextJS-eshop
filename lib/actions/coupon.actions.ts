@@ -2,7 +2,8 @@
 
 import { prisma } from "@/db/prisma";
 import { getAuthSession } from "@/lib/auth-session";
-import { formatError, toPlainObject } from "../utils";
+import { formatCurrency, formatError, toPlainObject } from "../utils";
+import { getMyCart } from "./cart.actions";
 import { revalidatePath } from "next/cache";
 import { createInsertCouponSchema, createUpdateCouponSchema } from "../validators";
 import { z } from "zod/v3";
@@ -10,6 +11,7 @@ import { insertCouponSchema, updateCouponSchema } from "../validators";
 import { PAGE_SIZE } from "../constants";
 import { getTranslations } from "next-intl/server";
 import { assertAdmin } from "@/lib/auth-guard";
+import { logAuditEvent } from "@/lib/audit-log";
 
 // Validate a coupon code (for cart/checkout)
 export async function validateCoupon(code: string) {
@@ -53,6 +55,19 @@ export async function validateCoupon(code: string) {
 
       if (userUsageCount >= coupon.maxUsesPerUser) {
         throw new Error(t("couponMaxUsesPerUserReached"));
+      }
+    }
+
+    // The minimum is enforced silently inside calcPrice, so report it here
+    // rather than letting the caller call an ineffective coupon "valid".
+    if (coupon.minOrderAmount) {
+      const cart = await getMyCart();
+      if (cart && Number(cart.itemsPrice) < Number(coupon.minOrderAmount)) {
+        throw new Error(
+          t("couponMinOrderNotMet", {
+            amount: formatCurrency(Number(coupon.minOrderAmount)),
+          })
+        );
       }
     }
 
@@ -163,7 +178,7 @@ export async function createCoupon(data: z.infer<typeof insertCouponSchema>) {
 
     const { categoryIds, productIds, ...couponData } = parsed;
 
-    await prisma.coupon.create({
+    const created = await prisma.coupon.create({
       data: {
         ...couponData,
         categories: categoryIds.length > 0
@@ -181,6 +196,13 @@ export async function createCoupon(data: z.infer<typeof insertCouponSchema>) {
             }
           : undefined,
       },
+    });
+
+    await logAuditEvent({
+      action: "coupon.create",
+      entity: "Coupon",
+      entityId: created.id,
+      details: { code: created.code },
     });
 
     revalidatePath("/admin/coupons");
@@ -235,6 +257,13 @@ export async function updateCoupon(data: z.infer<typeof updateCouponSchema>) {
       });
     });
 
+    await logAuditEvent({
+      action: "coupon.update",
+      entity: "Coupon",
+      entityId: id,
+      details: { code: existing.code },
+    });
+
     revalidatePath("/admin/coupons");
 
     return { success: true, message: t("couponUpdatedSuccessfully") };
@@ -248,7 +277,14 @@ export async function deleteCoupon(id: string) {
   try {
     await assertAdmin();
     const t = await getTranslations("Actions");
-    await prisma.coupon.delete({ where: { id } });
+    const deleted = await prisma.coupon.delete({ where: { id } });
+
+    await logAuditEvent({
+      action: "coupon.delete",
+      entity: "Coupon",
+      entityId: id,
+      details: { code: deleted.code },
+    });
 
     revalidatePath("/admin/coupons");
 

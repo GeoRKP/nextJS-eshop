@@ -11,6 +11,7 @@ import { getTranslations } from "next-intl/server";
 import { assertAdmin } from "@/lib/auth-guard";
 import { logAuditEvent } from "@/lib/audit-log";
 import { deleteUploadedImages, diffImages } from "@/lib/file-cleanup";
+import { foldGreekSql, foldGreekSqlNoUnaccent } from "@/lib/greek-search";
 
 export const getLatestProducts = unstable_cache(
   async (limit?: number) => {
@@ -118,18 +119,19 @@ export async function getAllProducts({
   limit = PAGE_SIZE,
   page,
   price,
-  rating,
   sort,
   category,
+  brand,
 }: {
   query: string;
   limit?: number;
   page: number;
   price?: string;
-  rating?: string;
   sort?: string;
   category?: string;
+  brand?: string;
 }) {
+  const brandFilter = brand && brand !== "all" ? brand : null;
   const hasTextQuery = query && query !== "all" && query.trim() !== "";
 
   // Resolve category hierarchy: if a parent is selected, include children
@@ -147,13 +149,29 @@ export async function getAllProducts({
       ensureUnaccent(),
     ]);
 
+    // Both sides go through foldGreekSql (lower + unaccent + final-sigma fold),
+    // so LIKE is correct here — the operands are already case-folded and ILIKE
+    // would only re-apply a lowercasing that mishandles ς.
+    const fold = hasUnaccent ? foldGreekSql : foldGreekSqlNoUnaccent;
+    const term = fold(Prisma.sql`${likeTerm}`);
+
+    const likeAny = (columns: Prisma.Sql[]) =>
+      Prisma.join(
+        columns.map((col) => Prisma.sql`${fold(col)} LIKE ${term}`),
+        " OR "
+      );
+
+    const nameBrand = likeAny([Prisma.sql`name`, Prisma.sql`brand`]);
+    const allFields = likeAny([
+      Prisma.sql`name`,
+      Prisma.sql`brand`,
+      Prisma.sql`category`,
+      Prisma.sql`description`,
+    ]);
+
     const searchCondition = useFullText
-      ? hasUnaccent
-        ? Prisma.sql`(search_vector @@ plainto_tsquery('simple', ${query}) OR unaccent(name) ILIKE unaccent(${likeTerm}) OR unaccent(brand) ILIKE unaccent(${likeTerm}))`
-        : Prisma.sql`search_vector @@ plainto_tsquery('simple', ${query})`
-      : hasUnaccent
-        ? Prisma.sql`(unaccent(name) ILIKE unaccent(${likeTerm}) OR unaccent(brand) ILIKE unaccent(${likeTerm}) OR unaccent(category) ILIKE unaccent(${likeTerm}) OR unaccent(description) ILIKE unaccent(${likeTerm}))`
-        : Prisma.sql`(name ILIKE ${likeTerm} OR brand ILIKE ${likeTerm} OR category ILIKE ${likeTerm} OR description ILIKE ${likeTerm})`;
+      ? Prisma.sql`(search_vector @@ plainto_tsquery('simple', ${query}) OR ${nameBrand})`
+      : Prisma.sql`(${allFields})`;
 
     const conditions: Prisma.Sql[] = [
       searchCondition,
@@ -172,14 +190,13 @@ export async function getAllProducts({
         conditions.push(Prisma.sql`category = ${categoryFilter.textFallback}`);
       }
     }
+    if (brandFilter) {
+      conditions.push(Prisma.sql`brand = ${brandFilter}`);
+    }
     if (price && price !== "all") {
       const [min, max] = price.split("-").map(Number);
       conditions.push(Prisma.sql`price >= ${min} AND price <= ${max}`);
     }
-    if (rating && rating !== "all") {
-      conditions.push(Prisma.sql`rating >= ${Number(rating)}`);
-    }
-
     const whereClause = Prisma.join(conditions, " AND ");
 
     const orderClause =
@@ -187,11 +204,9 @@ export async function getAllProducts({
         ? Prisma.sql`price ASC`
         : sort === "highest"
           ? Prisma.sql`price DESC`
-          : sort === "rating"
-            ? Prisma.sql`rating DESC`
-            : useFullText
-              ? Prisma.sql`ts_rank(search_vector, plainto_tsquery('simple', ${query})) DESC`
-              : Prisma.sql`name ASC`;
+          : useFullText
+            ? Prisma.sql`ts_rank(search_vector, plainto_tsquery('simple', ${query})) DESC`
+            : Prisma.sql`name ASC`;
 
     const offset = (page - 1) * limit;
 
@@ -205,19 +220,20 @@ export async function getAllProducts({
       description: string;
       stock: number;
       price: string;
-      rating: string;
-      numreviews: number;
       isfeatured: boolean;
       banner: string | null;
       createdat: Date;
+      lowstockthreshold: number;
+      allowbackorder: boolean;
     };
 
     const [rows, countResult] = await Promise.all([
       prisma.$queryRaw<RawProduct[]>`
         SELECT
           id::text, name, slug, category, images, brand, description, stock,
-          price::text, rating::text, "numReviews" AS numreviews,
-          "isFeatured" AS isfeatured, banner, "createdAt" AS createdat
+          price::text,
+          "isFeatured" AS isfeatured, banner, "createdAt" AS createdat,
+          "lowStockThreshold" AS lowstockthreshold, "allowBackorder" AS allowbackorder
         FROM "Product"
         WHERE ${whereClause}
         ORDER BY ${orderClause}
@@ -239,17 +255,18 @@ export async function getAllProducts({
       description: r.description,
       stock: r.stock,
       price: r.price,
-      rating: r.rating,
-      numReviews: r.numreviews,
       isFeatured: r.isfeatured,
       banner: r.banner,
       createdAt: r.createdat,
+      lowStockThreshold: r.lowstockthreshold,
+      allowBackorder: r.allowbackorder,
     }));
 
     const total = Number(countResult[0].count);
 
     return {
       data,
+      totalCount: total,
       totalPages: Math.ceil(total / limit),
     };
   }
@@ -273,15 +290,10 @@ export async function getAllProducts({
         }
       : {};
 
-  const ratingFilter: Prisma.ProductWhereInput =
-    rating && rating !== "all"
-      ? { rating: { gte: Number(rating) } }
-      : {};
-
   const where = {
     ...categoryWhere,
     ...priceFilter,
-    ...ratingFilter,
+    ...(brandFilter ? { brand: brandFilter } : {}),
     deletedAt: null,
   };
 
@@ -293,9 +305,7 @@ export async function getAllProducts({
           ? { price: "asc" }
           : sort === "highest"
             ? { price: "desc" }
-            : sort === "rating"
-              ? { rating: "desc" }
-              : { createdAt: "desc" },
+            : { createdAt: "desc" },
       skip: (page - 1) * limit,
       take: limit,
     }),
@@ -304,6 +314,7 @@ export async function getAllProducts({
 
   return {
     data,
+    totalCount: dataCount,
     totalPages: Math.ceil(dataCount / limit),
   };
 }

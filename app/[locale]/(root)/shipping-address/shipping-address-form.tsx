@@ -83,7 +83,9 @@ export default function ShippingAddressForm({
     const country =
       locker.country && locker.country.length >= 3 ? locker.country : "Greece";
     form.setValue("address", locker.addressLine1 || locker.name, { shouldValidate: true });
-    form.setValue("city", locker.city || locker.name, { shouldValidate: true });
+    form.setValue("city", locker.city || locker.addressLine2 || locker.name, {
+      shouldValidate: true,
+    });
     form.setValue("postalCode", locker.postalCode || "00000", { shouldValidate: true });
     form.setValue("country", country, { shouldValidate: true });
     if (typeof locker.lat === "number") form.setValue("lat", locker.lat);

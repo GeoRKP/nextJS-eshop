@@ -159,7 +159,9 @@ function normalizeLocker(raw: RawLocker): BoxNowLocker {
     addressLine1: raw.addressLine1 as string | undefined,
     addressLine2: raw.addressLine2 as string | undefined,
     postalCode: (raw.postalCode ?? raw.zipCode) as string | undefined,
-    city: raw.city as string | undefined,
+    // Box Now returns the town in addressLine2 and leaves `city` empty, so
+    // reading city alone left the order with the locker's NAME as its city.
+    city: (raw.city ?? raw.addressLine2) as string | undefined,
     country: raw.country as string | undefined,
     lat: num(raw.lat ?? raw.latitude),
     lng: num(raw.lng ?? raw.longitude),

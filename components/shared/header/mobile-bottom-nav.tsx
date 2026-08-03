@@ -69,6 +69,7 @@ export default function MobileBottomNav() {
                 <button
                   key={tab.key}
                   onClick={tab.action}
+                  aria-label={tab.label}
                   className="flex flex-col items-center justify-center"
                 >
                   <div className="bg-brand-accent text-accent-foreground rounded-full h-14 w-14 flex items-center justify-center -mt-7 ring-4 ring-background shadow-card-glow hover:bg-brand-accent-dark transition-colors">

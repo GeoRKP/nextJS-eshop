@@ -3,87 +3,15 @@
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { CartItem } from "@/types";
-import { formatError, round2, toPlainObject } from "../utils";
+import { formatCurrency, formatError, toPlainObject } from "../utils";
 import { getAuthSession } from "@/lib/auth-session";
 import { prisma } from "@/db/prisma";
-import { cartItemSchema, insertCartSchema } from "../validators";
+import { createCartItemSchema, insertCartSchema } from "../validators";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { getTranslations, getLocale } from "next-intl/server";
 import { localizedName } from "@/lib/i18n-helpers";
-
-// Helper to get coupon data for price recalculation
-async function getCouponData(couponCode: string | null | undefined) {
-  if (!couponCode) return null;
-  const coupon = await prisma.coupon.findUnique({
-    where: { code: couponCode },
-  });
-  if (!coupon) return null;
-  return {
-    discountType: coupon.discountType,
-    discountValue: coupon.discountValue.toString(),
-    minOrderAmount: coupon.minOrderAmount?.toString(),
-    maxDiscount: coupon.maxDiscount?.toString(),
-  };
-}
-
-// Calculate prices with optional coupon discount
-const calcPrice = (
-  items: CartItem[],
-  coupon?: {
-    discountType: string;
-    discountValue: string | number;
-    minOrderAmount?: string | number | null;
-    maxDiscount?: string | number | null;
-  } | null
-) => {
-  // Greek VAT: standard 24%, reduced 13%/6%. Configurable via env for flexibility.
-  const VAT_RATE = Number(process.env.VAT_RATE ?? 0.24);
-  const FREE_SHIPPING_THRESHOLD = Number(
-    process.env.FREE_SHIPPING_THRESHOLD ?? 100
-  );
-  const SHIPPING_COST = Number(process.env.SHIPPING_COST ?? 10);
-
-  const itemsPrice = round2(
-      items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0)
-    ),
-    shippingPrice = round2(
-      itemsPrice >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
-    ),
-    // Catalog prices are FINAL (VAT-inclusive) — taxPrice is the VAT already
-    // contained in itemsPrice, shown for information; it is NOT added to the total.
-    taxPrice = round2(itemsPrice - itemsPrice / (1 + VAT_RATE));
-
-  // Calculate discount
-  let discountAmount = 0;
-
-  if (coupon) {
-    // Check minimum order amount
-    if (coupon.minOrderAmount && itemsPrice < Number(coupon.minOrderAmount)) {
-      // Don't apply discount if below minimum
-    } else if (coupon.discountType === "percentage") {
-      discountAmount = round2(itemsPrice * (Number(coupon.discountValue) / 100));
-      // Apply max discount cap
-      if (coupon.maxDiscount && discountAmount > Number(coupon.maxDiscount)) {
-        discountAmount = round2(Number(coupon.maxDiscount));
-      }
-    } else if (coupon.discountType === "fixed_amount") {
-      discountAmount = round2(Math.min(Number(coupon.discountValue), itemsPrice));
-    } else if (coupon.discountType === "free_shipping") {
-      discountAmount = shippingPrice;
-    }
-  }
-
-  const totalPrice = round2(itemsPrice + shippingPrice - discountAmount);
-
-  return {
-    itemsPrice: itemsPrice.toFixed(2),
-    shippingPrice: shippingPrice.toFixed(2),
-    taxPrice: taxPrice.toFixed(2),
-    totalPrice: totalPrice.toFixed(2),
-    discountAmount: discountAmount.toFixed(2),
-  };
-};
+import { calcPrice, getCouponData } from "../pricing";
 
 export async function addItemToCart(data: CartItem) {
   try {
@@ -97,7 +25,8 @@ export async function addItemToCart(data: CartItem) {
 
     const cart = await getMyCart();
 
-    const clientItem = cartItemSchema.parse(data);
+    const tV = await getTranslations("Validation");
+    const clientItem = createCartItemSchema(tV).parse(data);
 
     // SECURITY: never trust client-provided price/name/image.
     // Re-fetch from DB and override — protects against DevTools price manipulation.
@@ -109,10 +38,12 @@ export async function addItemToCart(data: CartItem) {
       select: {
         id: true,
         name: true,
+        nameEn: true,
         slug: true,
         images: true,
         price: true,
         stock: true,
+        allowBackorder: true,
       },
     });
 
@@ -121,6 +52,7 @@ export async function addItemToCart(data: CartItem) {
     const item = {
       ...clientItem,
       name: product.name,
+      nameEn: product.nameEn,
       slug: product.slug,
       image: product.images[0] ?? clientItem.image,
       price: product.price.toString(),
@@ -128,7 +60,8 @@ export async function addItemToCart(data: CartItem) {
 
     if (!cart) {
       // Never let the first add exceed available stock (client qty is untrusted).
-      if (product.stock < clientItem.qty) {
+      // Backorder products are purchasable regardless of stock.
+      if (!product.allowBackorder && product.stock < clientItem.qty) {
         throw new Error(t("notEnoughStock"));
       }
 
@@ -161,7 +94,7 @@ export async function addItemToCart(data: CartItem) {
       );
 
       if (existItem) {
-        if (product.stock < existItem.qty + 1) {
+        if (!product.allowBackorder && product.stock < existItem.qty + 1) {
           throw new Error(t("notEnoughStock"));
         }
 
@@ -171,7 +104,7 @@ export async function addItemToCart(data: CartItem) {
           (x) => x.productId === item.productId
         )!.qty = existItem.qty + 1;
       } else {
-        if (product.stock < clientItem.qty) {
+        if (!product.allowBackorder && product.stock < clientItem.qty) {
           throw new Error(t("notEnoughStock"));
         }
 
@@ -273,15 +206,18 @@ export const getMyCart = cache(async () => {
 
         // Clamp merged quantities to available stock (guest + user carts may
         // together exceed it) and drop items that are out of stock entirely.
+        // Backorder products are exempt from both the clamp and the drop.
         const stocks = await prisma.product.findMany({
           where: { id: { in: userItems.map((i) => i.productId) } },
-          select: { id: true, stock: true },
+          select: { id: true, stock: true, allowBackorder: true },
         });
-        const stockById = new Map(stocks.map((p) => [p.id, p.stock]));
+        const productById = new Map(stocks.map((p) => [p.id, p]));
         const mergedItems = userItems.filter((item) => {
-          const stock = stockById.get(item.productId) ?? 0;
-          if (stock <= 0) return false;
-          if (item.qty > stock) item.qty = stock;
+          const p = productById.get(item.productId);
+          if (!p) return false;
+          if (p.allowBackorder) return true;
+          if (p.stock <= 0) return false;
+          if (item.qty > p.stock) item.qty = p.stock;
           return true;
         });
 
@@ -426,6 +362,19 @@ export async function applyCouponToCart(code: string) {
       if (userUsageCount >= coupon.maxUsesPerUser) {
         throw new Error(t("couponMaxUsesPerUserReached"));
       }
+    }
+
+    // calcPrice silently skips the discount below the minimum, so without this
+    // the cart reported "coupon applied" while charging full price.
+    if (
+      coupon.minOrderAmount &&
+      Number(cart.itemsPrice) < Number(coupon.minOrderAmount)
+    ) {
+      throw new Error(
+        t("couponMinOrderNotMet", {
+          amount: formatCurrency(Number(coupon.minOrderAmount)),
+        })
+      );
     }
 
     const couponData = {

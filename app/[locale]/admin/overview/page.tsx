@@ -21,6 +21,8 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
 import { Eye, AlertTriangle } from "lucide-react";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
+import OrderStatusBadge from "@/components/shared/order-status-badge";
+import { ORDER_STATUS_TRANSLATION_KEY } from "@/lib/order-status";
 
 export async function generateMetadata() {
   const t = await getTranslations("Metadata");
@@ -44,6 +46,12 @@ export default async function AdminOverviewPage(props: {
 
   const data = await getDashboardData(filters);
   const t = await getTranslations("AdminDashboard");
+  const tOrder = await getTranslations("Order");
+
+  const statusLabel = (status: string) => {
+    const key = ORDER_STATUS_TRANSLATION_KEY[status];
+    return key ? tOrder(key as Parameters<typeof tOrder>[0]) : status;
+  };
 
   return (
     <div className="space-y-4">
@@ -61,7 +69,10 @@ export default async function AdminOverviewPage(props: {
       {/* Charts */}
       <Charts
         salesTimeSeries={data.salesTimeSeries}
-        ordersByStatus={data.ordersByStatus}
+        ordersByStatus={data.ordersByStatus.map((s) => ({
+          ...s,
+          status: statusLabel(s.status),
+        }))}
         revenueByPaymentMethod={data.revenueByPaymentMethod}
         topProducts={data.topProducts}
         salesByCategory={data.salesByCategory}
@@ -107,7 +118,10 @@ export default async function AdminOverviewPage(props: {
                     {formatCurrency(order.totalPrice)}
                   </TableCell>
                   <TableCell>
-                    <StatusBadge status={order.status} label={t(`status${order.status}` as Parameters<typeof t>[0])} />
+                    <OrderStatusBadge
+                      status={order.status}
+                      label={statusLabel(order.status)}
+                    />
                   </TableCell>
                   <TableCell>
                     <Link href={`/order/${order.id}`}>
@@ -169,19 +183,3 @@ export default async function AdminOverviewPage(props: {
   );
 }
 
-function StatusBadge({ status, label }: { status: string; label: string }) {
-  const variants: Record<
-    string,
-    "default" | "secondary" | "destructive" | "outline" | "accent" | "success" | "warning"
-  > = {
-    Pending: "outline",
-    Paid: "accent",
-    Delivered: "success",
-  };
-
-  return (
-    <Badge variant={variants[status] || "outline"} className="text-xs">
-      {label}
-    </Badge>
-  );
-}

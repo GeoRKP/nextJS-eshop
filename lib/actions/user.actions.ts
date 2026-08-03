@@ -8,21 +8,22 @@ import {
   createShippingAddressSchema,
   createPaymentMethodSchema,
 } from "../validators";
-import { auth, signIn, signOut } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { hashSync } from "bcrypt-ts";
 import { prisma } from "@/db/prisma";
 import { formatError } from "../utils";
-import { ShippingAddress } from "@/types";
+import { CartItem, ShippingAddress } from "@/types";
 import { z } from "zod/v3";
 import { PAGE_SIZE } from "../constants";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { calcPrice, getCouponData } from "../pricing";
 import { getTranslations } from "next-intl/server";
-import { headers } from "next/headers";
-import { rateLimit } from "@/lib/rate-limit";
-import { assertAdmin } from "@/lib/auth-guard";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { assertAdmin, requireUserId } from "@/lib/auth-guard";
 import { safeCallbackUrl } from "@/lib/safe-redirect";
 import { createGuestToken } from "@/lib/guest-token";
+import { logAuditEvent } from "@/lib/audit-log";
 import { Prisma } from "@prisma/client";
 
 export async function signInWithCredentials(
@@ -38,11 +39,10 @@ export async function signInWithCredentials(
     });
 
     // Throttle brute-force / password-spraying: cap attempts per IP+email.
-    const ip =
-      (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      "unknown";
+    // Same key as the authorize() limit in auth.ts, so both entry points share
+    // one bucket instead of granting 10 attempts each.
     const rl = rateLimit({
-      key: `login:${ip}:${user.email.toLowerCase()}`,
+      key: `login:${await clientIp()}:${user.email.toLowerCase()}`,
       limit: 10,
       windowMs: 15 * 60_000,
     });
@@ -92,11 +92,8 @@ export async function continueAsGuest(prevState: unknown, formData: FormData) {
       );
 
     // Same throttle profile as login: guests can enumerate emails otherwise.
-    const ip =
-      (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      "unknown";
     const rl = rateLimit({
-      key: `guest:${ip}`,
+      key: `guest:${await clientIp()}`,
       limit: 10,
       windowMs: 15 * 60_000,
     });
@@ -108,6 +105,11 @@ export async function continueAsGuest(prevState: unknown, formData: FormData) {
       where: { email, deletedAt: null },
     });
 
+    // This does reveal that an account exists for the address. Any flow that
+    // refuses guest checkout for registered emails leaks that either way, and a
+    // vague error would just strand a real customer who forgot they signed up.
+    // The defence is the rate limit above, which is now keyed on an IP the
+    // caller cannot choose (see clientIp in lib/rate-limit.ts).
     if (existing && !existing.isGuest) {
       return { success: false, message: t("guestEmailHasAccount") };
     }
@@ -209,12 +211,10 @@ export async function getUserById(id: string) {
 export async function updateUserAddress(data: ShippingAddress) {
   try {
     const t = await getTranslations("Actions");
-    const session = await auth();
+    const userId = await requireUserId();
 
-    const currentUser = await prisma.user.findFirst({
-      where: {
-        id: session?.user?.id,
-      },
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
     });
 
     if (!currentUser) {
@@ -229,6 +229,28 @@ export async function updateUserAddress(data: ShippingAddress) {
       data: { address: address },
     });
 
+    // Shipping cost depends on the chosen method (Box Now vs carrier) — bring
+    // the cart totals in line so payment/place-order show the right amount.
+    const cart = await prisma.cart.findFirst({
+      where: { userId: currentUser.id },
+    });
+    if (cart && (cart.items as CartItem[]).length > 0) {
+      const couponData = await getCouponData(cart.couponCode);
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: {
+          ...calcPrice(
+            cart.items as CartItem[],
+            couponData,
+            address.shippingMethod
+          ),
+        },
+      });
+      revalidatePath("/cart");
+      revalidatePath("/en/cart");
+      revalidateTag("cart", "max");
+    }
+
     return { success: true, message: t("addressUpdatedSuccessfully") };
   } catch (error) {
     return { success: false, message: formatError(error) };
@@ -242,12 +264,10 @@ export async function updateUserPaymentMethod(
 ) {
   try {
     const t = await getTranslations("Actions");
-    const session = await auth();
+    const userId = await requireUserId();
 
-    const currentUser = await prisma.user.findFirst({
-      where: {
-        id: session?.user?.id,
-      },
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
     });
 
     if (!currentUser) {
@@ -272,12 +292,10 @@ export async function updateUserPaymentMethod(
 export async function updateProfile(user: { name: string; email: string }) {
   try {
     const t = await getTranslations("Actions");
-    const session = await auth();
+    const userId = await requireUserId();
 
-    const currentUser = await prisma.user.findFirst({
-      where: {
-        id: session?.user?.id,
-      },
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
     });
 
     if (!currentUser) {
@@ -306,13 +324,23 @@ export async function getAllUsers({
   query: string;
 }) {
   await assertAdmin();
+
+  // Searching only `name` meant an admin holding a customer's email address
+  // could not find them. Soft-deleted accounts stay out of the list entirely.
+  const where: Prisma.UserWhereInput = {
+    deletedAt: null,
+    ...(query
+      ? {
+          OR: [
+            { name: { contains: query, mode: "insensitive" as const } },
+            { email: { contains: query, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+  };
+
   const data = await prisma.user.findMany({
-    where: {
-      name: {
-        contains: query,
-        mode: "insensitive",
-      },
-    },
+    where,
     orderBy: {
       createdAt: "desc",
     },
@@ -320,14 +348,7 @@ export async function getAllUsers({
     take: limit,
   });
 
-  const dataCount = await prisma.user.count({
-    where: {
-      name: {
-        contains: query,
-        mode: "insensitive",
-      },
-    },
-  });
+  const dataCount = await prisma.user.count({ where });
 
   return {
     data,
@@ -349,8 +370,39 @@ export async function deleteUser(id: string) {
       return { success: false, message: t("cannotDeleteUserWithOrders") };
     }
 
-    await prisma.user.delete({
+    const existing = await prisma.user.findUnique({
       where: { id },
+      select: { email: true, deletedAt: true },
+    });
+    if (!existing || existing.deletedAt) {
+      return { success: false, message: t("userNotFound") };
+    }
+
+    // Soft delete, which is what the rest of the codebase already assumes —
+    // every read filters on deletedAt. The email is released at the same time
+    // (it is uniquely indexed) so the person can sign up again later, and
+    // releasing it doubles as the GDPR erasure of the identifier.
+    await prisma.$transaction(async (tx) => {
+      await tx.cart.deleteMany({ where: { userId: id } });
+      await tx.address.deleteMany({ where: { userId: id } });
+      await tx.user.update({
+        where: { id },
+        data: {
+          deletedAt: new Date(),
+          email: `deleted-${id}@deleted.invalid`,
+          name: "Deleted user",
+          password: null,
+          address: Prisma.DbNull,
+          paymentMethod: null,
+        },
+      });
+    });
+
+    await logAuditEvent({
+      action: "user.delete",
+      entity: "User",
+      entityId: id,
+      details: { email: existing.email, mode: "soft" },
     });
 
     revalidatePath("/admin/users");
@@ -369,11 +421,32 @@ export async function updateUser(user: z.infer<typeof updateUserSchema>) {
     // Validate server-side: never trust the typed input verbatim. This also
     // constrains `role` to the allowed set (see updateUserSchema).
     const parsed = updateUserSchema.parse(user);
+
+    const before = await prisma.user.findUnique({
+      where: { id: parsed.id },
+      select: { name: true, role: true },
+    });
+
     await prisma.user.update({
       where: { id: parsed.id },
       data: {
         name: parsed.name,
         role: parsed.role,
+      },
+    });
+
+    // Privilege escalation was the one admin action with no trace anywhere —
+    // not in the audit log, not in any history table.
+    await logAuditEvent({
+      action:
+        before && before.role !== parsed.role
+          ? "user.roleChange"
+          : "user.update",
+      entity: "User",
+      entityId: parsed.id,
+      details: {
+        from: { name: before?.name, role: before?.role },
+        to: { name: parsed.name, role: parsed.role },
       },
     });
 

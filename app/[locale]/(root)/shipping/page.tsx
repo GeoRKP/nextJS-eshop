@@ -1,9 +1,10 @@
 import { getTranslations } from "next-intl/server";
+import { localeAlternates } from "@/lib/seo";
 import { Truck, Clock, Package, MapPin } from "lucide-react";
 
 export async function generateMetadata() {
   const t = await getTranslations("Info.shipping");
-  return { title: t("title") };
+  return { title: t("title"), alternates: localeAlternates("/shipping") };
 }
 
 export default async function ShippingPage() {
@@ -38,6 +39,11 @@ export default async function ShippingPage() {
         <section>
           <h2 className="h3-bold mb-3">{t("costsTitle")}</h2>
           <p>{t("costsBody")}</p>
+        </section>
+
+        <section>
+          <h2 className="h3-bold mt-8 mb-3">{t("arrangementTitle")}</h2>
+          <p>{t("arrangementBody")}</p>
         </section>
 
         <section>

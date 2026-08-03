@@ -40,8 +40,11 @@ const EVENT_TRANSACTION_FAILED = 1798; // Transaction Failed (StatusId "E")
 function isAllowedSourceIp(req: NextRequest): boolean {
   const allowed = process.env.VIVA_WEBHOOK_ALLOWED_IPS;
   if (!allowed) return true; // not configured → don't block
+  // Last hop, not first: everything before it is whatever the caller sent, so
+  // reading [0] would let anyone spoof their way past the allow-list.
   const fwd = req.headers.get("x-forwarded-for") || "";
-  const clientIp = fwd.split(",")[0].trim();
+  const hops = fwd.split(",").map((s) => s.trim()).filter(Boolean);
+  const clientIp = hops[hops.length - 1] ?? "";
   if (!clientIp) return true; // can't determine → don't block
   return allowed
     .split(",")
@@ -70,10 +73,10 @@ async function resolveOrderId(
 export async function GET() {
   const key = process.env.VIVA_WEBHOOK_KEY;
   if (!key) {
-    return NextResponse.json(
-      { error: "VIVA_WEBHOOK_KEY is not set on the server" },
-      { status: 500 }
-    );
+    // Generic body: this endpoint is public and the old message handed an
+    // anonymous caller the exact env var name we were missing.
+    console.error("Viva webhook verification requested but VIVA_WEBHOOK_KEY is not set");
+    return NextResponse.json({ error: "not configured" }, { status: 503 });
   }
   return NextResponse.json({ Key: key });
 }

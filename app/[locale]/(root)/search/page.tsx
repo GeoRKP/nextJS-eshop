@@ -17,16 +17,15 @@ import Pagination from "@/components/shared/pagination";
 import { SearchX } from "lucide-react";
 import { ViewProvider } from "./view-context";
 import ProductsView from "./products-view";
+import { localeAlternates } from "@/lib/seo";
+import { PAGE_SIZE } from "@/lib/constants";
 
-const ratings = [4, 3, 2, 1];
-
-const sortOrders = ["newest", "lowest", "highest", "rating"] as const;
+const sortOrders = ["newest", "lowest", "highest"] as const;
 
 const sortKeyMap: Record<string, string> = {
   newest: "newest",
   lowest: "lowest",
   highest: "highest",
-  rating: "sortRating",
 };
 
 export async function generateMetadata(props: {
@@ -34,7 +33,7 @@ export async function generateMetadata(props: {
     q?: string;
     category?: string;
     price?: string;
-    rating?: string;
+    brand?: string;
   }>;
 }) {
   const t = await getTranslations("Search");
@@ -44,24 +43,28 @@ export async function generateMetadata(props: {
     q = "all",
     category = "all",
     price = "all",
-    rating = "all",
+    brand = "all",
   } = await props.searchParams;
 
   const isQuerySet = q && q !== "all" && q.trim() !== "";
   const isCategorySet =
     category && category !== "all" && category.trim() !== "";
   const isPriceSet = price && price !== "all" && price.trim() !== "";
-  const isRatingSet = rating && rating !== "all" && rating.trim() !== "";
+  const isBrandSet = brand && brand !== "all" && brand.trim() !== "";
 
-  if (isQuerySet || isCategorySet || isPriceSet || isRatingSet) {
+  // Canonical without the facet params, so ?sort/?price/?page variants
+  // consolidate onto one /search entry instead of competing with each other.
+  const alternates = localeAlternates("/search");
+
+  if (isQuerySet || isCategorySet || isPriceSet || isBrandSet) {
     const parts: string[] = [];
+    if (isBrandSet) parts.push(brand);
     if (isCategorySet) parts.push(category);
     if (isQuerySet) parts.push(q);
     if (isPriceSet) parts.push(`${t("priceLabel")} ${price}`);
-    if (isRatingSet) parts.push(`${rating}+ ★`);
-    return { title: parts.join(" · ") };
+    return { title: parts.join(" · "), alternates };
   }
-  return { title: tMeta("searchProducts") };
+  return { title: tMeta("searchProducts"), alternates };
 }
 
 export default async function SearchPage(props: {
@@ -69,7 +72,7 @@ export default async function SearchPage(props: {
     q?: string;
     category?: string;
     price?: string;
-    rating?: string;
+    brand?: string;
     sort?: string;
     page?: string;
     view?: string;
@@ -79,7 +82,7 @@ export default async function SearchPage(props: {
     q = "all",
     category = "all",
     price = "all",
-    rating = "all",
+    brand = "all",
     sort = "newest",
     page = "1",
     view = "grid",
@@ -95,26 +98,26 @@ export default async function SearchPage(props: {
     c,
     s,
     p,
-    r,
+    b,
     pg,
     qv,
   }: {
     c?: string;
     s?: string;
     p?: string;
-    r?: string;
+    b?: string;
     pg?: string;
     qv?: string;
   }) => {
-    const params = { q, category, price, rating, sort, page };
+    const params = { q, category, price, brand, sort, page };
     if (qv !== undefined) params.q = qv;
     if (c) params.category = c;
     if (s) params.sort = s;
     if (p) params.price = p;
-    if (r) params.rating = r;
+    if (b) params.brand = b;
     if (pg) {
       params.page = pg;
-    } else if (c || s || p || r || qv !== undefined) {
+    } else if (c || s || p || b || qv !== undefined) {
       // Any filter/sort/query change resets to page 1 — the current page may
       // not exist in the narrowed result set (otherwise: empty grid).
       params.page = "1";
@@ -127,7 +130,7 @@ export default async function SearchPage(props: {
     query: q,
     category,
     price,
-    rating,
+    brand,
     sort,
     page: parseInt(page),
   });
@@ -180,10 +183,10 @@ export default async function SearchPage(props: {
       clearUrl: getFilterUrl({ p: "all" }),
     });
   }
-  if (rating !== "all") {
+  if (brand !== "all" && brand !== "") {
     activeFilters.push({
-      label: `${t("ratingLabel")} ${rating} ${t("starsAndUp", { count: Number(rating) })}`,
-      clearUrl: getFilterUrl({ r: "all" }),
+      label: `${t("brand")} ${brand}`,
+      clearUrl: getFilterUrl({ b: "all" }),
     });
   }
 
@@ -209,24 +212,15 @@ export default async function SearchPage(props: {
       currentMin,
       currentMax,
     },
-    ratings: ratings.map((r) => ({
-      value: r,
-      label: t("starsAndUp", { count: r }),
-      href: getFilterUrl({ r: `${r}` }),
-      isActive: rating === r.toString(),
-    })),
     anyHref: {
       category: getFilterUrl({ c: "all" }),
       price: getFilterUrl({ p: "all" }),
-      rating: getFilterUrl({ r: "all" }),
     },
     activeCategory: category,
     activePrice: price,
-    activeRating: rating,
     translations: {
       department: t("department"),
       price: t("price"),
-      rating: t("rating"),
       any: tCommon("any"),
       filters: t("filters"),
       clearFilters: t("clearFilters"),
@@ -234,7 +228,7 @@ export default async function SearchPage(props: {
       applyPrice: t("applyPrice"),
     },
     clearAllHref: "/search",
-    searchParams: { q, category, price, rating, sort, page },
+    searchParams: { q, category, price, brand, sort, page },
   };
 
   const hasQuery = q !== "all" && q.trim() !== "";
@@ -274,7 +268,11 @@ export default async function SearchPage(props: {
           </h1>
           {products.data.length > 0 && (
             <p className="text-sm text-muted-foreground mt-1">
-              {t("showingResults", { count: products.data.length, page: page, totalPages: products.totalPages.toString() })}
+              {t("showingResults", {
+                from: (Number(page) - 1) * PAGE_SIZE + 1,
+                to: (Number(page) - 1) * PAGE_SIZE + products.data.length,
+                total: products.totalCount,
+              })}
             </p>
           )}
         </div>

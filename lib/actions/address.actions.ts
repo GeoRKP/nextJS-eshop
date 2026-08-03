@@ -201,15 +201,23 @@ export async function setDefaultAddress(id: string) {
       throw new Error(t("userNotAuthenticated"));
     }
 
-    // Unset all defaults
+    // Scope the promotion to the caller's own rows, and only unset the previous
+    // default once we know the target is theirs — a bare update({ where: { id } })
+    // let anyone flip another account's address to default.
+    const owned = await prisma.address.findFirst({
+      where: { id, userId: session.user.id },
+      select: { id: true },
+    });
+
+    if (!owned) throw new Error(t("addressNotFound"));
+
     await prisma.address.updateMany({
       where: { userId: session.user.id, isDefault: true },
       data: { isDefault: false },
     });
 
-    // Set new default
     await prisma.address.update({
-      where: { id },
+      where: { id: owned.id },
       data: { isDefault: true },
     });
 

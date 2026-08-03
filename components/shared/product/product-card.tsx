@@ -3,7 +3,6 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import ProductPrice from "./product-price";
 import { Product } from "@/types";
-import Rating from "@/components/shared/product/rating";
 import HighlightText from "@/lib/highlight-text";
 import { getLocale, getTranslations } from "next-intl/server";
 import { localizedName, localizedDescription } from "@/lib/i18n-helpers";
@@ -25,7 +24,11 @@ export default async function ProductCard({
   const locale = await getLocale();
   const displayName = localizedName(product, locale);
   const displayDescription = localizedDescription(product, locale);
-  const lowStock = product.stock > 0 && product.stock <= 5;
+  // Honour the per-product threshold the admin form already exposes; the old
+  // hardcoded 5 meant a product with stock 19 and a threshold of 20 still
+  // showed a plain "in stock" badge.
+  const lowStockThreshold = product.lowStockThreshold ?? 5;
+  const lowStock = product.stock > 0 && product.stock <= lowStockThreshold;
 
   if (variant === "list") {
     return (
@@ -64,13 +67,6 @@ export default async function ProductCard({
               </h2>
             </Link>
 
-            {/* Rating */}
-            <div className="flex items-center gap-2 mt-2">
-              <Rating value={Number(product.rating)} />
-              <span className="font-mono text-[11px] text-muted-foreground">
-                ({product.numReviews})
-              </span>
-            </div>
 
             {/* Description */}
             <p className="hidden md:block text-xs text-muted-foreground line-clamp-2 mt-3 leading-relaxed">
@@ -156,13 +152,6 @@ export default async function ProductCard({
             </h2>
           </Link>
 
-          {/* Rating */}
-          <div className="flex items-center gap-1.5">
-            <Rating value={Number(product.rating)} />
-            <span className="font-mono text-[10px] text-muted-foreground">
-              ({product.numReviews})
-            </span>
-          </div>
 
           {/* Price + Add to Cart */}
           <div className="border-t border-dashed border-border pt-3 mt-1 flex items-center justify-between gap-2">
